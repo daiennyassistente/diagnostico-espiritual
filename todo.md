@@ -90,15 +90,15 @@
 
 
 ## Bugs Encontrados no Site Publicado
-- [ ] Botões não ficam preenchidos com cor escura quando selecionados
-- [ ] Verificar renderização de textos das perguntas
-- [ ] Adicionar espaço entre setas e texto nos botões de navegação
-- [ ] Verificar nomenclatura da barra de progresso (Etapa vs Pergunta)
+- [x] Botões não ficam preenchidos com cor escura quando selecionados
+- [x] Verificar renderização de textos das perguntas
+- [x] Adicionar espaço entre setas e texto nos botões de navegação
+- [x] Verificar nomenclatura da barra de progresso (Etapa vs Pergunta)
 
 
 ## Integração Stripe
-- [ ] Adicionar feature Stripe ao projeto
-- [ ] Configurar chaves API do Stripe
-- [ ] Criar página de checkout
-- [ ] Integrar Stripe com resultado do quiz
-- [ ] Testar fluxo de pagamento
+- [ ] Adicionar feature Stripe ao projeto (adiado)
+- [ ] Configurar chaves API do Stripe (adiado)
+- [ ] Criar página de checkout (adiado)
+- [ ] Integrar Stripe com resultado do quiz (adiado)
+- [ ] Testar fluxo de pagamento (adiado)

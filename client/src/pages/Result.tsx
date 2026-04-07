@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { analyzeResponses, SpiritualProfile } from "@/lib/spiritualProfileAnalyzer";
-import { Heart, Lightbulb, Target, TrendingUp } from "lucide-react";
+import { Heart, Lightbulb, Target, TrendingUp, Download, Loader2 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 export default function Result() {
   const [location, setLocation] = useLocation();
   const [profile, setProfile] = useState<SpiritualProfile | null>(null);
   const [responses, setResponses] = useState<Record<number, string> | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
 
   useEffect(() => {
     // Recuperar respostas do localStorage
@@ -150,6 +154,51 @@ export default function Result() {
 
         {/* Botões de Ação */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            onClick={async () => {
+              setIsGeneratingPDF(true);
+              try {
+                const result = await generatePDFMutation.mutateAsync({
+                  profileName: profile.title,
+                  profileDescription: profile.description,
+                  strengths: profile.strengths,
+                  challenges: profile.challenges,
+                  recommendations: profile.recommendations,
+                  nextSteps: profile.nextSteps,
+                  responses: responses as Record<string, string>,
+                });
+
+                if (result.success && result.pdfBase64) {
+                  const link = document.createElement("a");
+                  link.href = `data:application/pdf;base64,${result.pdfBase64}`;
+                  link.download = `diagnostico-espiritual-${profile.title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  toast.success("PDF baixado com sucesso!");
+                }
+              } catch (error) {
+                console.error("Erro ao gerar PDF:", error);
+                toast.error("Erro ao gerar PDF. Tente novamente.");
+              } finally {
+                setIsGeneratingPDF(false);
+              }
+            }}
+            disabled={isGeneratingPDF}
+            className="flex-1"
+          >
+            {isGeneratingPDF ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Gerando PDF...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" />
+                Baixar Diagnóstico em PDF
+              </>
+            )}
+          </Button>
           <Button
             onClick={() => {
               localStorage.removeItem("quizResponses");

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { invokeLLM } from "./_core/llm";
 
-describe("OpenAI Integration", () => {
+describe("OpenAI Integration", { timeout: 15000 }, () => {
   it("should successfully call OpenAI API with valid key", async () => {
     const response = await invokeLLM({
       messages: [
