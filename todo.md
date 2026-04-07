@@ -46,5 +46,11 @@
 - [x] Desenvolver página de admin com tabela de respostas
 - [x] Implementar filtros e busca na tabela de respostas
 - [x] Criar dashboard com gráficos de distribuição de respostas
-- [ ] Adicionar proteção de acesso (apenas admin pode ver)
+- [x] Adicionar proteção de acesso (apenas admin pode ver)
 - [x] Testar visualização de dados
+
+## Melhorias de Design
+- [x] Melhorar design dos botões de resposta com estados visuais mais pronunciados
+- [x] Adicionar ícone de checkmark quando opção é selecionada
+- [x] Melhorar transições e animações dos botões
+- [x] Adicionar cruz e bíblia como elementos decorativos no fundo

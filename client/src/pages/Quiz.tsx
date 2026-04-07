@@ -256,7 +256,7 @@ export default function Quiz() {
   // Tela de abertura
   if (currentStep === 0 && Object.keys(responses).length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full">
           <div className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground">
@@ -285,7 +285,7 @@ export default function Quiz() {
     const progress = ((processingStep + 1) / PROCESSING_MESSAGES.length) * 100;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-foreground">
@@ -329,7 +329,7 @@ export default function Quiz() {
   // Tela de captura de leads
   if (showLeadForm) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full">
           <div className="space-y-6">
             <div className="text-center">
@@ -400,7 +400,7 @@ export default function Quiz() {
     const progress = (currentStep / QUIZ_STEPS.length) * 100;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 spiritual-background">
         <div className="quiz-card max-w-2xl w-full">
           {/* Progress Bar */}
           <div className="mb-8">

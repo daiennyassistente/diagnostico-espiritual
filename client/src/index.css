@@ -173,20 +173,55 @@
   
   /* Quiz Card Styling */
   .quiz-card {
-    @apply bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-2xl mx-auto;
+    @apply bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-2xl mx-auto relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 245, 240, 0.98) 100%);
+  }
+  
+  .quiz-card::before {
+    content: '';
+    position: relative;
+    z-index: 10;
+  }
+  
+  .quiz-card::after {
+    content: '';
+    position: relative;
+    z-index: 10;
   }
   
   /* Quiz Button Styling */
   .quiz-button {
-    @apply w-full px-4 py-4 rounded-xl border-2 border-muted text-foreground font-medium transition-all duration-200 hover:border-accent hover:shadow-md text-center;
+    @apply w-full px-4 py-4 pr-12 rounded-xl border-2 border-muted text-foreground font-medium transition-all duration-300 hover:border-accent hover:shadow-lg text-center relative overflow-hidden;
   }
   
   .quiz-button:hover {
-    @apply bg-secondary;
+    @apply bg-secondary border-accent;
   }
   
   .quiz-button.selected {
-    @apply bg-primary text-primary-foreground border-primary shadow-md;
+    @apply bg-primary text-primary-foreground border-primary shadow-lg scale-105 font-semibold;
+  }
+  
+  .quiz-button.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    font-weight: bold;
+    animation: checkmark 0.3s ease-out;
+  }
+  
+  @keyframes checkmark {
+    0% {
+      opacity: 0;
+      transform: translateY(-50%) scale(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
   }
   
   /* Progress Bar */
@@ -196,5 +231,37 @@
   
   .progress-fill {
     @apply h-full bg-primary transition-all duration-300;
+  }
+  
+  /* Page Background with Decorative Elements */
+  .spiritual-background {
+    position: relative;
+    background: linear-gradient(135deg, #F5F1EA 0%, #F9F7F3 100%);
+    overflow: hidden;
+  }
+  
+  .spiritual-background::before {
+    content: '✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 80px;
+    opacity: 0.03;
+    font-weight: bold;
+    color: #4A3F35;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1.8;
+    word-wrap: break-word;
+    overflow: hidden;
+    white-space: pre-wrap;
+    padding: 20px;
+    text-align: justify;
+  }
+  
+  .spiritual-background::after {
+    content: '';
   }
 }
