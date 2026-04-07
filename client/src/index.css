@@ -192,14 +192,20 @@
   /* Quiz Button Styling */
   .quiz-button {
     @apply w-full px-4 py-4 pr-12 rounded-xl border-2 border-muted text-foreground font-medium transition-all duration-300 hover:border-accent hover:shadow-lg text-center relative overflow-hidden;
+    background-color: transparent !important;
   }
   
   .quiz-button:hover {
     @apply bg-secondary border-accent;
+    background-color: #E8E1D8 !important;
   }
   
   .quiz-button.selected {
-    @apply bg-primary text-primary-foreground border-primary shadow-lg scale-105 font-semibold;
+    background-color: #3E342C !important;
+    color: #FFFFFF !important;
+    border-color: #3E342C !important;
+    @apply shadow-lg font-semibold;
+    transform: scale(1.02);
   }
   
   .quiz-button.selected::after {
@@ -210,6 +216,7 @@
     transform: translateY(-50%);
     font-size: 20px;
     font-weight: bold;
+    color: #FFFFFF;
     animation: checkmark 0.3s ease-out;
   }
   
@@ -217,6 +224,10 @@
     0% {
       opacity: 0;
       transform: translateY(-50%) scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.2);
     }
     100% {
       opacity: 1;
