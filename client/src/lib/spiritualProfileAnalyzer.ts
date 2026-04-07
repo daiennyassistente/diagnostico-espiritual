@@ -65,7 +65,7 @@ const PROFILES: Record<string, SpiritualProfile> = {
     nextSteps: [
       "Tire um tempo para reflexão e descanso",
       "Busque atividades que te tragam alegria",
-      "Considere uma retiro ou tempo de silêncio"
+      "Considere um retiro ou tempo de silêncio"
     ]
   },
   TRAVADA_ESPIRITUALMENTE: {

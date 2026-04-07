@@ -30,9 +30,9 @@ const STEP_LABELS = [
   'O que você mais sente falta hoje na sua vida com Deus?',
   'O que você sente que mais tem sido tratado em você nessa fase?',
   'O que você mais deseja viver com Deus agora?',
-  'Quanto tempo por dia você consegue separar com intencionalidade?',
-  'Você sente que sua dificuldade maior é mais…',
-  'Hoje, no fundo, você sente que está…',
+  'Quanto tempo por dia você consegue dedicar com intencionalidade?',
+  'Qual é sua maior dificuldade?',
+  'Como você se descreve espiritualmente neste momento?',
 ];
 
 export default function Admin() {

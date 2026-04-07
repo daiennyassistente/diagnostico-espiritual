@@ -70,3 +70,20 @@
 - [x] Manter botão selecionado com tom escuro mesmo ao passar o mouse
 
 - [x] Avanço automático para próxima página ao selecionar opção
+
+
+## Integração OpenAI
+- [ ] Obter chave API da OpenAI
+- [ ] Configurar variável de ambiente OPENAI_API_KEY
+- [ ] Criar procedimento tRPC para gerar resultado com OpenAI
+- [ ] Integrar geração de resultado na página de resultado
+- [ ] Testar integração com OpenAI
+
+
+## Revisão e Correções Técnicas
+- [x] Corrigir erros de ortografia, gramática e digitação em português
+- [x] Remover elementos irrelevantes do site
+- [x] Corrigir bug da barra de progresso (sempre mostra 9/10)
+- [x] Garantir contador dinâmico de perguntas (1/10, 2/10, etc)
+- [x] Revisar textos das perguntas e respostas
+- [x] Testar fluxo completo do quiz com correções

@@ -95,17 +95,17 @@ const QUIZ_STEPS: QuizStep[] = [
   },
   {
     id: 8,
-    question: 'Quanto tempo por dia você consegue separar com intencionalidade?',
+    question: 'Quanto tempo por dia você consegue dedicar com intencionalidade?',
     options: [
-      '5 min',
-      '10 min',
-      '15 min',
-      '20 min ou mais',
+      '5 minutos',
+      '10 minutos',
+      '15 minutos',
+      '20 minutos ou mais',
     ],
   },
   {
     id: 9,
-    question: 'Você sente que sua dificuldade maior é mais…',
+    question: 'Qual é sua maior dificuldade?',
     options: [
       'emocional',
       'de disciplina',
@@ -116,7 +116,7 @@ const QUIZ_STEPS: QuizStep[] = [
   },
   {
     id: 10,
-    question: 'Hoje, no fundo, você sente que está…',
+    question: 'Como você se descreve espiritualmente neste momento?',
     options: [
       'com fome de Deus',
       'cansada',
@@ -346,10 +346,10 @@ export default function Quiz() {
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-foreground mb-2">
-                Seu diagnóstico está quase pronto
+                Seu diagnóstico está pronto
               </h2>
               <p className="text-foreground/80">
-                Informe seus dados para receber sua leitura espiritual e a orientação mais indicada para essa fase.
+                Informe seus dados para receber seu resultado e a orientação personalizada para esta fase.
               </p>
             </div>
 
@@ -397,7 +397,7 @@ export default function Quiz() {
               </Button>
 
               <p className="text-center text-xs text-foreground/60">
-                Suas respostas serão usadas apenas para montar sua leitura espiritual e direcionar o melhor próximo passo para você.
+                Suas respostas serão usadas apenas para gerar seu diagnóstico personalizado.
               </p>
             </form>
           </div>
