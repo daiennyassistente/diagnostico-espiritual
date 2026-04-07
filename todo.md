@@ -87,3 +87,18 @@
 - [x] Garantir contador dinâmico de perguntas (1/10, 2/10, etc)
 - [x] Revisar textos das perguntas e respostas
 - [x] Testar fluxo completo do quiz com correções
+
+
+## Bugs Encontrados no Site Publicado
+- [ ] Botões não ficam preenchidos com cor escura quando selecionados
+- [ ] Verificar renderização de textos das perguntas
+- [ ] Adicionar espaço entre setas e texto nos botões de navegação
+- [ ] Verificar nomenclatura da barra de progresso (Etapa vs Pergunta)
+
+
+## Integração Stripe
+- [ ] Adicionar feature Stripe ao projeto
+- [ ] Configurar chaves API do Stripe
+- [ ] Criar página de checkout
+- [ ] Integrar Stripe com resultado do quiz
+- [ ] Testar fluxo de pagamento

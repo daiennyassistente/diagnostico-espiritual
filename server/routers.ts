@@ -73,6 +73,40 @@ export const appRouter = router({
         return await getResponseStatistics();
       }),
   }),
+
+  pdf: router({
+    generateDiagnosticPDF: publicProcedure
+      .input(z.object({
+        profileName: z.string(),
+        profileDescription: z.string(),
+        strengths: z.array(z.string()),
+        challenges: z.array(z.string()),
+        recommendations: z.array(z.string()),
+        nextSteps: z.array(z.string()),
+        responses: z.record(z.string(), z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const { generateDiagnosticPDF } = await import("./pdf-generator");
+        
+        try {
+          const pdfBuffer = await generateDiagnosticPDF({
+            profileName: input.profileName,
+            profileDescription: input.profileDescription,
+            strengths: input.strengths,
+            challenges: input.challenges,
+            recommendations: input.recommendations,
+            nextSteps: input.nextSteps,
+            responses: input.responses as Record<string, string>,
+          });
+
+          const base64 = pdfBuffer.toString("base64" as BufferEncoding);
+          return { success: true, pdfBase64: base64 };
+        } catch (error: any) {
+          console.error("PDF generation error:", error);
+          throw new Error("Erro ao gerar PDF do diagnóstico");
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
