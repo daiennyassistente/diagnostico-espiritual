@@ -61,3 +61,7 @@
 - [x] Adicionar recomendações específicas baseadas no perfil
 - [x] Integrar página de resultado ao fluxo do quiz
 - [x] Testar fluxo completo do quiz até resultado
+
+## Bugs a Corrigir
+- [x] Página de resultado não está aparecendo após envio do quiz
+- [x] Botões selecionados não estão visualmente diferentes

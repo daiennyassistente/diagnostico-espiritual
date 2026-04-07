@@ -191,21 +191,22 @@
   
   /* Quiz Button Styling */
   .quiz-button {
-    @apply w-full px-4 py-4 pr-12 rounded-xl border-2 border-muted text-foreground font-medium transition-all duration-300 hover:border-accent hover:shadow-lg text-center relative overflow-hidden;
-    background-color: transparent !important;
+    @apply w-full px-4 py-4 pr-12 rounded-xl border-2 border-muted text-foreground font-medium transition-all duration-500 hover:border-accent hover:shadow-lg text-center relative overflow-hidden;
+    background-color: #FFFFFF !important;
+    color: #4A3F35 !important;
   }
   
   .quiz-button:hover {
-    @apply bg-secondary border-accent;
-    background-color: #E8E1D8 !important;
+    background-color: #F0E8E0 !important;
+    border-color: #8B7355 !important;
   }
   
   .quiz-button.selected {
     background-color: #2A1F1A !important;
     color: #FFFFFF !important;
     border-color: #2A1F1A !important;
-    @apply shadow-lg font-semibold;
-    transform: scale(1.02);
+    @apply shadow-xl font-bold;
+    transform: scale(1.03);
   }
   
   .quiz-button.selected::after {
