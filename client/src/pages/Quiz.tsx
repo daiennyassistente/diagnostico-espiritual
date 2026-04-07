@@ -238,10 +238,13 @@ export default function Quiz() {
 
         await submitResponsesMutation.mutateAsync(responsesData);
 
+        // Salvar respostas no localStorage para a página de resultado
+        localStorage.setItem('quizResponses', JSON.stringify(responses));
+
         toast.success('Diagnóstico enviado com sucesso!');
         // Redirecionar para página de resultado
         setTimeout(() => {
-          window.location.href = '/resultado';
+          window.location.href = '/result';
         }, 1500);
       }
     } catch (error) {

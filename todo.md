@@ -54,3 +54,10 @@
 - [x] Adicionar ícone de checkmark quando opção é selecionada
 - [x] Melhorar transições e animações dos botões
 - [x] Adicionar cruz e bíblia como elementos decorativos no fundo
+
+## Página de Resultado Personalizado
+- [x] Criar lógica de análise de respostas para gerar perfil espiritual
+- [x] Desenvolver página de resultado com perfil customizado
+- [x] Adicionar recomendações específicas baseadas no perfil
+- [x] Integrar página de resultado ao fluxo do quiz
+- [x] Testar fluxo completo do quiz até resultado
