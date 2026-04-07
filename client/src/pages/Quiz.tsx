@@ -1,0 +1,460 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { trpc } from '@/lib/trpc';
+import { toast } from 'sonner';
+
+interface QuizStep {
+  id: number;
+  question: string;
+  options: string[];
+}
+
+const QUIZ_STEPS: QuizStep[] = [
+  {
+    id: 1,
+    question: 'Como você se sente espiritualmente hoje?',
+    options: [
+      'próxima de Deus, mas inconstante',
+      'distante e querendo voltar',
+      'com sede, mas sem direção',
+      'cansada espiritualmente',
+      'em processo de recomeço',
+    ],
+  },
+  {
+    id: 2,
+    question: 'O que mais tem dificultado sua constância com Deus?',
+    options: [
+      'distrações',
+      'cansaço',
+      'desânimo',
+      'falta de disciplina',
+      'confusão mental/emocional',
+      'rotina corrida',
+    ],
+  },
+  {
+    id: 3,
+    question: 'Como está sua rotina com a Palavra?',
+    options: [
+      'frequente e profunda',
+      'frequente, mas superficial',
+      'irregular',
+      'quase parada',
+      'quero voltar, mas não consigo manter',
+    ],
+  },
+  {
+    id: 4,
+    question: 'Como você descreveria sua vida de oração hoje?',
+    options: [
+      'sincera, mas instável',
+      'muito emocional e pouco constante',
+      'quase inexistente',
+      'quero voltar a orar com profundidade',
+      'viva e constante',
+    ],
+  },
+  {
+    id: 5,
+    question: 'O que você mais sente falta hoje na sua vida com Deus?',
+    options: [
+      'intimidade',
+      'constância',
+      'direção',
+      'paz',
+      'sensibilidade espiritual',
+      'profundidade',
+    ],
+  },
+  {
+    id: 6,
+    question: 'O que você sente que mais tem sido tratado em você nessa fase?',
+    options: [
+      'disciplina',
+      'espera',
+      'cura emocional',
+      'identidade',
+      'obediência',
+      'vigilância',
+      'maturidade',
+    ],
+  },
+  {
+    id: 7,
+    question: 'O que você mais deseja viver com Deus agora?',
+    options: [
+      'voltar ao secreto',
+      'criar constância',
+      'ouvir melhor a voz de Deus',
+      'amadurecer espiritualmente',
+      'ter mais paz e alinhamento',
+    ],
+  },
+  {
+    id: 8,
+    question: 'Quanto tempo por dia você consegue separar com intencionalidade?',
+    options: [
+      '5 min',
+      '10 min',
+      '15 min',
+      '20 min ou mais',
+    ],
+  },
+  {
+    id: 9,
+    question: 'Você sente que sua dificuldade maior é mais…',
+    options: [
+      'emocional',
+      'de disciplina',
+      'de foco',
+      'de profundidade',
+      'de direção',
+    ],
+  },
+  {
+    id: 10,
+    question: 'Hoje, no fundo, você sente que está…',
+    options: [
+      'com fome de Deus',
+      'cansada',
+      'travada',
+      'em reconstrução',
+      'amadurecendo',
+      'precisando recomeçar',
+    ],
+  },
+];
+
+const PROCESSING_MESSAGES = [
+  'Analisando suas respostas...',
+  'Identificando padrões de constância, profundidade, direção e bloqueios espirituais...',
+  'Organizando a direção mais indicada para você...',
+  'Seu diagnóstico está pronto!',
+];
+
+export default function Quiz() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [responses, setResponses] = useState<Record<number, string>>({});
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStep, setProcessingStep] = useState(0);
+  const [leadData, setLeadData] = useState({ whatsapp: '', email: '' });
+
+  const submitLeadMutation = trpc.quiz.submitLead.useMutation();
+  const submitResponsesMutation = trpc.quiz.submitResponses.useMutation();
+
+  const isQuizComplete = currentStep >= QUIZ_STEPS.length;
+
+  const handleSelectOption = (option: string) => {
+    setResponses({
+      ...responses,
+      [currentStep]: option,
+    });
+  };
+
+  const handleNext = () => {
+    if (!responses[currentStep]) {
+      toast.error('Por favor, selecione uma opção para continuar');
+      return;
+    }
+
+    if (currentStep < QUIZ_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      setShowLeadForm(true);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const formatWhatsApp = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 2) return cleaned;
+    if (cleaned.length <= 7) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+  };
+
+  const handleSubmitLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!leadData.whatsapp || !leadData.email) {
+      toast.error('Por favor, preencha todos os campos');
+      return;
+    }
+
+    // Validar WhatsApp
+    const whatsappRegex = /^(\d{10,15})$/;
+    if (!whatsappRegex.test(leadData.whatsapp.replace(/\D/g, ''))) {
+      toast.error('WhatsApp inválido');
+      return;
+    }
+
+    // Validar Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(leadData.email)) {
+      toast.error('E-mail inválido');
+      return;
+    }
+
+    setIsProcessing(true);
+    setShowLeadForm(false);
+    setProcessingStep(0);
+
+    try {
+      // Animar as etapas de processamento
+      for (let i = 0; i < PROCESSING_MESSAGES.length; i++) {
+        setProcessingStep(i);
+        await new Promise(resolve => setTimeout(resolve, 1200));
+      }
+
+      // Salvar lead
+      const leadResult = await submitLeadMutation.mutateAsync({
+        whatsapp: leadData.whatsapp.replace(/\D/g, ''),
+        email: leadData.email,
+      });
+
+      if (leadResult.success && leadResult.leadId) {
+        // Salvar respostas do quiz
+        const responsesData = {
+          leadId: leadResult.leadId,
+          step1: responses[0],
+          step2: responses[1],
+          step3: responses[2],
+          step4: responses[3],
+          step5: responses[4],
+          step6: responses[5],
+          step7: responses[6],
+          step8: responses[7],
+          step9: responses[8],
+          step10: responses[9],
+        };
+
+        await submitResponsesMutation.mutateAsync(responsesData);
+
+        toast.success('Diagnóstico enviado com sucesso!');
+        // Redirecionar para página de resultado
+        setTimeout(() => {
+          window.location.href = '/resultado';
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar dados:', error);
+      toast.error('Erro ao enviar dados. Tente novamente.');
+      setShowLeadForm(true);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Tela de abertura
+  if (currentStep === 0 && Object.keys(responses).length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="quiz-card max-w-2xl w-full">
+          <div className="text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+              Diagnóstico Espiritual
+            </h1>
+            <p className="text-lg text-foreground/80 leading-relaxed">
+              Responda algumas perguntas rápidas para identificar possíveis bloqueios espirituais e descobrir o que pode estar travando sua vida.
+            </p>
+            <p className="text-sm text-foreground/60">
+              Leva menos de 2 minutos e pode te ajudar a enxergar com mais clareza a fase espiritual que você está vivendo agora.
+            </p>
+            <Button
+              onClick={() => setCurrentStep(1)}
+              className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
+            >
+              Quero começar meu diagnóstico
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela de processamento
+  if (isProcessing) {
+    const progress = ((processingStep + 1) / PROCESSING_MESSAGES.length) * 100;
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="quiz-card max-w-2xl w-full text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold text-foreground">
+              {PROCESSING_MESSAGES[processingStep]}
+            </h2>
+            <p className="text-foreground/60">
+              Processando seu diagnóstico espiritual...
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${progress}%`,
+                  transition: 'width 0.8s ease-in-out',
+                }}
+              />
+            </div>
+            <p className="text-sm text-foreground/60">
+              {Math.round(progress)}%
+            </p>
+          </div>
+
+          <div className="flex gap-2 justify-center">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  i <= processingStep ? 'bg-primary' : 'bg-muted'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela de captura de leads
+  if (showLeadForm) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="quiz-card max-w-2xl w-full">
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-2">
+                Seu diagnóstico está quase pronto
+              </h2>
+              <p className="text-foreground/80">
+                Informe seus dados para receber sua leitura espiritual e a orientação mais indicada para essa fase.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmitLead} className="space-y-4">
+              <div>
+                <Label htmlFor="whatsapp" className="text-foreground font-medium mb-2 block">
+                  Número WhatsApp
+                </Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  placeholder="(11) 99999-9999"
+                  value={leadData.whatsapp}
+                  onChange={(e) => setLeadData({ ...leadData, whatsapp: formatWhatsApp(e.target.value) })}
+                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="email" className="text-foreground font-medium mb-2 block">
+                  E-mail
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={leadData.email}
+                  onChange={(e) => setLeadData({ ...leadData, email: e.target.value })}
+                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-foreground/60">
+                <input type="checkbox" id="consent" defaultChecked />
+                <label htmlFor="consent">
+                  Quero receber meu diagnóstico e orientações pelo WhatsApp e e-mail.
+                </label>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
+              >
+                Ver meu diagnóstico espiritual
+              </Button>
+
+              <p className="text-center text-xs text-foreground/60">
+                Suas respostas serão usadas apenas para montar sua leitura espiritual e direcionar o melhor próximo passo para você.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Telas do quiz
+  if (currentStep > 0 && currentStep <= QUIZ_STEPS.length) {
+    const step = QUIZ_STEPS[currentStep - 1];
+    const progress = (currentStep / QUIZ_STEPS.length) * 100;
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
+        <div className="quiz-card max-w-2xl w-full">
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+            <p className="text-sm text-foreground/60 text-center">
+              Etapa {currentStep} de {QUIZ_STEPS.length}
+            </p>
+          </div>
+
+          {/* Question */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              {step.question}
+            </h2>
+
+            {/* Options */}
+            <div className="space-y-3">
+              {step.options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSelectOption(option)}
+                  className={`quiz-button ${
+                    responses[currentStep - 1] === option ? 'selected' : ''
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex gap-4 justify-between">
+            <Button
+              onClick={handlePrevious}
+              disabled={currentStep === 1}
+              variant="outline"
+              className="flex-1"
+            >
+              ← Voltar
+            </Button>
+            <Button
+              onClick={handleNext}
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              {currentStep === QUIZ_STEPS.length ? 'Finalizar' : 'Próximo'} →
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
