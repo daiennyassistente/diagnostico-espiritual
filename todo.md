@@ -96,12 +96,18 @@
 - [x] Verificar nomenclatura da barra de progresso (Etapa vs Pergunta)
 
 
-## Integração Stripe
-- [ ] Adicionar feature Stripe ao projeto (adiado para versão futura)
-- [ ] Configurar chaves API do Stripe (adiado para versão futura)
-- [ ] Criar página de checkout (adiado para versão futura)
-- [ ] Integrar Stripe com resultado do quiz (adiado para versão futura)
-- [ ] Testar fluxo de pagamento (adiado para versão futura)
+## Correção de Dependências para Deploy
+- [x] Adicionar pdfkit às dependencies do package.json
+- [x] Reinstalar dependências com pnpm
+- [x] Reiniciar servidor de desenvolvimento
+- [x] Validar que servidor está rodando sem erros
+
+## Integração Stripe (Versão Futura)
+- [ ] Webhook Stripe para confirmação de pagamentos
+- [ ] Expandir personalização do devocional com OpenAI
+- [ ] Histórico de diagnósticos
+- [ ] Compartilhamento no Facebook
+- [ ] Compartilhamento no Twitter/X
 
 ## Testes de Integração
 - [x] Criar testes de integração para createLead e createQuizResponse
@@ -181,3 +187,34 @@
 - [x] Implementar download de PDF devocional na página de sucesso
 - [x] Criar testes para validação de checkout (checkout.test.ts)
 - [x] Testar fluxo completo: Quiz → Resultado → Checkout → Sucesso
+
+
+## Webhook Stripe
+- [ ] Implementar endpoint /api/stripe/webhook
+- [ ] Validar assinatura do webhook
+- [ ] Processar evento payment_intent.succeeded
+- [ ] Registrar pagamento no banco de dados
+- [ ] Testar webhook com eventos de teste
+
+## Email de Confirmacao com PDF
+- [ ] Configurar servico de envio de email (SMTP ou Manus API)
+- [ ] Criar template de email com PDF anexado
+- [ ] Enviar email apos pagamento confirmado
+- [ ] Manter pagina de download do PDF
+- [ ] Testar envio de email com PDF
+
+## Compartilhamento de Resultados
+- [ ] Expandir compartilhamento para Facebook
+- [ ] Expandir compartilhamento para Twitter/X
+- [ ] Expandir compartilhamento para LinkedIn
+- [ ] Testar todos os compartilhamentos
+
+## Site de Admin
+- [ ] Criar novo projeto para site de admin
+- [ ] Implementar autenticacao (login/logout)
+- [ ] Dashboard com metricas e graficos
+- [ ] Secao de Leads com tabela e filtros
+- [ ] Secao de Pagamentos com status
+- [ ] Secao de Emails com historico
+- [ ] Configuracoes e backup de dados
+- [ ] Testar fluxo completo do admin

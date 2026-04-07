@@ -91,28 +91,41 @@ export default function Result() {
     setLocation("/quiz");
   };
 
-  const handleShare = async () => {
+  const handleShare = async (platform?: string) => {
     setIsSharing(true);
     const text = `Fiz um diagnóstico espiritual e descobri que sou: ${result?.profileName}\n\n${result?.profileDescription}`;
     const encodedText = encodeURIComponent(text);
+    const currentUrl = window.location.origin;
     
     try {
-      // Tentar usar Web Share API primeiro (mobile)
-      if (navigator.share) {
-        await navigator.share({
-          title: "Meu Diagnóstico Espiritual",
-          text: text,
-        });
-      } else {
-        // Fallback: tentar WhatsApp
+      if (platform === 'whatsapp') {
         const whatsappUrl = `https://wa.me/?text=${encodedText}`;
-        const popup = window.open(whatsappUrl, '_blank');
-        if (!popup) {
-          // Se popup foi bloqueado, copiar para clipboard
+        window.open(whatsappUrl, '_blank');
+        toast.success("Abrindo WhatsApp...");
+      } else if (platform === 'facebook') {
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodedText}`;
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+        toast.success("Abrindo Facebook...");
+      } else if (platform === 'twitter') {
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodeURIComponent(currentUrl)}`;
+        window.open(twitterUrl, '_blank', 'width=600,height=400');
+        toast.success("Abrindo Twitter...");
+      } else if (platform === 'linkedin') {
+        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+        window.open(linkedinUrl, '_blank', 'width=600,height=400');
+        toast.success("Abrindo LinkedIn...");
+      } else {
+        // Tentar usar Web Share API primeiro (mobile)
+        if (navigator.share) {
+          await navigator.share({
+            title: "Meu Diagnóstico Espiritual",
+            text: text,
+            url: currentUrl,
+          });
+        } else {
+          // Fallback: copiar para clipboard
           await navigator.clipboard.writeText(text);
           toast.success("Resultado copiado para a área de transferência!");
-        } else {
-          toast.success("Abrindo WhatsApp...");
         }
       }
     } catch (error) {
@@ -305,7 +318,7 @@ export default function Result() {
           </Button>
 
           <Button
-            onClick={handleShare}
+            onClick={() => handleShare()}
             className="w-full"
             variant="outline"
           >
