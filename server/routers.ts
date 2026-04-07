@@ -107,6 +107,83 @@ export const appRouter = router({
         }
       }),
   }),
+
+  aiResult: router({
+    generateFromResponses: publicProcedure
+      .input(z.object({
+        responses: z.record(z.string(), z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const { invokeLLM } = await import("./_core/llm");
+
+        const responsesText = Object.entries(input.responses)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("\n");
+
+        const prompt = `Você é um especialista em diagnóstico espiritual. Analise as seguintes respostas de um quiz espiritual e gere um diagnóstico personalizado em português.
+
+Respostas do usuário:
+${responsesText}
+
+Gere uma resposta JSON com a seguinte estrutura:
+{
+  "profileName": "Nome do perfil espiritual (ex: Coração em Recomeço)",
+  "profileDescription": "Descrição detalhada do perfil (2-3 frases)",
+  "strengths": ["força 1", "força 2", "força 3"],
+  "challenges": ["desafio 1", "desafio 2", "desafio 3"],
+  "recommendations": ["recomendação 1", "recomendação 2", "recomendação 3"],
+  "nextSteps": ["próximo passo 1", "próximo passo 2", "próximo passo 3"]
+}
+
+Seja empático, espiritual e construtivo na análise.`;
+
+        try {
+          const response = await invokeLLM({
+            messages: [
+              {
+                role: "system",
+                content: "Você é um especialista em diagnóstico espiritual cristão. Forneça análises profundas, empáticas e construtivas.",
+              },
+              {
+                role: "user",
+                content: prompt,
+              },
+            ],
+            response_format: {
+              type: "json_schema" as const,
+              json_schema: {
+                name: "spiritual_diagnosis" as const,
+                strict: true as const,
+                schema: {
+                  type: "object",
+                  properties: {
+                    profileName: { type: "string" },
+                    profileDescription: { type: "string" },
+                    strengths: { type: "array", items: { type: "string" } },
+                    challenges: { type: "array", items: { type: "string" } },
+                    recommendations: { type: "array", items: { type: "string" } },
+                    nextSteps: { type: "array", items: { type: "string" } },
+                  },
+                  required: ["profileName", "profileDescription", "strengths", "challenges", "recommendations", "nextSteps"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          });
+
+          const content = response.choices[0]?.message?.content;
+          if (!content || typeof content !== 'string') {
+            throw new Error("Sem conteúdo na resposta da IA");
+          }
+
+          const result = JSON.parse(content);
+          return { success: true, ...result };
+        } catch (error: any) {
+          console.error("AI result generation error:", error);
+          throw new Error("Erro ao gerar diagnóstico com IA");
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

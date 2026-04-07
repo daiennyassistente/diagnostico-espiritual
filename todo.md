@@ -73,11 +73,11 @@
 
 
 ## Integração OpenAI
-- [ ] Obter chave API da OpenAI
-- [ ] Configurar variável de ambiente OPENAI_API_KEY
-- [ ] Criar procedimento tRPC para gerar resultado com OpenAI
-- [ ] Integrar geração de resultado na página de resultado
-- [ ] Testar integração com OpenAI
+- [x] Obter chave API da OpenAI
+- [x] Configurar variável de ambiente OPENAI_API_KEY
+- [x] Criar procedimento tRPC para gerar resultado com OpenAI
+- [x] Integrar geração de resultado na página de resultado
+- [x] Testar integração com OpenAI
 
 
 ## Revisão e Correções Técnicas
