@@ -251,6 +251,12 @@ export default function Quiz() {
 
         // Salvar respostas no localStorage para a página de resultado
         localStorage.setItem('quizResponses', JSON.stringify(responses));
+        
+        // Salvar dados do lead para o checkout
+        localStorage.setItem('leadData', JSON.stringify({
+          email: leadData.email,
+          whatsapp: leadData.whatsapp.replace(/\D/g, ''),
+        }));
 
         toast.success('Diagnóstico enviado com sucesso!');
         // Redirecionar para página de resultado

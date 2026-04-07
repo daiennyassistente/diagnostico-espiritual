@@ -151,3 +151,22 @@
 - [x] Testar página de resultado com novo layout
 - [x] Testar download de PDF com novo design
 - [x] Testar compartilhamento em WhatsApp
+
+## Otimização para Alta Conversão
+- [x] Ajustar resultado para elementos emocionais e urgência
+- [x] Adicionar CTA forte para oferta do guia
+- [x] Implementar seção de benefícios do guia devocional
+- [x] Adicionar social proof/depoimentos
+
+## Guia Devocional Personalizado (PDF)
+- [ ] Criar sistema de geração de PDF devocional (7 dias)
+- [ ] Personalizar conteúdo baseado no resultado do quiz
+- [ ] Garantir 100% baseado em Bíblia e prática cristã
+- [ ] Testar geração de PDF personalizado
+
+## Integração Stripe
+- [x] Configurar produto "Guia Devocional" no Stripe (R$ 9,90)
+- [x] Implementar checkout do Stripe na página de resultado
+- [x] Adicionar procedimento tRPC createDevocionalCheckout
+- [x] Integrar botão de compra na página de resultado
+- [x] Testar fluxo de pagamento completo

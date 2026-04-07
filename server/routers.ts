@@ -4,6 +4,17 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { createLead, createQuizResponse, getAllQuizResponses, getResponseStatistics } from "./db";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2024-04-10",
+});
+
+// Helper para obter origin do request
+const getOrigin = (req: any): string => {
+  const origin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/');
+  return origin || 'http://localhost:3000';
+};
 
 export const appRouter = router({
   system: systemRouter,
@@ -72,6 +83,45 @@ export const appRouter = router({
       .query(async () => {
         return await getResponseStatistics();
       }),
+
+    createDevocionalCheckout: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        profileName: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [
+              {
+                price_data: {
+                  currency: "brl",
+                  product_data: {
+                    name: "Devocional: 7 Dias para se Aproximar de Deus",
+                    description: `Guia devocional personalizado baseado em seu perfil: ${input.profileName}`,
+                  },
+                  unit_amount: 990,
+                },
+                quantity: 1,
+              },
+            ],
+            mode: "payment",
+            success_url: `${ctx.req.headers.origin}/result?payment=success`,
+            cancel_url: `${ctx.req.headers.origin}/result?payment=cancelled`,
+            customer_email: input.email,
+            metadata: {
+              profileName: input.profileName,
+              email: input.email,
+            },
+          });
+
+          return { success: true, checkoutUrl: session.url };
+        } catch (error: any) {
+          console.error("Stripe checkout error:", error);
+          throw new Error("Erro ao criar sessão de pagamento");
+        }
+      }),
   }),
 
   pdf: router({
@@ -104,6 +154,34 @@ export const appRouter = router({
         } catch (error: any) {
           console.error("PDF generation error:", error);
           throw new Error("Erro ao gerar PDF do diagnóstico");
+        }
+      }),
+
+    generateDevocionalPDF: publicProcedure
+      .input(z.object({
+        profileName: z.string(),
+        profileDescription: z.string(),
+        challenges: z.array(z.string()),
+        recommendations: z.array(z.string()),
+        responses: z.record(z.string(), z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        const { generateDevotionalPDF } = await import("./devotional-generator");
+        
+        try {
+          const pdfBuffer = await generateDevotionalPDF({
+            profileName: input.profileName,
+            profileDescription: input.profileDescription,
+            challenges: input.challenges,
+            recommendations: input.recommendations,
+            responses: input.responses as Record<string, string>,
+          });
+
+          const base64 = pdfBuffer.toString("base64" as BufferEncoding);
+          return { success: true, pdfBase64: base64 };
+        } catch (error: any) {
+          console.error("Devotional PDF generation error:", error);
+          throw new Error("Erro ao gerar PDF do devocional");
         }
       }),
   }),
