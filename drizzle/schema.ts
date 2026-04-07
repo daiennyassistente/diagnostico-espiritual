@@ -70,3 +70,19 @@ export const payments = mysqlTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
+
+export const diagnosticHistory = mysqlTable("diagnostic_history", {
+  id: int("id").autoincrement().primaryKey(),
+  leadId: int("leadId").notNull(),
+  profileName: varchar("profileName", { length: 255 }).notNull(),
+  profileDescription: text("profileDescription").notNull(),
+  strengths: text("strengths").notNull(), // JSON stringified array
+  challenges: text("challenges").notNull(), // JSON stringified array
+  recommendations: text("recommendations").notNull(), // JSON stringified array
+  nextSteps: text("nextSteps").notNull(), // JSON stringified array
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DiagnosticHistory = typeof diagnosticHistory.$inferSelect;
+export type InsertDiagnosticHistory = typeof diagnosticHistory.$inferInsert;

@@ -142,6 +142,7 @@
 - [ ] Testar histórico de diagnósticos
 
 ## Melhorias de Design e UX
+- [x] Aumentar opacidade e tamanho dos elementos decorativos (cruz e bíblia)
 - [ ] Melhorar animações de transição entre etapas
 - [ ] Adicionar micro-interações (hover, focus, etc)
 - [ ] Otimizar responsividade mobile
