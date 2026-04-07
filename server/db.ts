@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, leads, quizResponses, InsertLead, InsertQuizResponse } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { sql } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -95,19 +96,27 @@ export async function createLead(lead: InsertLead) {
     throw new Error("Database not available");
   }
 
+  // Inserir o lead e obter o resultado
   const result = await db.insert(leads).values(lead);
   
-  // Recuperar o ID do lead inserido
-  const inserted = await db.select().from(leads)
-    .where(eq(leads.email, lead.email))
-    .orderBy((t) => t.id)
-    .limit(1);
-  
-  if (inserted.length > 0) {
-    return { id: inserted[0].id };
+  // O resultado do insert do Drizzle com mysql2 é um array
+  // onde o primeiro elemento é o ResultSetHeader com insertId
+  if (Array.isArray(result) && result.length > 0) {
+    const header = result[0] as any;
+    if (header && header.insertId) {
+      return { id: Number(header.insertId) };
+    }
   }
   
-  throw new Error("Failed to retrieve inserted lead ID");
+  // Fallback: tentar acessar insertId diretamente
+  if (result && typeof result === 'object') {
+    const insertId = (result as any).insertId;
+    if (insertId) {
+      return { id: Number(insertId) };
+    }
+  }
+  
+  throw new Error("Failed to retrieve inserted lead ID from insert result");
 }
 
 export async function createQuizResponse(response: InsertQuizResponse) {

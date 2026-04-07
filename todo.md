@@ -97,12 +97,21 @@
 
 
 ## Integração Stripe
-- [ ] Adicionar feature Stripe ao projeto (adiado)
-- [ ] Configurar chaves API do Stripe (adiado)
-- [ ] Criar página de checkout (adiado)
-- [ ] Integrar Stripe com resultado do quiz (adiado)
-- [ ] Testar fluxo de pagamento (adiado)
+- [ ] Adicionar feature Stripe ao projeto (adiado para versão futura)
+- [ ] Configurar chaves API do Stripe (adiado para versão futura)
+- [ ] Criar página de checkout (adiado para versão futura)
+- [ ] Integrar Stripe com resultado do quiz (adiado para versão futura)
+- [ ] Testar fluxo de pagamento (adiado para versão futura)
+
+## Testes de Integração
+- [x] Criar testes de integração para createLead e createQuizResponse
+- [x] Validar retorno de ID do lead inserido
+- [x] Testar múltiplos leads com emails diferentes
+- [x] Validar persistência de respostas do quiz por lead
+- [x] Testar email repetido com IDs diferentes
+- [x] Validar fluxo completo do quiz até resultado
 
 
 ## Bugs Encontrados Após Testes
-- [ ] Após envio de leads, usuário volta para tela de captura em vez de ir para resultado
+- [x] Após envio de leads, usuário volta para tela de captura em vez de ir para resultado
+- [x] Melhorar robustez da função createLead para usar insertId nativo do Drizzle
