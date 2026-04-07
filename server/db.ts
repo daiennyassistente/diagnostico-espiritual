@@ -96,7 +96,18 @@ export async function createLead(lead: InsertLead) {
   }
 
   const result = await db.insert(leads).values(lead);
-  return result;
+  
+  // Recuperar o ID do lead inserido
+  const inserted = await db.select().from(leads)
+    .where(eq(leads.email, lead.email))
+    .orderBy((t) => t.id)
+    .limit(1);
+  
+  if (inserted.length > 0) {
+    return { id: inserted[0].id };
+  }
+  
+  throw new Error("Failed to retrieve inserted lead ID");
 }
 
 export async function createQuizResponse(response: InsertQuizResponse) {

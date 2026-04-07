@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -136,6 +137,7 @@ const PROCESSING_MESSAGES = [
 ];
 
 export default function Quiz() {
+  const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
   const [responses, setResponses] = useState<Record<number, string>>({});
   const [showLeadForm, setShowLeadForm] = useState(false);
@@ -253,8 +255,11 @@ export default function Quiz() {
         toast.success('Diagnóstico enviado com sucesso!');
         // Redirecionar para página de resultado
         setTimeout(() => {
-          window.location.href = '/result';
-        }, 1500);
+          setLocation('/result');
+        }, 2000);
+      } else {
+        toast.error('Não foi possível salvar seus dados. Tente novamente.');
+        setShowLeadForm(true);
       }
     } catch (error) {
       console.error('Erro ao enviar dados:', error);

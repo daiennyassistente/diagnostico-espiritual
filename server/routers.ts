@@ -29,7 +29,7 @@ export const appRouter = router({
           whatsapp: input.whatsapp,
           email: input.email,
         });
-        return { success: true, leadId: (result as any).insertId };
+        return { success: true, leadId: result.id };
       }),
 
     submitResponses: publicProcedure

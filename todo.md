@@ -102,3 +102,7 @@
 - [ ] Criar página de checkout (adiado)
 - [ ] Integrar Stripe com resultado do quiz (adiado)
 - [ ] Testar fluxo de pagamento (adiado)
+
+
+## Bugs Encontrados Após Testes
+- [ ] Após envio de leads, usuário volta para tela de captura em vez de ir para resultado
