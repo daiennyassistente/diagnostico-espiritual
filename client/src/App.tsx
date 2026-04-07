@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import Resultado from "./pages/Resultado";
 import Result from "./pages/Result";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Admin from "./pages/Admin";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path={"/quiz"} component={Quiz} />
       <Route path={"/resultado"} component={Resultado} />
       <Route path={"/result"} component={Result} />
+      <Route path={"/checkout-success"} component={CheckoutSuccess} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

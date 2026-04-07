@@ -36,8 +36,10 @@ export default function Result() {
       generateResultMutation.mutate(
         { responses: parsed },
         {
-          onSuccess: (data) => {
+          onSuccess: (data: any) => {
             setResult(data);
+            // Salvar resultado no localStorage para uso na página de sucesso
+            localStorage.setItem('quizResult', JSON.stringify(data));
             setIsLoading(false);
           },
           onError: (error) => {
@@ -51,7 +53,7 @@ export default function Result() {
       // Redirecionar para o quiz se não houver respostas
       setLocation("/");
     }
-  }, [setLocation]);
+  }, [generateResultMutation, setLocation]);
 
   const handleDownloadPDF = async () => {
     if (!result || !responses) return;

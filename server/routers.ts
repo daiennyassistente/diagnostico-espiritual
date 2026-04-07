@@ -107,8 +107,8 @@ export const appRouter = router({
               },
             ],
             mode: "payment",
-            success_url: `${ctx.req.headers.origin}/result?payment=success`,
-            cancel_url: `${ctx.req.headers.origin}/result?payment=cancelled`,
+            success_url: `${ctx.req.headers.origin}/checkout-success`,
+            cancel_url: `${ctx.req.headers.origin}/result`,
             customer_email: input.email,
             metadata: {
               profileName: input.profileName,

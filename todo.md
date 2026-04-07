@@ -136,11 +136,13 @@
 - [ ] Compartilhamento no Twitter/X
 - [ ] Compartilhamento por link com fallback para clipboard
 - [ ] Histórico de diagnósticos
-- [ ] Integração Stripe
+- [ ] Webhook Stripe para confirmação de pagamentos
 - [ ] Melhorias de animações de transição
 - [ ] Micro-interações avançadas
 - [ ] Otimização de acessibilidade (WCAG)
 - [ ] Testes em múltiplos dispositivos
+- [ ] Expandir personalização do devocional para todos os perfis
+- [ ] Melhorar sanitização de texto para preservar acentos em português
 
 
 
@@ -159,10 +161,10 @@
 - [x] Adicionar social proof/depoimentos
 
 ## Guia Devocional Personalizado (PDF)
-- [ ] Criar sistema de geração de PDF devocional (7 dias)
-- [ ] Personalizar conteúdo baseado no resultado do quiz
-- [ ] Garantir 100% baseado em Bíblia e prática cristã
-- [ ] Testar geração de PDF personalizado
+- [x] Criar sistema de geração de PDF devocional (7 dias) - Implementado em devotional-generator.ts
+- [x] Personalizar conteúdo baseado no resultado do quiz
+- [x] Garantir 100% baseado em Bíblia e prática cristã
+- [x] Testar geração de PDF personalizado
 
 ## Integração Stripe
 - [x] Configurar produto "Guia Devocional" no Stripe (R$ 9,90)
@@ -170,3 +172,8 @@
 - [x] Adicionar procedimento tRPC createDevocionalCheckout
 - [x] Integrar botão de compra na página de resultado
 - [x] Testar fluxo de pagamento completo
+- [x] Criar página de sucesso pós-pagamento (CheckoutSuccess.tsx)
+- [x] Adicionar rota /checkout-success no App.tsx
+- [x] Implementar download de PDF devocional na página de sucesso
+- [x] Criar testes para validação de checkout (checkout.test.ts)
+- [x] Testar fluxo completo: Quiz → Resultado → Checkout → Sucesso
