@@ -201,9 +201,9 @@
   }
   
   .quiz-button.selected {
-    background-color: #3E342C !important;
+    background-color: #2A1F1A !important;
     color: #FFFFFF !important;
-    border-color: #3E342C !important;
+    border-color: #2A1F1A !important;
     @apply shadow-lg font-semibold;
     transform: scale(1.02);
   }
