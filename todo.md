@@ -130,21 +130,24 @@
 ## Compartilhamento em Redes Sociais
 - [x] Implementar compartilhamento no WhatsApp
 - [x] Testar compartilhamento WhatsApp
-- [ ] Implementar compartilhamento no Facebook (adiado)
-- [ ] Implementar compartilhamento no Twitter/X (adiado)
-- [ ] Implementar compartilhamento por link (adiado)
 
-## Histórico de Diagnósticos
-- [ ] Criar tabela de histórico de diagnósticos no banco
-- [ ] Implementar salvamento automático de diagnósticos
-- [ ] Criar página de histórico de diagnósticos
-- [ ] Implementar visualização de diagnósticos anteriores
-- [ ] Testar histórico de diagnósticos
+## Funcionalidades Adiadas para Versão Futura
+- [ ] Compartilhamento no Facebook
+- [ ] Compartilhamento no Twitter/X
+- [ ] Compartilhamento por link com fallback para clipboard
+- [ ] Histórico de diagnósticos
+- [ ] Integração Stripe
+- [ ] Melhorias de animações de transição
+- [ ] Micro-interações avançadas
+- [ ] Otimização de acessibilidade (WCAG)
+- [ ] Testes em múltiplos dispositivos
+
+
 
 ## Melhorias de Design e UX
 - [x] Aumentar opacidade e tamanho dos elementos decorativos (cruz e bíblia)
-- [ ] Melhorar animações de transição entre etapas
-- [ ] Adicionar micro-interações (hover, focus, etc)
-- [ ] Otimizar responsividade mobile
-- [ ] Melhorar acessibilidade (WCAG)
-- [ ] Testar em diferentes dispositivos
+- [x] Testar fluxo completo do quiz (10 etapas)
+- [x] Testar captura de leads e redirecionamento
+- [x] Testar página de resultado com novo layout
+- [x] Testar download de PDF com novo design
+- [x] Testar compartilhamento em WhatsApp
