@@ -115,3 +115,8 @@
 ## Bugs Encontrados Após Testes
 - [x] Após envio de leads, usuário volta para tela de captura em vez de ir para resultado
 - [x] Melhorar robustez da função createLead para usar insertId nativo do Drizzle
+
+## Reformulação da Página de Resultado
+- [x] Atualizar prompt do OpenAI para gerar resultados resumidos
+- [x] Reformular layout da página de resultado para estilo conversacional
+- [x] Testar novo layout com fluxo completo do quiz

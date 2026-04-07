@@ -120,22 +120,22 @@ export const appRouter = router({
           .map(([key, value]) => `${key}: ${value}`)
           .join("\n");
 
-        const prompt = `Você é um especialista em diagnóstico espiritual. Analise as seguintes respostas de um quiz espiritual e gere um diagnóstico personalizado em português.
+        const prompt = `Você é um especialista em diagnóstico espiritual. Analise as seguintes respostas de um quiz espiritual e gere um diagnóstico personalizado resumido em português, em estilo conversacional e amigável.
 
 Respostas do usuário:
 ${responsesText}
 
 Gere uma resposta JSON com a seguinte estrutura:
 {
-  "profileName": "Nome do perfil espiritual (ex: Coração em Recomeço)",
-  "profileDescription": "Descrição detalhada do perfil (2-3 frases)",
-  "strengths": ["força 1", "força 2", "força 3"],
-  "challenges": ["desafio 1", "desafio 2", "desafio 3"],
-  "recommendations": ["recomendação 1", "recomendação 2", "recomendação 3"],
-  "nextSteps": ["próximo passo 1", "próximo passo 2", "próximo passo 3"]
+  "profileName": "Nome do perfil espiritual com emoji (ex: 🌳 Amadurecendo na Fé)",
+  "profileDescription": "Um parágrafo conversacional (3-4 frases) que descreve o perfil de forma amigável e encorajadora",
+  "strengths": ["força 1", "força 2"],
+  "challenges": ["desafio 1", "desafio 2"],
+  "recommendations": ["recomendação 1", "recomendação 2"],
+  "nextSteps": ["próximo passo 1"]
 }
 
-Seja empático, espiritual e construtivo na análise.`;
+Seja conciso, conversacional e encorajador. Use tom amigável como se estivesse conversando com um amigo.`;
 
         try {
           const response = await invokeLLM({
