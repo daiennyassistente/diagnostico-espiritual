@@ -170,10 +170,13 @@ function generateDevotionalContent(input: DevotionalInput): DevotionalDay[] {
 }
 
 function sanitizeText(text: string): string {
-  // Remove emojis e caracteres especiais problemáticos
-  // Remove emojis e caracteres especiais
+  // Remove apenas emojis e caracteres realmente problemáticos
+  // Preserva acentos e caracteres latinos estendidos
   return text
-    .replace(/[^\x00-\x7F]/g, "") // Remove caracteres não-ASCII
+    .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, "") // Remove emojis (pares surrogate)
+    .replace(/[\u1F300-\u1F9FF]/g, "") // Remove emojis variados
+    .replace(/[\u2600-\u27BF]/g, "") // Remove símbolos diversos
+    .replace(/[\u2300-\u23FF]/g, "") // Remove símbolos técnicos
     .trim();
 }
 

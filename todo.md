@@ -131,6 +131,11 @@
 - [x] Implementar compartilhamento no WhatsApp
 - [x] Testar compartilhamento WhatsApp
 
+## Melhorias de Sanitização de Texto
+- [x] Melhorar sanitização para preservar acentos em português
+- [x] Remover apenas emojis e caracteres problemáticos
+- [x] Corrigir labels do PDF (Introdução, Versículo, Reflexão, Oração, Aplicação, Próximo Passo)
+
 ## Funcionalidades Adiadas para Versão Futura
 - [ ] Compartilhamento no Facebook
 - [ ] Compartilhamento no Twitter/X
@@ -141,8 +146,7 @@
 - [ ] Micro-interações avançadas
 - [ ] Otimização de acessibilidade (WCAG)
 - [ ] Testes em múltiplos dispositivos
-- [ ] Expandir personalização do devocional para todos os perfis
-- [ ] Melhorar sanitização de texto para preservar acentos em português
+- [ ] Expandir personalização do devocional para todos os perfis com OpenAI
 
 
 
