@@ -120,3 +120,30 @@
 - [x] Atualizar prompt do OpenAI para gerar resultados resumidos
 - [x] Reformular layout da página de resultado para estilo conversacional
 - [x] Testar novo layout com fluxo completo do quiz
+
+## Melhorias de PDF
+- [x] Atualizar PDF generator com paleta de cores do quiz
+- [x] Adicionar elementos decorativos (Bíblias e Cruz) ao PDF
+- [x] Melhorar layout e formatação do PDF
+- [x] Testar geração de PDF com novo design
+
+## Compartilhamento em Redes Sociais
+- [x] Implementar compartilhamento no WhatsApp
+- [x] Testar compartilhamento WhatsApp
+- [ ] Implementar compartilhamento no Facebook (adiado)
+- [ ] Implementar compartilhamento no Twitter/X (adiado)
+- [ ] Implementar compartilhamento por link (adiado)
+
+## Histórico de Diagnósticos
+- [ ] Criar tabela de histórico de diagnósticos no banco
+- [ ] Implementar salvamento automático de diagnósticos
+- [ ] Criar página de histórico de diagnósticos
+- [ ] Implementar visualização de diagnósticos anteriores
+- [ ] Testar histórico de diagnósticos
+
+## Melhorias de Design e UX
+- [ ] Melhorar animações de transição entre etapas
+- [ ] Adicionar micro-interações (hover, focus, etc)
+- [ ] Otimizar responsividade mobile
+- [ ] Melhorar acessibilidade (WCAG)
+- [ ] Testar em diferentes dispositivos

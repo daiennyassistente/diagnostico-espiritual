@@ -20,6 +20,7 @@ export default function Result() {
   const [responses, setResponses] = useState<Record<string, string> | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSharing, setIsSharing] = useState(false);
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
@@ -88,18 +89,40 @@ export default function Result() {
     setLocation("/quiz");
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
+    setIsSharing(true);
     const text = `Fiz um diagnóstico espiritual e descobri que sou: ${result?.profileName}\n\n${result?.profileDescription}`;
+    const encodedText = encodeURIComponent(text);
     
-    if (navigator.share) {
-      navigator.share({
-        title: "Meu Diagnóstico Espiritual",
-        text: text,
-      });
-    } else {
-      // Fallback: copiar para clipboard
-      navigator.clipboard.writeText(text);
-      toast.success("Resultado copiado para a área de transferência!");
+    try {
+      // Tentar usar Web Share API primeiro (mobile)
+      if (navigator.share) {
+        await navigator.share({
+          title: "Meu Diagnóstico Espiritual",
+          text: text,
+        });
+      } else {
+        // Fallback: tentar WhatsApp
+        const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+        const popup = window.open(whatsappUrl, '_blank');
+        if (!popup) {
+          // Se popup foi bloqueado, copiar para clipboard
+          await navigator.clipboard.writeText(text);
+          toast.success("Resultado copiado para a área de transferência!");
+        } else {
+          toast.success("Abrindo WhatsApp...");
+        }
+      }
+    } catch (error) {
+      // Se tudo falhar, copiar para clipboard
+      try {
+        await navigator.clipboard.writeText(text);
+        toast.success("Resultado copiado para a área de transferência!");
+      } catch {
+        toast.error("Erro ao compartilhar resultado");
+      }
+    } finally {
+      setIsSharing(false);
     }
   };
 
