@@ -68,3 +68,5 @@
 
 ## Melhorias Adicionais
 - [x] Manter botão selecionado com tom escuro mesmo ao passar o mouse
+
+- [x] Avanço automático para próxima página ao selecionar opção

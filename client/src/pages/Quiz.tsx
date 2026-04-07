@@ -153,6 +153,15 @@ export default function Quiz() {
       ...responses,
       [currentStep]: option,
     });
+    
+    // Avanço automático após 600ms para o usuário ver a seleção
+    setTimeout(() => {
+      if (currentStep < QUIZ_STEPS.length - 1) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        setShowLeadForm(true);
+      }
+    }, 600);
   };
 
   const handleNext = () => {
