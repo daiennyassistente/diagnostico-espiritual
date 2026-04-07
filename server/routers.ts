@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { createLead, createQuizResponse } from "./db";
+import { createLead, createQuizResponse, getAllQuizResponses, getResponseStatistics } from "./db";
 
 export const appRouter = router({
   system: systemRouter,
@@ -61,6 +61,16 @@ export const appRouter = router({
           step10: input.step10,
         });
         return { success: true };
+      }),
+
+    getAllResponses: publicProcedure
+      .query(async () => {
+        return await getAllQuizResponses();
+      }),
+
+    getStatistics: publicProcedure
+      .query(async () => {
+        return await getResponseStatistics();
       }),
   }),
 });

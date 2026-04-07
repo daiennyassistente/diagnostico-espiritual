@@ -39,3 +39,12 @@
 - [x] Revisar e refinar interface
 - [x] Criar checkpoint final
 - [x] Entregar aplicação ao usuário
+
+## Painel de Admin e Dashboard
+- [x] Criar procedimento tRPC para listar todas as respostas do quiz
+- [x] Criar procedimento tRPC para obter estatísticas de respostas por etapa
+- [x] Desenvolver página de admin com tabela de respostas
+- [x] Implementar filtros e busca na tabela de respostas
+- [x] Criar dashboard com gráficos de distribuição de respostas
+- [ ] Adicionar proteção de acesso (apenas admin pode ver)
+- [x] Testar visualização de dados

@@ -128,3 +128,72 @@ export async function getQuizResponseByLeadId(leadId: number) {
   const result = await db.select().from(quizResponses).where(eq(quizResponses.leadId, leadId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
+
+
+export async function getAllQuizResponses() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const allResponses = await db
+    .select({
+      id: quizResponses.id,
+      leadId: quizResponses.leadId,
+      whatsapp: leads.whatsapp,
+      email: leads.email,
+      step1: quizResponses.step1,
+      step2: quizResponses.step2,
+      step3: quizResponses.step3,
+      step4: quizResponses.step4,
+      step5: quizResponses.step5,
+      step6: quizResponses.step6,
+      step7: quizResponses.step7,
+      step8: quizResponses.step8,
+      step9: quizResponses.step9,
+      step10: quizResponses.step10,
+      createdAt: quizResponses.createdAt,
+    })
+    .from(quizResponses)
+    .innerJoin(leads, eq(quizResponses.leadId, leads.id));
+
+  return allResponses;
+}
+
+export async function getResponseStatistics() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const allResponses = await getAllQuizResponses();
+
+  // Contar respostas por etapa
+  const stats: Record<string, any> = {
+    totalRespostas: allResponses.length,
+    step1: {} as Record<string, number>,
+    step2: {} as Record<string, number>,
+    step3: {} as Record<string, number>,
+    step4: {} as Record<string, number>,
+    step5: {} as Record<string, number>,
+    step6: {} as Record<string, number>,
+    step7: {} as Record<string, number>,
+    step8: {} as Record<string, number>,
+    step9: {} as Record<string, number>,
+    step10: {} as Record<string, number>,
+  }
+
+  allResponses.forEach((response) => {
+    for (let i = 1; i <= 10; i++) {
+      const stepKey = `step${i}` as 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8' | 'step9' | 'step10';
+      const answer = response[stepKey];
+      if (answer) {
+        const statsKey = `step${i}` as 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8' | 'step9' | 'step10';
+        const stepStats = stats[statsKey] as Record<string, number>;
+        stepStats[answer] = (stepStats[answer] || 0) + 1;
+      }
+    }
+  });
+
+  return stats;
+}
