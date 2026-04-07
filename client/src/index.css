@@ -196,7 +196,7 @@
     color: #4A3F35 !important;
   }
   
-  .quiz-button:hover {
+  .quiz-button:hover:not(.selected) {
     background-color: #F0E8E0 !important;
     border-color: #8B7355 !important;
   }
@@ -207,6 +207,12 @@
     border-color: #2A1F1A !important;
     @apply shadow-xl font-bold;
     transform: scale(1.03);
+  }
+  
+  .quiz-button.selected:hover {
+    background-color: #1A0F0A !important;
+    border-color: #1A0F0A !important;
+    box-shadow: 0 10px 25px rgba(42, 31, 26, 0.4) !important;
   }
   
   .quiz-button.selected::after {

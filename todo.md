@@ -65,3 +65,6 @@
 ## Bugs a Corrigir
 - [x] Página de resultado não está aparecendo após envio do quiz
 - [x] Botões selecionados não estão visualmente diferentes
+
+## Melhorias Adicionais
+- [x] Manter botão selecionado com tom escuro mesmo ao passar o mouse
