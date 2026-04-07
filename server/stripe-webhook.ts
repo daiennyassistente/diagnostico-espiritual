@@ -1,8 +1,9 @@
 import Stripe from "stripe";
 import { Request, Response } from "express";
 import { getDb } from "./db";
-import { payments } from "../drizzle/schema";
+import { payments, leads } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { sendDevotionalConfirmationEmail } from "./email-service";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-04-10",
@@ -75,6 +76,29 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                 productName: "Devocional: 7 Dias para se Aproximar de Deus",
               });
               console.log(`[Webhook] Payment recorded for lead ${leadId}`);
+              
+              // Enviar email com PDF devocional
+              try {
+                const leadData = await db.select().from(leads).where(eq(leads.id, parseInt(leadId))).limit(1);
+                if (leadData.length > 0) {
+                  const profileName = paymentIntent.metadata?.profile_name || "Seu Devocional";
+                  const downloadLink = `${process.env.FRONTEND_URL || "https://espiritualquiz-sx87ncqt.manus.space"}/checkout-success`;
+                  
+                  const emailSent = await sendDevotionalConfirmationEmail(
+                    leadData[0].email,
+                    profileName,
+                    downloadLink
+                  );
+                  
+                  if (emailSent) {
+                    console.log(`[Webhook] Email sent to ${leadData[0].email}`);
+                  } else {
+                    console.warn(`[Webhook] Email failed for ${leadData[0].email}`);
+                  }
+                }
+              } catch (emailError: any) {
+                console.error(`[Webhook] Failed to send email: ${emailError.message}`);
+              }
             }
           } catch (dbError: any) {
             console.error(`[Webhook] Database error: ${dbError.message}`);

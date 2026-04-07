@@ -1,15 +1,29 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, CreditCard, TrendingUp, Mail } from "lucide-react";
+import { Loader2, Users, CreditCard, TrendingUp, Mail, LogOut } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function AdminDashboard() {
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"dashboard" | "leads" | "pagamentos" | "emails">("dashboard");
   
   const { data: allResponses, isLoading: loadingResponses } = trpc.quiz.getAllResponses.useQuery();
   const { data: statistics, isLoading: loadingStats } = trpc.quiz.getStatistics.useQuery();
+  const { data: meQuery } = trpc.auth.me.useQuery();
+  
+  // Verificar se é admin
+  useEffect(() => {
+    if (meQuery && meQuery.role !== "admin") {
+      setLocation("/");
+    }
+  }, [meQuery, setLocation]);
+  
+  if (meQuery && meQuery.role !== "admin") {
+    return null;
+  }
 
   // Dados de exemplo para gráficos
   const leadsData = [
@@ -40,14 +54,25 @@ export default function AdminDashboard() {
   ];
 
   const COLORS = ["#4A3F35", "#3E342C", "#8B7355", "#A0826D"];
+  
+  const handleLogout = async () => {
+    await trpc.auth.logout.useMutation().mutateAsync();
+    setLocation("/");
+  };
 
   return (
     <div className="spiritual-background min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground">📊 Dashboard Admin</h1>
-          <p className="text-muted-foreground mt-2">Gerenciamento completo da plataforma</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground">📊 Dashboard Admin</h1>
+            <p className="text-muted-foreground mt-2">Gerenciamento completo da plataforma</p>
+          </div>
+          <Button onClick={handleLogout} variant="outline">
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
         </div>
 
         {/* Tabs */}
