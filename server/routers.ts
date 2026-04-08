@@ -424,7 +424,7 @@ export const appRouter = router({
                     name: "Devocional: 7 Dias para se Aproximar de Deus",
                     description: `Guia devocional personalizado baseado em seu perfil: ${input.profileName}`,
                   },
-                  unit_amount: 990,
+                  unit_amount: 1290,
                 },
                 quantity: 1,
               },
@@ -459,7 +459,7 @@ export const appRouter = router({
           
           const preference = await createMercadoPagoPreference({
             title: "Devocional: 7 Dias para se Aproximar de Deus",
-            price: 9.90,
+            price: 12.90,
             quantity: 1,
             email: input.email,
             externalReference: `devotional-${Date.now()}`,

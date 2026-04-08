@@ -399,3 +399,5 @@
 - [x] Alterar botão de compra para "Adquirir" - COMPLETO
 
 - [ ] Botão "Criar Pix" do Mercado Pago não está respondendo no iPhone - Criar alternativa
+
+- [x] Alterar preço do devocional de R$ 9,90 para R$ 12,90
