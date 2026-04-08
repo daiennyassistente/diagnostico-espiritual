@@ -304,44 +304,74 @@ export default function Result() {
   };
 
   const [isBuyingGuide, setIsBuyingGuide] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'mercadopago' | null>(null);
   const createCheckoutMutation = trpc.quiz.createDevocionalCheckout.useMutation();
+  const createMercadoPagoCheckoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
 
-  const handleBuyGuide = async () => {
+  const handleBuyGuide = async (method: 'stripe' | 'mercadopago') => {
     if (!result || !responses) return;
     
     setIsBuyingGuide(true);
+    setPaymentMethod(method);
     
     // Obter email do localStorage (salvo durante captura de leads)
     const leadData = localStorage.getItem("leadData");
     if (!leadData) {
       toast.error("Email não encontrado. Por favor, complete o quiz novamente.");
       setIsBuyingGuide(false);
+      setPaymentMethod(null);
       return;
     }
     
     const { email } = JSON.parse(leadData);
     
-    createCheckoutMutation.mutate(
-      {
-        email,
-        profileName: result.profileName,
-      },
-      {
-        onSuccess: (data: any) => {
-          if (data.checkoutUrl) {
-            window.open(data.checkoutUrl, "_blank");
-            toast.success("Redirecionando para o checkout...");
-          }
+    if (method === 'stripe') {
+      createCheckoutMutation.mutate(
+        {
+          email,
+          profileName: result.profileName,
         },
-        onError: (error: any) => {
-          console.error("Erro ao criar checkout:", error);
-          toast.error("Erro ao processar pagamento. Tente novamente.");
+        {
+          onSuccess: (data: any) => {
+            if (data.checkoutUrl) {
+              window.open(data.checkoutUrl, "_blank");
+              toast.success("Redirecionando para o checkout...");
+            }
+          },
+          onError: (error: any) => {
+            console.error("Erro ao criar checkout:", error);
+            toast.error("Erro ao processar pagamento. Tente novamente.");
+          },
+          onSettled: () => {
+            setIsBuyingGuide(false);
+            setPaymentMethod(null);
+          },
+        }
+      );
+    } else if (method === 'mercadopago') {
+      createMercadoPagoCheckoutMutation.mutate(
+        {
+          email,
+          profileName: result.profileName,
         },
-        onSettled: () => {
-          setIsBuyingGuide(false);
-        },
-      }
-    );
+        {
+          onSuccess: (data: any) => {
+            if (data.checkoutUrl) {
+              window.open(data.checkoutUrl, "_blank");
+              toast.success("Redirecionando para o Pix...");
+            }
+          },
+          onError: (error: any) => {
+            console.error("Erro ao criar checkout Mercado Pago:", error);
+            toast.error("Erro ao processar pagamento. Tente novamente.");
+          },
+          onSettled: () => {
+            setIsBuyingGuide(false);
+            setPaymentMethod(null);
+          },
+        }
+      );
+    }
   };
 
   if (isLoading) {
@@ -564,29 +594,50 @@ export default function Result() {
             <p className="text-xs text-foreground/60">Acesso imediato ao PDF + Suporte por 7 dias</p>
           </div>
 
-          {/* Botão de compra com urgência */}
-          <Button
-            onClick={handleBuyGuide}
-            disabled={isBuyingGuide}
-            className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 text-lg mb-4"
-          >
-            {isBuyingGuide ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Processando...
-              </>
-            ) : (
-              <>
-                <BookOpen className="w-5 h-5 mr-2" />
-                Obter Meu Devocional Agora
-              </>
-            )}
-          </Button>
+          {/* Botões de compra com opções de pagamento */}
+          <div className="space-y-3">
+            <Button
+              onClick={() => handleBuyGuide('stripe')}
+              disabled={isBuyingGuide}
+              className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 text-lg"
+            >
+              {isBuyingGuide && paymentMethod === 'stripe' ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                <>
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  Comprar com Cartão
+                </>
+              )}
+            </Button>
+            
+            <Button
+              onClick={() => handleBuyGuide('mercadopago')}
+              disabled={isBuyingGuide}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 text-lg"
+            >
+              {isBuyingGuide && paymentMethod === 'mercadopago' ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                <>
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  Comprar com Pix
+                </>
+              )}
+            </Button>
+          </div>
 
           <div className="text-center text-sm text-foreground/70 mb-6">
             <p>
               ✓ Entrega imediata do PDF após a confirmação do pagamento
             </p>
+            <p className="text-xs mt-2">Escolha sua forma de pagamento preferida</p>
           </div>
 
           {/* Depoimento social proof (opcional) */}

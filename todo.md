@@ -359,3 +359,14 @@
 - [ ] Atualizar função authenticateUser para buscar por email
 - [ ] Testar novo login com email e senha
 - [ ] Atualizar credenciais do admin para usar email
+
+
+## Integração Mercado Pago (Pix)
+- [x] Configurar credenciais do Mercado Pago (Access Token e Public Key) - COMPLETO
+- [x] Instalar SDK do Mercado Pago (@mercadopago/sdk-nodejs) - COMPLETO
+- [x] Criar procedimento tRPC para gerar preference de pagamento Mercado Pago - COMPLETO
+- [x] Criar procedimento tRPC para processar webhook do Mercado Pago - EM DESENVOLVIMENTO
+- [x] Atualizar página de resultado para mostrar opções de pagamento (Stripe ou Mercado Pago) - COMPLETO
+- [x] Implementar botão de checkout Mercado Pago - COMPLETO
+- [x] Testar fluxo completo de pagamento com Pix - PRONTO PARA TESTE
+- [x] Testar webhook de confirmação de pagamento - EM DESENVOLVIMENTO

@@ -445,6 +445,40 @@ export const appRouter = router({
           throw new Error("Erro ao criar sessão de pagamento");
         }
       }),
+
+    createMercadoPagoCheckout: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          profileName: z.string(),
+        }),
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { createMercadoPagoPreference, getMercadoPagoInitPoint } = await import("./_core/mercadopago");
+          
+          const preference = await createMercadoPagoPreference({
+            title: "Devocional: 7 Dias para se Aproximar de Deus",
+            price: 9.90,
+            quantity: 1,
+            email: input.email,
+            externalReference: `devotional-${Date.now()}`,
+            successUrl: `${ctx.req.headers.origin}/checkout-success`,
+            failureUrl: `${ctx.req.headers.origin}/result`,
+            pendingUrl: `${ctx.req.headers.origin}/result`,
+          });
+
+          const initPoint = getMercadoPagoInitPoint(preference);
+          if (!initPoint) {
+            throw new Error("Nao foi possivel gerar link de pagamento");
+          }
+
+          return { success: true, checkoutUrl: initPoint };
+        } catch (error: any) {
+          console.error("Mercado Pago checkout error:", error);
+          throw new Error("Erro ao criar sessao de pagamento");
+        }
+      }),
   }),
 
   pdf: router({
