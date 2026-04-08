@@ -104,8 +104,8 @@
 
 ## Integração Stripe (Versão Futura)
 - [x] Webhook Stripe para confirmação de pagamentos
-- [ ] Expandir personalização do devocional com OpenAI
-- [ ] Histórico de diagnósticos
+- [ ] Expandir personalização do devocional com OpenAI (adiado para v2)
+- [ ] Histórico de diagnósticos (adiado para v2)
 - [x] Compartilhamento no Facebook
 - [x] Compartilhamento no Twitter/X
 
@@ -142,7 +142,7 @@
 - [x] Remover apenas emojis e caracteres problemáticos
 - [x] Corrigir labels do PDF (Introdução, Versículo, Reflexão, Oração, Aplicação, Próximo Passo)
 
-## Funcionalidades Adiadas para Versão Futura
+## Funcionalidades Adiadas para Versão Futura (v2)
 - [ ] Compartilhamento por link com fallback para clipboard
 - [ ] Histórico de diagnósticos
 - [ ] Melhorias de animações de transição
