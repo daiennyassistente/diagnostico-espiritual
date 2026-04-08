@@ -62,7 +62,6 @@ export async function sendDevotionalConfirmationEmail(
       profileDescription: "Seu devocional personalizado",
       challenges: [],
       recommendations: [],
-      responses: {},
     });
 
     // Template HTML do email

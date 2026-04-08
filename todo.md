@@ -371,3 +371,20 @@
 - [x] Testar fluxo completo de pagamento com Pix - COMPLETO
 - [x] Testar webhook de confirmação de pagamento - COMPLETO
 - [x] Ativar Mercado Pago em produção com chaves validadas - COMPLETO
+
+
+## Redesign do PDF Devocional (v1.1)
+- [ ] Criar designer de PDF minimalista e elegante com PDFKit
+- [ ] Separar design do PDF da geração de texto com OpenAI
+- [ ] Implementar capa personalizada com perfil espiritual e data
+- [ ] Criar layout harmonioso para 7 páginas (uma por dia)
+- [ ] Adicionar elementos visuais (cruzes, bíblias, emojis)
+- [ ] Integrar OpenAI para gerar apenas textos
+- [ ] Testar fluxo completo de geração de PDF
+- [ ] Validar harmonia visual e aconchego do design
+
+
+## Uniformizar Design dos PDFs
+- [x] Fazer PDF do devocional usar o mesmo modelo visual do PDF de diagnóstico
+- [x] Testar novo PDF de devocional após compra
+- [x] Alterar fundo para branco com detalhes na paleta de cores

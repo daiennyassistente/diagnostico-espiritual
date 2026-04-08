@@ -524,6 +524,7 @@ export const appRouter = router({
           challenges: z.array(z.string()),
           recommendations: z.array(z.string()),
           responses: z.record(z.string(), z.string()),
+          userName: z.string().optional(),
         }),
       )
       .mutation(async ({ input }) => {
@@ -535,7 +536,7 @@ export const appRouter = router({
             profileDescription: input.profileDescription,
             challenges: input.challenges,
             recommendations: input.recommendations,
-            responses: input.responses as Record<string, string>,
+            userName: input.userName,
           });
 
           const base64 = pdfBuffer.toString("base64" as BufferEncoding);

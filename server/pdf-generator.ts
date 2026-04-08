@@ -11,12 +11,13 @@ export interface DiagnosticData {
 }
 
 const COLORS = {
-  background: rgb(0.96, 0.94, 0.92),
+  background: rgb(1, 1, 1),
   dark: rgb(0.24, 0.20, 0.15),
   medium: rgb(0.29, 0.25, 0.21),
   accent: rgb(0.58, 0.47, 0.36),
   white: rgb(1, 1, 1),
-  mutedBorder: rgb(0.88, 0.84, 0.79),
+  mutedBorder: rgb(0.93, 0.91, 0.89),
+  lightBg: rgb(0.98, 0.97, 0.95),
 };
 
 const PAGE_WIDTH = 595;
