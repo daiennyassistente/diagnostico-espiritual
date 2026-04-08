@@ -63,6 +63,16 @@ export default function Result() {
     const parsed = JSON.parse(savedResponses);
     setResponses(parsed);
 
+    const storedLeadId = localStorage.getItem("quizLeadId");
+    const parsedLeadId = storedLeadId ? Number(storedLeadId) : undefined;
+    const leadDataRaw = localStorage.getItem("leadData");
+    const leadData = leadDataRaw ? JSON.parse(leadDataRaw) : null;
+    const leadId = Number.isFinite(parsedLeadId)
+      ? parsedLeadId
+      : typeof leadData?.leadId === "number"
+        ? leadData.leadId
+        : undefined;
+
     if (savedResult) {
       try {
         const parsedResult = JSON.parse(savedResult);
@@ -174,7 +184,7 @@ export default function Result() {
     }, 8000);
 
     generateResultMutation.mutate(
-      { responses: parsed },
+      { responses: parsed, leadId },
       {
         onSuccess: (data: any) => {
           if (fallbackTimeoutRef.current) {

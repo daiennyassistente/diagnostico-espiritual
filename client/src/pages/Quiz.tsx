@@ -404,7 +404,9 @@ export default function Quiz() {
         await submitResponsesMutation.mutateAsync(responsesData);
 
         localStorage.setItem('quizResponses', JSON.stringify(responses));
+        localStorage.setItem('quizLeadId', String(leadResult.leadId));
         localStorage.setItem('leadData', JSON.stringify({
+          leadId: leadResult.leadId,
           email: leadData.email,
           whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         }));

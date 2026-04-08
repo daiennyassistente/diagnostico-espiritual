@@ -260,3 +260,17 @@
 - [x] Trocar qualquer menção de suporte por 30 dias para suporte por 7 dias
 - [x] Remover menções sobre devolução do dinheiro, garantia ou reembolso na oferta e pós-compra
 - [x] Validar que a nova copy aparece corretamente no resultado e nas páginas relacionadas
+
+## Nova Solicitação - Área Administrativa Protegida
+- [x] Criar controle de acesso para permitir apenas admins/autorizados na área administrativa
+- [x] Reaproveitar a autenticação e a base de dados real já existentes no projeto para o admin
+- [x] Criar seção de Usuários com dados reais da base
+- [x] Criar seção de Compradores com dados reais de pagamentos/compras
+- [x] Criar Dashboard de Resultados com métricas e visão consolidada dos diagnósticos
+- [x] Aplicar na área administrativa a mesma paleta visual e linguagem do site principal
+- [x] Validar a navegação, proteção de acesso e carregamento de dados reais no admin
+- [x] Criar/atualizar testes para a nova área administrativa
+
+## Correção Descoberta na Validação do Admin
+- [x] Aplicar no banco real a tabela `diagnostic_history` já definida no schema para eliminar o erro 500 do snapshot administrativo
+- [x] Revalidar a área `/admin` após a criação da tabela para confirmar carregamento de Usuários, Compradores e Dashboard de Resultados

@@ -18,3 +18,21 @@ A automação do fluxo no navegador conseguiu completar o quiz, preencher o lead
 
 A captura mais recente do resultado confirmou a estrutura visual hoje exibida ao usuário: emoji destacado no topo, nome do perfil sem o emoji na linha principal, subtítulo **"Seu Diagnóstico Espiritual"**, caixa de descrição com citação fixa, seções **Seus Pontos Fortes**, **Desafios a Trabalhar** e **Recomendações**, além do bloco de oferta abaixo. Essa observação será usada para alinhar o PDF de forma mais fiel ao layout efetivamente mostrado no site.
 
+
+## 2026-04-08 10:39 - Validação inicial do admin protegido
+
+A rota `/admin` carregou corretamente para a conta autenticada atual, exibindo sidebar, cabeçalho administrativo e a mesma paleta bege/marrom do site principal. A estrutura visual ficou coerente com a identidade do projeto, com menu lateral contendo as seções **Dashboard de Resultados**, **Usuários** e **Compradores**.
+
+Ao clicar em **Usuários**, a navegação lateral respondeu corretamente, mas o conteúdo principal entrou em estado de erro com a mensagem **"Não foi possível carregar a área administrativa"**. Isso indica que o layout base e a navegação estão ativos, porém a consulta de dados reais do painel ainda está falhando em tempo de execução e precisa ser investigada no backend ou no contrato consumido pelo frontend.
+
+## 2026-04-08 10:45 - Validação das seções Usuários e Compradores no admin
+
+Após aplicar a tabela `diagnostic_history` no banco real, a área administrativa deixou de falhar no carregamento do snapshot. A seção **Usuários** passou a exibir dados reais, incluindo total de usuários, contagem de administradores, novos usuários em 30 dias e a tabela com nome, e-mail, papel, método e datas da conta autenticada.
+
+Na sequência, a seção **Compradores** também carregou corretamente. O painel mostrou métricas reais do momento, com **0 compras aprovadas**, **R$ 0,00 de receita confirmada** e **0% de taxa de conversão**, além de um estado vazio coerente com a mensagem **"Nenhum comprador registrado"**. Isso confirma que a navegação lateral está funcionando e que o admin já consulta a base real do projeto sem cair em erro nessas duas áreas.
+
+## 2026-04-08 10:46 - Validação do Dashboard de Resultados no admin
+
+A seção **Dashboard de Resultados** também carregou corretamente após a correção aplicada no banco. O painel mostrou métricas reais do projeto naquele momento, incluindo **0 diagnósticos gerados**, **168 leads capturados**, **0 compras aprovadas** e **0% de taxa de conversão**.
+
+Além dos KPIs, a interface exibiu os blocos visuais de **Leads e compras por dia** e **Distribuição de perfis**, mantendo a mesma identidade visual do site principal. Como ainda não existem diagnósticos persistidos na base real, o estado vazio apareceu de forma coerente com a mensagem **"Sem perfis registrados ainda"**, o que confirma que o dashboard está funcional e lendo os dados reais disponíveis sem cair em erro.

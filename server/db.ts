@@ -1,8 +1,17 @@
-import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, leads, quizResponses, InsertLead, InsertQuizResponse } from "../drizzle/schema";
-import { ENV } from './_core/env';
-import { sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
+import {
+  InsertDiagnosticHistory,
+  InsertLead,
+  InsertQuizResponse,
+  InsertUser,
+  diagnosticHistory,
+  leads,
+  payments,
+  quizResponses,
+  users,
+} from "../drizzle/schema";
+import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -57,8 +66,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = user.role;
       updateSet.role = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+      values.role = "admin";
+      updateSet.role = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -96,26 +105,22 @@ export async function createLead(lead: InsertLead) {
     throw new Error("Database not available");
   }
 
-  // Inserir o lead e obter o resultado
   const result = await db.insert(leads).values(lead);
-  
-  // O resultado do insert do Drizzle com mysql2 é um array
-  // onde o primeiro elemento é o ResultSetHeader com insertId
+
   if (Array.isArray(result) && result.length > 0) {
     const header = result[0] as any;
     if (header && header.insertId) {
       return { id: Number(header.insertId) };
     }
   }
-  
-  // Fallback: tentar acessar insertId diretamente
-  if (result && typeof result === 'object') {
+
+  if (result && typeof result === "object") {
     const insertId = (result as any).insertId;
     if (insertId) {
       return { id: Number(insertId) };
     }
   }
-  
+
   throw new Error("Failed to retrieve inserted lead ID from insert result");
 }
 
@@ -126,6 +131,16 @@ export async function createQuizResponse(response: InsertQuizResponse) {
   }
 
   const result = await db.insert(quizResponses).values(response);
+  return result;
+}
+
+export async function createDiagnosticHistoryEntry(entry: InsertDiagnosticHistory) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(diagnosticHistory).values(entry);
   return result;
 }
 
@@ -148,7 +163,6 @@ export async function getQuizResponseByLeadId(leadId: number) {
   const result = await db.select().from(quizResponses).where(eq(quizResponses.leadId, leadId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
-
 
 export async function getAllQuizResponses() {
   const db = await getDb();
@@ -181,14 +195,8 @@ export async function getAllQuizResponses() {
 }
 
 export async function getResponseStatistics() {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
   const allResponses = await getAllQuizResponses();
 
-  // Contar respostas por etapa
   const stats: Record<string, any> = {
     totalRespostas: allResponses.length,
     step1: {} as Record<string, number>,
@@ -201,19 +209,240 @@ export async function getResponseStatistics() {
     step8: {} as Record<string, number>,
     step9: {} as Record<string, number>,
     step10: {} as Record<string, number>,
-  }
+  };
 
   allResponses.forEach((response) => {
-    for (let i = 1; i <= 10; i++) {
-      const stepKey = `step${i}` as 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8' | 'step9' | 'step10';
+    for (let i = 1; i <= 10; i += 1) {
+      const stepKey = `step${i}` as
+        | "step1"
+        | "step2"
+        | "step3"
+        | "step4"
+        | "step5"
+        | "step6"
+        | "step7"
+        | "step8"
+        | "step9"
+        | "step10";
       const answer = response[stepKey];
       if (answer) {
-        const statsKey = `step${i}` as 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8' | 'step9' | 'step10';
-        const stepStats = stats[statsKey] as Record<string, number>;
+        const stepStats = stats[stepKey] as Record<string, number>;
         stepStats[answer] = (stepStats[answer] || 0) + 1;
       }
     }
   });
 
   return stats;
+}
+
+const formatDateKey = (date: Date) =>
+  new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+  }).format(date);
+
+const safeNumber = (value: unknown) => Number(value || 0);
+
+export async function getAdminUsers() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const records = await db
+    .select({
+      id: users.id,
+      openId: users.openId,
+      name: users.name,
+      email: users.email,
+      loginMethod: users.loginMethod,
+      role: users.role,
+      createdAt: users.createdAt,
+      lastSignedIn: users.lastSignedIn,
+      updatedAt: users.updatedAt,
+    })
+    .from(users)
+    .orderBy(desc(users.lastSignedIn), desc(users.createdAt));
+
+  return records;
+}
+
+export async function getAdminBuyers() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const records = await db
+    .select({
+      id: payments.id,
+      leadId: payments.leadId,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      amount: payments.amount,
+      currency: payments.currency,
+      status: payments.status,
+      productName: payments.productName,
+      stripePaymentIntentId: payments.stripePaymentIntentId,
+      stripeCustomerId: payments.stripeCustomerId,
+      createdAt: payments.createdAt,
+      updatedAt: payments.updatedAt,
+    })
+    .from(payments)
+    .innerJoin(leads, eq(payments.leadId, leads.id))
+    .orderBy(desc(payments.createdAt));
+
+  return records;
+}
+
+export async function getAdminDiagnosticResults() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const records = await db
+    .select({
+      id: diagnosticHistory.id,
+      leadId: diagnosticHistory.leadId,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      profileName: diagnosticHistory.profileName,
+      profileDescription: diagnosticHistory.profileDescription,
+      strengths: diagnosticHistory.strengths,
+      challenges: diagnosticHistory.challenges,
+      recommendations: diagnosticHistory.recommendations,
+      nextSteps: diagnosticHistory.nextSteps,
+      createdAt: diagnosticHistory.createdAt,
+    })
+    .from(diagnosticHistory)
+    .innerJoin(leads, eq(diagnosticHistory.leadId, leads.id))
+    .orderBy(desc(diagnosticHistory.createdAt));
+
+  return records.map((record) => ({
+    ...record,
+    strengths: JSON.parse(record.strengths || "[]") as string[],
+    challenges: JSON.parse(record.challenges || "[]") as string[],
+    recommendations: JSON.parse(record.recommendations || "[]") as string[],
+    nextSteps: JSON.parse(record.nextSteps || "[]") as string[],
+  }));
+}
+
+export async function getAdminDashboardSummary() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [userTotals] = await db.select({ total: sql<number>`count(*)` }).from(users);
+  const [leadTotals] = await db.select({ total: sql<number>`count(*)` }).from(leads);
+  const [paymentTotals] = await db.select({ total: sql<number>`count(*)` }).from(payments);
+  const [diagnosticTotals] = await db.select({ total: sql<number>`count(*)` }).from(diagnosticHistory);
+  const [successfulPayments] = await db
+    .select({ total: sql<number>`count(*)`, revenue: sql<number>`coalesce(sum(${payments.amount}), 0)` })
+    .from(payments)
+    .where(eq(payments.status, "succeeded"));
+
+  const [recentUsers] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(users)
+    .where(gte(users.createdAt, thirtyDaysAgo));
+  const [recentLeads] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(leads)
+    .where(gte(leads.createdAt, thirtyDaysAgo));
+  const [recentDiagnostics] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(diagnosticHistory)
+    .where(gte(diagnosticHistory.createdAt, thirtyDaysAgo));
+
+  const recentLeadRows = await db
+    .select({ createdAt: leads.createdAt })
+    .from(leads)
+    .where(gte(leads.createdAt, thirtyDaysAgo))
+    .orderBy(leads.createdAt);
+
+  const recentPaymentRows = await db
+    .select({ createdAt: payments.createdAt, amount: payments.amount, status: payments.status })
+    .from(payments)
+    .where(gte(payments.createdAt, thirtyDaysAgo))
+    .orderBy(payments.createdAt);
+
+  const profileRows = await db
+    .select({ profileName: diagnosticHistory.profileName, total: sql<number>`count(*)` })
+    .from(diagnosticHistory)
+    .groupBy(diagnosticHistory.profileName)
+    .orderBy(desc(sql<number>`count(*)`));
+
+  const leadsByDayMap = new Map<string, number>();
+  recentLeadRows.forEach((row) => {
+    const key = formatDateKey(new Date(row.createdAt));
+    leadsByDayMap.set(key, (leadsByDayMap.get(key) || 0) + 1);
+  });
+
+  const paymentsByDayMap = new Map<string, { count: number; revenue: number }>();
+  recentPaymentRows.forEach((row) => {
+    const key = formatDateKey(new Date(row.createdAt));
+    const current = paymentsByDayMap.get(key) || { count: 0, revenue: 0 };
+    paymentsByDayMap.set(key, {
+      count: current.count + (row.status === "succeeded" ? 1 : 0),
+      revenue: current.revenue + (row.status === "succeeded" ? safeNumber(row.amount) : 0),
+    });
+  });
+
+  const timelineLabels = Array.from(
+    new Set(
+      Array.from(leadsByDayMap.keys()).concat(Array.from(paymentsByDayMap.keys())),
+    ),
+  );
+
+  const timeline = timelineLabels.map((date) => ({
+    date,
+    leads: leadsByDayMap.get(date) || 0,
+    pagamentos: paymentsByDayMap.get(date)?.count || 0,
+    receita: paymentsByDayMap.get(date)?.revenue || 0,
+  }));
+
+  const conversionRate = safeNumber(leadTotals?.total)
+    ? (safeNumber(successfulPayments?.total) / safeNumber(leadTotals?.total)) * 100
+    : 0;
+
+  return {
+    kpis: {
+      totalUsuarios: safeNumber(userTotals?.total),
+      novosUsuarios30Dias: safeNumber(recentUsers?.total),
+      totalLeads: safeNumber(leadTotals?.total),
+      leads30Dias: safeNumber(recentLeads?.total),
+      totalCompras: safeNumber(paymentTotals?.total),
+      comprasAprovadas: safeNumber(successfulPayments?.total),
+      receitaTotal: safeNumber(successfulPayments?.revenue),
+      totalDiagnosticos: safeNumber(diagnosticTotals?.total),
+      diagnosticos30Dias: safeNumber(recentDiagnostics?.total),
+      taxaConversao: Number(conversionRate.toFixed(1)),
+    },
+    timeline,
+    perfilDistribuicao: profileRows.map((row) => ({
+      name: row.profileName,
+      value: safeNumber(row.total),
+    })),
+  };
+}
+
+export async function getAdminSnapshot() {
+  const [summary, usersList, buyers, diagnostics] = await Promise.all([
+    getAdminDashboardSummary(),
+    getAdminUsers(),
+    getAdminBuyers(),
+    getAdminDiagnosticResults(),
+  ]);
+
+  return {
+    summary,
+    users: usersList,
+    buyers,
+    diagnostics,
+  };
 }

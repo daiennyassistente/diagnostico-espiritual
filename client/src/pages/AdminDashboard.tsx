@@ -1,329 +1,572 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { Card } from "@/components/ui/card";
+import { useAuth } from "@/_core/hooks/useAuth";
+import DashboardLayout, {
+  type DashboardLayoutMenuItem,
+} from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, CreditCard, TrendingUp, Mail, LogOut } from "lucide-react";
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Card } from "@/components/ui/card";
+import { trpc } from "@/lib/trpc";
+import {
+  Activity,
+  BookHeart,
+  CreditCard,
+  Loader2,
+  RefreshCcw,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+type AdminSection = "dashboard" | "usuarios" | "compradores";
+
+const MENU_ITEMS: DashboardLayoutMenuItem[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard de Resultados",
+    icon: Sparkles,
+    helperText: "Funil, perfis e diagnósticos",
+  },
+  {
+    id: "usuarios",
+    label: "Usuários",
+    icon: Users,
+    helperText: "Contas autenticadas e permissões",
+  },
+  {
+    id: "compradores",
+    label: "Compradores",
+    icon: CreditCard,
+    helperText: "Pagamentos e devocionais vendidos",
+  },
+];
+
+const CHART_COLORS = ["#3E342C", "#6C5B4E", "#8B7355", "#B49A84", "#D4C9BD"];
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format((value || 0) / 100);
+
+const formatDateTime = (value: string | Date | null | undefined) => {
+  if (!value) return "-";
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+};
+
+const roleBadgeClass = (role: string) =>
+  role === "admin"
+    ? "bg-accent text-accent-foreground"
+    : "bg-secondary text-secondary-foreground";
+
+const paymentBadgeClass = (status: string) => {
+  switch (status) {
+    case "succeeded":
+      return "bg-emerald-100 text-emerald-800";
+    case "pending":
+      return "bg-amber-100 text-amber-800";
+    case "failed":
+      return "bg-rose-100 text-rose-800";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="space-y-3">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+        {eyebrow}
+      </p>
+      <div className="space-y-2">
+        <h2 className="text-3xl text-foreground">{title}</h2>
+        <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ title, description }: { title: string; description: string }) {
+  return (
+    <Card className="rounded-[28px] border border-dashed border-border/80 bg-white/80 p-10 text-center shadow-sm">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+        <BookHeart className="h-6 w-6" />
+      </div>
+      <h3 className="mt-5 text-xl text-foreground">{title}</h3>
+      <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        {description}
+      </p>
+    </Card>
+  );
+}
 
 export default function AdminDashboard() {
-  const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "leads" | "pagamentos" | "emails">("dashboard");
-  
-  const { data: allResponses, isLoading: loadingResponses } = trpc.quiz.getAllResponses.useQuery();
-  const { data: statistics, isLoading: loadingStats } = trpc.quiz.getStatistics.useQuery();
-  const { data: meQuery } = trpc.auth.me.useQuery();
-  
-  // Verificar se é admin
-  useEffect(() => {
-    if (meQuery && meQuery.role !== "admin") {
-      setLocation("/");
+  const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
+  const { user } = useAuth();
+
+  const snapshotQuery = trpc.admin.snapshot.useQuery(undefined, {
+    enabled: user?.role === "admin",
+    refetchOnWindowFocus: false,
+  });
+
+  const summary = snapshotQuery.data?.summary;
+  const users = snapshotQuery.data?.users ?? [];
+  const buyers = snapshotQuery.data?.buyers ?? [];
+  const diagnostics = snapshotQuery.data?.diagnostics ?? [];
+
+  const approvedBuyers = useMemo(
+    () => buyers.filter((buyer) => buyer.status === "succeeded"),
+    [buyers],
+  );
+
+  const latestDiagnostics = useMemo(() => diagnostics.slice(0, 6), [diagnostics]);
+
+  const renderContent = () => {
+    if (snapshotQuery.isLoading) {
+      return (
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Card
+              key={index}
+              className="h-36 animate-pulse rounded-[28px] border border-border/60 bg-white/85 shadow-sm"
+            />
+          ))}
+        </div>
+      );
     }
-  }, [meQuery, setLocation]);
-  
-  if (meQuery && meQuery.role !== "admin") {
-    return null;
-  }
 
-  // Dados de exemplo para gráficos
-  const leadsData = [
-    { date: "01/04", leads: 12 },
-    { date: "02/04", leads: 19 },
-    { date: "03/04", leads: 15 },
-    { date: "04/04", leads: 25 },
-    { date: "05/04", leads: 22 },
-    { date: "06/04", leads: 28 },
-    { date: "07/04", leads: 32 },
-  ];
+    if (snapshotQuery.error) {
+      return (
+        <EmptyState
+          title="Não foi possível carregar a área administrativa"
+          description="A autenticação está protegida corretamente, mas houve uma falha ao consultar os dados reais do projeto. Atualize a página ou tente novamente em instantes."
+        />
+      );
+    }
 
-  const paymentData = [
-    { date: "01/04", pagamentos: 2 },
-    { date: "02/04", pagamentos: 3 },
-    { date: "03/04", pagamentos: 2 },
-    { date: "04/04", pagamentos: 5 },
-    { date: "05/04", pagamentos: 4 },
-    { date: "06/04", pagamentos: 6 },
-    { date: "07/04", pagamentos: 8 },
-  ];
+    if (activeSection === "usuarios") {
+      return (
+        <div className="space-y-6">
+          <SectionHeading
+            eyebrow="Usuários autenticados"
+            title="Contas e permissões"
+            description="Esta seção usa a base real de autenticação do projeto para listar usuários, papel de acesso e atividade recente."
+          />
 
-  const profileDistribution = [
-    { name: "Amadurecendo na Fé", value: 35 },
-    { name: "Buscando Direção", value: 28 },
-    { name: "Restaurando Relacionamento", value: 22 },
-    { name: "Vivendo Plenamente", value: 15 },
-  ];
-
-  const COLORS = ["#4A3F35", "#3E342C", "#8B7355", "#A0826D"];
-  
-  const handleLogout = async () => {
-    await trpc.auth.logout.useMutation().mutateAsync();
-    setLocation("/");
-  };
-
-  return (
-    <div className="spiritual-background min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">📊 Dashboard Admin</h1>
-            <p className="text-muted-foreground mt-2">Gerenciamento completo da plataforma</p>
+          <div className="grid gap-4 md:grid-cols-3">
+            <MetricCard
+              icon={Users}
+              label="Total de usuários"
+              value={String(summary?.kpis.totalUsuarios ?? users.length)}
+              helper="Base completa autenticada"
+            />
+            <MetricCard
+              icon={ShieldCheck}
+              label="Administradores"
+              value={String(users.filter((item) => item.role === "admin").length)}
+              helper="Acesso liberado ao painel"
+            />
+            <MetricCard
+              icon={Activity}
+              label="Novos usuários em 30 dias"
+              value={String(summary?.kpis.novosUsuarios30Dias ?? 0)}
+              helper="Evolução recente de acesso"
+            />
           </div>
-          <Button onClick={handleLogout} variant="outline">
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
-        </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-muted">
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "dashboard"
-                ? "text-accent border-b-2 border-accent"
-                : "text-foreground/60 hover:text-foreground"
-            }`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab("leads")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "leads"
-                ? "text-accent border-b-2 border-accent"
-                : "text-foreground/60 hover:text-foreground"
-            }`}
-          >
-            Leads
-          </button>
-          <button
-            onClick={() => setActiveTab("pagamentos")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "pagamentos"
-                ? "text-accent border-b-2 border-accent"
-                : "text-foreground/60 hover:text-foreground"
-            }`}
-          >
-            Pagamentos
-          </button>
-          <button
-            onClick={() => setActiveTab("emails")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "emails"
-                ? "text-accent border-b-2 border-accent"
-                : "text-foreground/60 hover:text-foreground"
-            }`}
-          >
-            Emails
-          </button>
-        </div>
-
-        {/* Dashboard Tab */}
-        {activeTab === "dashboard" && (
-          <div className="space-y-8">
-            {/* KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="p-6 bg-white/80 backdrop-blur">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total de Leads</p>
-                    <p className="text-3xl font-bold text-foreground">
-                      {loadingResponses ? "-" : allResponses?.length || 0}
-                    </p>
-                  </div>
-                  <Users className="w-10 h-10 text-accent" />
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-white/80 backdrop-blur">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Pagamentos Recebidos</p>
-                    <p className="text-3xl font-bold text-foreground">R$ 1.430</p>
-                  </div>
-                  <CreditCard className="w-10 h-10 text-accent" />
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-white/80 backdrop-blur">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Taxa de Conversão</p>
-                    <p className="text-3xl font-bold text-foreground">18.4%</p>
-                  </div>
-                  <TrendingUp className="w-10 h-10 text-accent" />
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-white/80 backdrop-blur">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Emails Enviados</p>
-                    <p className="text-3xl font-bold text-foreground">28</p>
-                  </div>
-                  <Mail className="w-10 h-10 text-accent" />
-                </div>
-              </Card>
-            </div>
-
-            {/* Gráficos */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="p-6 bg-white/80 backdrop-blur">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Leads por Dia</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={leadsData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="leads" stroke="#4A3F35" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Card>
-
-              <Card className="p-6 bg-white/80 backdrop-blur">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Pagamentos por Dia</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={paymentData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="pagamentos" fill="#4A3F35" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Card>
-
-              <Card className="p-6 bg-white/80 backdrop-blur lg:col-span-2">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Distribuição de Perfis</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={profileDistribution}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {profileDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* Leads Tab */}
-        {activeTab === "leads" && (
-          <Card className="p-6 bg-white/80 backdrop-blur">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Leads Capturados</h3>
-            {loadingResponses ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="animate-spin text-accent" />
-              </div>
-            ) : (
+          {users.length === 0 ? (
+            <EmptyState
+              title="Nenhum usuário encontrado"
+              description="Assim que novas contas autenticarem no app, elas aparecerão aqui com papel e último acesso registrados na mesma base do site."
+            />
+          ) : (
+            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white/90 shadow-lg">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-muted">
-                      <th className="text-left py-2 px-4 text-foreground font-semibold">Email</th>
-                      <th className="text-left py-2 px-4 text-foreground font-semibold">WhatsApp</th>
-                      <th className="text-left py-2 px-4 text-foreground font-semibold">Data</th>
-                      <th className="text-left py-2 px-4 text-foreground font-semibold">Status</th>
+                <table className="min-w-full text-sm">
+                  <thead className="bg-secondary/70 text-left">
+                    <tr>
+                      <th className="px-5 py-4 font-semibold text-foreground">Nome</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Papel</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Método</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Último acesso</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Criado em</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {allResponses?.map((response: any) => (
-                      <tr key={response.id} className="border-b border-muted/50 hover:bg-accent/5">
-                        <td className="py-3 px-4 text-foreground">{response.email}</td>
-                        <td className="py-3 px-4 text-foreground">{response.whatsapp}</td>
-                        <td className="py-3 px-4 text-muted-foreground">
-                          {new Date(response.createdAt).toLocaleDateString("pt-BR")}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                            Ativo
+                    {users.map((item) => (
+                      <tr key={item.id} className="border-t border-border/50 align-top">
+                        <td className="px-5 py-4 text-foreground">{item.name || "Sem nome"}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{item.email || "-"}</td>
+                        <td className="px-5 py-4">
+                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${roleBadgeClass(item.role)}`}>
+                            {item.role === "admin" ? "Administrador" : "Usuário"}
                           </span>
                         </td>
+                        <td className="px-5 py-4 text-muted-foreground">{item.loginMethod || "-"}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{formatDateTime(item.lastSignedIn)}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{formatDateTime(item.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+            </Card>
+          )}
+        </div>
+      );
+    }
+
+    if (activeSection === "compradores") {
+      return (
+        <div className="space-y-6">
+          <SectionHeading
+            eyebrow="Compradores reais"
+            title="Pagamentos e devocionais vendidos"
+            description="Aqui ficam os pagamentos vinculados ao funil real do Diagnóstico Espiritual, usando a mesma base de leads e os registros do checkout."
+          />
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <MetricCard
+              icon={CreditCard}
+              label="Compras aprovadas"
+              value={String(summary?.kpis.comprasAprovadas ?? approvedBuyers.length)}
+              helper="Pagamentos com status confirmado"
+            />
+            <MetricCard
+              icon={TrendingUp}
+              label="Receita confirmada"
+              value={formatCurrency(summary?.kpis.receitaTotal ?? 0)}
+              helper="Soma dos pagamentos aprovados"
+            />
+            <MetricCard
+              icon={Sparkles}
+              label="Taxa de conversão"
+              value={`${summary?.kpis.taxaConversao ?? 0}%`}
+              helper="Conversão entre leads e compra"
+            />
+          </div>
+
+          {buyers.length === 0 ? (
+            <EmptyState
+              title="Nenhum comprador registrado"
+              description="Quando houver compras aprovadas ou pendentes no checkout do devocional, elas aparecerão aqui com produto, valor, status e identificadores do Stripe."
+            />
+          ) : (
+            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white/90 shadow-lg">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-secondary/70 text-left">
+                    <tr>
+                      <th className="px-5 py-4 font-semibold text-foreground">Comprador</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Contato</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Produto</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Valor</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Status</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Stripe</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {buyers.map((buyer) => (
+                      <tr key={buyer.id} className="border-t border-border/50 align-top">
+                        <td className="px-5 py-4 text-foreground">{buyer.email}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{buyer.whatsapp || "-"}</td>
+                        <td className="px-5 py-4 text-foreground">{buyer.productName}</td>
+                        <td className="px-5 py-4 text-foreground">{formatCurrency(buyer.amount)}</td>
+                        <td className="px-5 py-4">
+                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${paymentBadgeClass(buyer.status)}`}>
+                            {buyer.status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-xs text-muted-foreground">{buyer.stripePaymentIntentId}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{formatDateTime(buyer.createdAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <SectionHeading
+          eyebrow="Dashboard de resultados"
+          title="Funil e diagnósticos reais do site"
+          description="Esta visão reúne a operação verdadeira do projeto: leads capturados, compras aprovadas, perfis espirituais gerados e histórico recente de resultados salvos no banco."
+        />
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <MetricCard
+            icon={Sparkles}
+            label="Diagnósticos gerados"
+            value={String(summary?.kpis.totalDiagnosticos ?? diagnostics.length)}
+            helper={`+${summary?.kpis.diagnosticos30Dias ?? 0} nos últimos 30 dias`}
+          />
+          <MetricCard
+            icon={Users}
+            label="Leads capturados"
+            value={String(summary?.kpis.totalLeads ?? 0)}
+            helper={`+${summary?.kpis.leads30Dias ?? 0} nos últimos 30 dias`}
+          />
+          <MetricCard
+            icon={CreditCard}
+            label="Compras aprovadas"
+            value={String(summary?.kpis.comprasAprovadas ?? approvedBuyers.length)}
+            helper={formatCurrency(summary?.kpis.receitaTotal ?? 0)}
+          />
+          <MetricCard
+            icon={TrendingUp}
+            label="Taxa de conversão"
+            value={`${summary?.kpis.taxaConversao ?? 0}%`}
+            helper="Leads que viraram compra"
+          />
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+            <div className="mb-5 space-y-1">
+              <h3 className="text-xl text-foreground">Leads e compras por dia</h3>
+              <p className="text-sm text-muted-foreground">
+                Evolução do funil com base nas entradas reais dos últimos 30 dias.
+              </p>
+            </div>
+            {summary?.timeline?.length ? (
+              <ResponsiveContainer width="100%" height={320}>
+                <LineChart data={summary.timeline}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D4C9BD" />
+                  <XAxis dataKey="date" stroke="#7A6F65" />
+                  <YAxis stroke="#7A6F65" />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="leads" stroke="#3E342C" strokeWidth={3} name="Leads" />
+                  <Line type="monotone" dataKey="pagamentos" stroke="#8B7355" strokeWidth={3} name="Compras" />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState
+                title="Sem movimentação suficiente"
+                description="Os gráficos começam a preencher automaticamente quando novos leads e compras entram no funil real."
+              />
             )}
           </Card>
-        )}
 
-        {/* Pagamentos Tab */}
-        {activeTab === "pagamentos" && (
-          <Card className="p-6 bg-white/80 backdrop-blur">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Pagamentos Recebidos</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-muted">
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Email</th>
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Valor</th>
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Data</th>
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-muted/50 hover:bg-accent/5">
-                    <td className="py-3 px-4 text-foreground">usuario@example.com</td>
-                    <td className="py-3 px-4 text-foreground font-semibold">R$ 9,90</td>
-                    <td className="py-3 px-4 text-muted-foreground">07/04/2026</td>
-                    <td className="py-3 px-4">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                        Pago
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+            <div className="mb-5 space-y-1">
+              <h3 className="text-xl text-foreground">Distribuição de perfis</h3>
+              <p className="text-sm text-muted-foreground">
+                Perfis espirituais mais recorrentes entre os diagnósticos salvos.
+              </p>
             </div>
+            {summary?.perfilDistribuicao?.length ? (
+              <ResponsiveContainer width="100%" height={320}>
+                <PieChart>
+                  <Pie
+                    data={summary.perfilDistribuicao}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={55}
+                    outerRadius={100}
+                    paddingAngle={3}
+                  >
+                    {summary.perfilDistribuicao.map((item, index) => (
+                      <Cell key={item.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState
+                title="Sem perfis registrados ainda"
+                description="Assim que novos diagnósticos forem persistidos no histórico, esta distribuição passa a refletir o comportamento real do quiz."
+              />
+            )}
           </Card>
-        )}
+        </div>
 
-        {/* Emails Tab */}
-        {activeTab === "emails" && (
-          <Card className="p-6 bg-white/80 backdrop-blur">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Histórico de Emails</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-muted">
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Destinatário</th>
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Assunto</th>
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Data</th>
-                    <th className="text-left py-2 px-4 text-foreground font-semibold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-muted/50 hover:bg-accent/5">
-                    <td className="py-3 px-4 text-foreground">usuario@example.com</td>
-                    <td className="py-3 px-4 text-foreground">Seu Devocional Chegou!</td>
-                    <td className="py-3 px-4 text-muted-foreground">07/04/2026 14:30</td>
-                    <td className="py-3 px-4">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                        Enviado
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+        <div className="grid gap-6 xl:grid-cols-[1.1fr_1fr]">
+          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+            <div className="mb-5 space-y-1">
+              <h3 className="text-xl text-foreground">Receita diária confirmada</h3>
+              <p className="text-sm text-muted-foreground">
+                Valores aprovados no checkout do devocional, ligados aos compradores reais.
+              </p>
             </div>
+            {summary?.timeline?.length ? (
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={summary.timeline}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D4C9BD" />
+                  <XAxis dataKey="date" stroke="#7A6F65" />
+                  <YAxis stroke="#7A6F65" />
+                  <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                  <Bar dataKey="receita" fill="#3E342C" radius={[8, 8, 0, 0]} name="Receita" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState
+                title="Ainda sem receita confirmada"
+                description="Quando houver pagamentos aprovados, o gráfico passa a exibir o faturamento diário do devocional."
+              />
+            )}
           </Card>
-        )}
+
+          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+            <div className="mb-5 space-y-1">
+              <h3 className="text-xl text-foreground">Diagnósticos mais recentes</h3>
+              <p className="text-sm text-muted-foreground">
+                Últimos resultados persistidos automaticamente a partir do fluxo real do quiz.
+              </p>
+            </div>
+            {latestDiagnostics.length === 0 ? (
+              <EmptyState
+                title="Nenhum diagnóstico salvo ainda"
+                description="Os registros aparecem aqui quando o resultado é gerado e gravado no histórico do banco."
+              />
+            ) : (
+              <div className="space-y-4">
+                {latestDiagnostics.map((diagnostic) => (
+                  <div
+                    key={diagnostic.id}
+                    className="rounded-3xl border border-border/60 bg-secondary/35 p-4"
+                  >
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          {diagnostic.email}
+                        </p>
+                        <h4 className="text-lg text-foreground">{diagnostic.profileName}</h4>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {diagnostic.profileDescription}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white/80 px-3 py-2 text-right text-xs text-muted-foreground">
+                        <p>{diagnostic.whatsapp || "Sem WhatsApp"}</p>
+                        <p className="mt-1">{formatDateTime(diagnostic.createdAt)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
       </div>
-    </div>
+    );
+  };
+
+  return (
+    <DashboardLayout
+      title="Painel Administrativo"
+      subtitle="Diagnóstico Espiritual"
+      menuItems={MENU_ITEMS}
+      activeItem={activeSection}
+      onItemSelect={(id) => setActiveSection(id as AdminSection)}
+      adminOnly
+    >
+      <div className="space-y-6">
+        <Card className="rounded-[32px] border border-border/60 bg-white/85 p-6 shadow-xl md:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                Área protegida para admins/autorizados
+              </p>
+              <div className="space-y-2">
+                <h1 className="text-4xl text-foreground md:text-5xl">
+                  Administração conectada à operação real
+                </h1>
+                <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
+                  A navegação abaixo usa a mesma paleta do site principal e consulta a base real do projeto para separar usuários autenticados, compradores do devocional e o dashboard de resultados do quiz.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap lg:justify-end">
+              <div className="rounded-full border border-border/70 bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+                {user?.email || "Conta autenticada"}
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => snapshotQuery.refetch()}
+                disabled={snapshotQuery.isFetching}
+              >
+                {snapshotQuery.isFetching ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Atualizando
+                  </>
+                ) : (
+                  <>
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    Atualizar dados
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {renderContent()}
+      </div>
+    </DashboardLayout>
+  );
+}
+
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  helper,
+}: {
+  icon: typeof Sparkles;
+  label: string;
+  value: string;
+  helper: string;
+}) {
+  return (
+    <Card className="rounded-[28px] border border-border/60 bg-white/90 p-5 shadow-lg">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <p className="text-3xl font-semibold text-foreground">{value}</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{helper}</p>
+        </div>
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+    </Card>
   );
 }
