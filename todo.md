@@ -224,3 +224,25 @@
 - [x] Secao de Emails com historico
 - [x] Integrar com dados reais do banco
 - [x] Testar fluxo completo do admin
+
+## Bug Atual - Resultado não aparece
+- [ ] Investigar por que a tela de resultado fica carregando por muito tempo
+- [ ] Identificar falha no fluxo de geração do resultado com IA/OpenAI
+- [ ] Implementar fallback para exibir resultado mesmo quando a IA falhar
+- [ ] Validar redirecionamento e renderização da página de resultado
+- [ ] Testar o fluxo completo do quiz até a exibição do resultado
+
+'} } to=functions.message ೇಜسون
+{"type":"info","text":"Entendido. Vou investigar agora por que o resultado está demorando demais e não aparece, corrigir o fluxo e validar um fallback para o caso de falha da IA.","attachments":[],"suggested_action":"none"}Oops
+
+## Bug Atual - Retorno visual ao início antes do resultado
+- [ ] Investigar por que, ao finalizar o quiz, a interface volta visualmente para a tela inicial antes de abrir o resultado
+- [ ] Corrigir o fluxo de navegação para ir direto ao resultado após envio do lead e das respostas
+- [ ] Validar que o estado de processamento não desmonta a experiência antes do redirecionamento final
+- [ ] Testar o fluxo completo até a página de resultado sem salto visual
+
+## Ajuste Atual - PDF idêntico ao diagnóstico do site
+- [x] Comparar o conteúdo exibido na página de resultado com a estrutura e o texto gerados no PDF
+- [x] Corrigir a geração do PDF para reproduzir exatamente profileName, descrição, pontos fortes, desafios, recomendações e próximo passo mostrados no site
+- [x] Validar consistência visual e textual entre resultado em tela e PDF baixado
+- [x] Testar a geração final do PDF com o mesmo diagnóstico apresentado ao usuário

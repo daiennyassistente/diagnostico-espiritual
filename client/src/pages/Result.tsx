@@ -26,34 +26,130 @@ export default function Result() {
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
 
   useEffect(() => {
-    // Recuperar respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
-    if (savedResponses) {
-      const parsed = JSON.parse(savedResponses);
-      setResponses(parsed);
-      
-      // Gerar resultado com IA
-      generateResultMutation.mutate(
-        { responses: parsed },
-        {
-          onSuccess: (data: any) => {
-            setResult(data);
-            // Salvar resultado no localStorage para uso na página de sucesso
-            localStorage.setItem('quizResult', JSON.stringify(data));
-            setIsLoading(false);
-          },
-          onError: (error) => {
-            console.error("Erro ao gerar resultado:", error);
-            toast.error("Erro ao gerar seu diagnóstico");
-            setIsLoading(false);
-          },
-        }
-      );
-    } else {
-      // Redirecionar para o quiz se não houver respostas
+    const savedResult = localStorage.getItem("quizResult");
+
+    if (!savedResponses) {
       setLocation("/");
+      return;
     }
-  }, [generateResultMutation, setLocation]);
+
+    const parsed = JSON.parse(savedResponses);
+    setResponses(parsed);
+
+    if (savedResult) {
+      try {
+        const parsedResult = JSON.parse(savedResult);
+        setResult(parsedResult);
+        setIsLoading(false);
+        return;
+      } catch {
+        localStorage.removeItem("quizResult");
+      }
+    }
+
+    const buildFallbackResult = (answers: Record<string, string>) => {
+      const step1 = answers["0"] || "";
+      const step3 = answers["2"] || "";
+      const step4 = answers["3"] || "";
+      const step5 = answers["4"] || "";
+      const step10 = answers["9"] || "";
+
+      if (step10.includes("recomeçar") || step10.includes("reconstrução") || step1.includes("voltar") || step1.includes("recomeço")) {
+        return {
+          profileName: "🌱 Coração em Recomeço",
+          profileDescription: "Você está em um momento de renovação espiritual. Existe dentro de você um desejo verdadeiro de voltar ao secreto, reconstruir sua constância e se aproximar de Deus com mais leveza e sinceridade.",
+          strengths: ["Disposição para recomeçar", "Sensibilidade espiritual", "Humildade para reconhecer a necessidade de Deus"],
+          challenges: ["Manter constância", "Superar culpa ou frustração", "Voltar à rotina espiritual com paz"],
+          recommendations: ["Separe alguns minutos diários para oração simples", "Recomece pela Palavra com metas pequenas", "Busque apoio espiritual de alguém maduro na fé"],
+          nextSteps: ["Dê hoje um passo simples e consistente na sua caminhada com Deus."]
+        };
+      }
+
+      if (step10.includes("cansada") || step5.includes("Paz") || step5.includes("paz")) {
+        return {
+          profileName: "😔 Fé Cansada",
+          profileDescription: "Você ama a Deus, mas tem carregado um peso maior do que deveria. Seu coração precisa de descanso, cuidado e renovação para voltar a viver a presença de Deus com profundidade e paz.",
+          strengths: ["Desejo de permanecer na fé", "Consciência de que precisa de cuidado", "História de caminhada com Deus"],
+          challenges: ["Cansaço emocional e espiritual", "Desânimo", "Dificuldade de manter energia espiritual"],
+          recommendations: ["Simplifique sua rotina devocional por alguns dias", "Escolha passagens bíblicas de descanso e esperança", "Ore com honestidade, sem tentar performar"],
+          nextSteps: ["Permita-se descansar em Deus antes de tentar acelerar novamente."]
+        };
+      }
+
+      if (step10.includes("Travada") || step10.includes("travada") || step3.includes("parada")) {
+        return {
+          profileName: "🔗 Travada Espiritualmente",
+          profileDescription: "Você sente que existe algo interrompendo seu avanço espiritual. Há sede de mudança, mas também bloqueios internos que precisam ser identificados e tratados com verdade, oração e constância.",
+          strengths: ["Consciência do bloqueio", "Desejo real de mudança", "Potencial de transformação"],
+          challenges: ["Romper ciclos repetitivos", "Retomar foco espiritual", "Vencer travas emocionais"],
+          recommendations: ["Anote os padrões que mais te afastam de Deus", "Ore com objetividade sobre suas travas", "Busque aconselhamento cristão se possível"],
+          nextSteps: ["Seu próximo passo é identificar a raiz do que tem te paralisado."]
+        };
+      }
+
+      if (step10.includes("Amadurecendo") || step10.includes("amadurecendo") || step3.includes("Frequente e profunda") || step3.includes("frequente e profunda")) {
+        return {
+          profileName: "🌳 Amadurecendo na Fé",
+          profileDescription: "Você está em uma fase saudável de crescimento espiritual. Há sinais de profundidade, sede pela Palavra e disposição para viver uma caminhada mais consistente, madura e frutífera.",
+          strengths: ["Constância crescente", "Desejo de profundidade", "Capacidade de amadurecer com propósito"],
+          challenges: ["Evitar acomodação", "Continuar avançando", "Manter sensibilidade espiritual"],
+          recommendations: ["Aprofunde seu tempo de estudo bíblico", "Transforme constância em estilo de vida", "Sirva outras pessoas com aquilo que Deus já te ensinou"],
+          nextSteps: ["Continue crescendo com constância e intencionalidade diante de Deus."]
+        };
+      }
+
+      if (step5.includes("Direção") || step5.includes("direção") || step1.includes("sem direção") || step10.includes("fome")) {
+        return {
+          profileName: "🧭 Buscando Direção",
+          profileDescription: "Você tem fome de Deus e quer viver algo mais profundo, mas ainda sente falta de clareza para entender o próximo passo. Deus está trabalhando direção no meio da sua busca sincera.",
+          strengths: ["Fome espiritual genuína", "Desejo de ouvir Deus", "Abertura para mudança"],
+          challenges: ["Confusão sobre o próximo passo", "Ansiedade por respostas rápidas", "Dificuldade em discernir direção"],
+          recommendations: ["Separe tempo de silêncio e oração", "Leia a Bíblia buscando princípios de direção", "Evite decisões precipitadas enquanto busca clareza"],
+          nextSteps: ["Deus pode estar te guiando primeiro à clareza interior, antes da resposta externa."]
+        };
+      }
+
+      if (step4.includes("instável") || step4.includes("pouco constante") || step3.includes("Irregular") || step3.includes("irregular")) {
+        return {
+          profileName: "📈 Fé Inconsistente",
+          profileDescription: "Sua caminhada com Deus tem sido marcada por fases de aproximação e afastamento. Ainda assim, existe dentro de você um desejo verdadeiro de viver uma constância mais saudável e madura.",
+          strengths: ["Desejo sincero de estar com Deus", "Consciência dos altos e baixos", "Capacidade de recomeçar"],
+          challenges: ["Falta de consistência", "Oscilações emocionais", "Dificuldade em manter disciplina"],
+          recommendations: ["Crie uma rotina espiritual simples e realista", "Associe seu momento com Deus a um horário fixo", "Evite metas grandes demais no início"],
+          nextSteps: ["Pequenos passos consistentes vão te levar mais longe do que grandes promessas ocasionais."]
+        };
+      }
+
+      return {
+        profileName: "✨ Caminho de Crescimento",
+        profileDescription: "Seu diagnóstico mostra que você está em um processo de crescimento espiritual com áreas importantes a fortalecer. Há potencial, fome e espaço para viver uma caminhada mais profunda com Deus a partir de agora.",
+        strengths: ["Desejo de crescer", "Abertura para aprender", "Sensibilidade espiritual"],
+        challenges: ["Criar constância", "Manter foco", "Transformar intenção em prática"],
+        recommendations: ["Escolha um horário diário para se dedicar a Deus", "Comece com um plano bíblico simples", "Ore com constância, mesmo que por poucos minutos"],
+        nextSteps: ["Seu próximo nível espiritual começa com consistência nas pequenas decisões."]
+      };
+    };
+
+    generateResultMutation.mutate(
+      { responses: parsed },
+      {
+        onSuccess: (data: any) => {
+          setResult(data);
+          localStorage.setItem("quizResult", JSON.stringify(data));
+          setIsLoading(false);
+        },
+        onError: (error) => {
+          console.error("Erro ao gerar resultado:", error);
+          const fallbackResult = buildFallbackResult(parsed);
+          setResult(fallbackResult);
+          localStorage.setItem("quizResult", JSON.stringify(fallbackResult));
+          toast.error("A análise instantânea ficou indisponível. Exibimos seu diagnóstico com base nas respostas do quiz.");
+          setIsLoading(false);
+        },
+      }
+    );
+  }, [setLocation]);
 
   const handleDownloadPDF = async () => {
     if (!result || !responses) return;
@@ -188,6 +284,7 @@ export default function Result() {
         <div className="text-center">
           <div className="animate-spin text-5xl mb-4">✨</div>
           <p className="text-foreground text-lg">Gerando seu diagnóstico personalizado...</p>
+          <p className="text-foreground/70 text-sm mt-2">Se a análise inteligente demorar, mostraremos automaticamente um resultado com base nas suas respostas.</p>
         </div>
       </div>
     );

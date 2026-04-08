@@ -200,39 +200,36 @@ export default function Quiz() {
       return;
     }
 
-    // Validar WhatsApp
     const whatsappRegex = /^(\d{10,15})$/;
     if (!whatsappRegex.test(leadData.whatsapp.replace(/\D/g, ''))) {
       toast.error('WhatsApp inválido');
       return;
     }
 
-    // Validar Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(leadData.email)) {
       toast.error('E-mail inválido');
       return;
     }
 
+    let redirectedToResult = false;
+
     setIsProcessing(true);
     setShowLeadForm(false);
     setProcessingStep(0);
 
     try {
-      // Animar as etapas de processamento
       for (let i = 0; i < PROCESSING_MESSAGES.length; i++) {
         setProcessingStep(i);
         await new Promise(resolve => setTimeout(resolve, 1200));
       }
 
-      // Salvar lead
       const leadResult = await submitLeadMutation.mutateAsync({
         whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         email: leadData.email,
       });
 
       if (leadResult.success && leadResult.leadId) {
-        // Salvar respostas do quiz
         const responsesData = {
           leadId: leadResult.leadId,
           step1: responses[0],
@@ -249,30 +246,28 @@ export default function Quiz() {
 
         await submitResponsesMutation.mutateAsync(responsesData);
 
-        // Salvar respostas no localStorage para a página de resultado
         localStorage.setItem('quizResponses', JSON.stringify(responses));
-        
-        // Salvar dados do lead para o checkout
         localStorage.setItem('leadData', JSON.stringify({
           email: leadData.email,
           whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         }));
 
+        redirectedToResult = true;
         toast.success('Diagnóstico enviado com sucesso!');
-        // Redirecionar para página de resultado
-        setTimeout(() => {
-          setLocation('/result');
-        }, 2000);
-      } else {
-        toast.error('Não foi possível salvar seus dados. Tente novamente.');
-        setShowLeadForm(true);
+        setLocation('/result');
+        return;
       }
+
+      toast.error('Não foi possível salvar seus dados. Tente novamente.');
+      setShowLeadForm(true);
     } catch (error) {
       console.error('Erro ao enviar dados:', error);
       toast.error('Erro ao enviar dados. Tente novamente.');
       setShowLeadForm(true);
     } finally {
-      setIsProcessing(false);
+      if (!redirectedToResult) {
+        setIsProcessing(false);
+      }
     }
   };
 

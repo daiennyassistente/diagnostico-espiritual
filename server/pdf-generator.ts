@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type PDFPage, type PDFFont } from "pdf-lib";
 
 export interface DiagnosticData {
   profileName: string;
@@ -10,283 +10,270 @@ export interface DiagnosticData {
   responses: Record<string, string>;
 }
 
-// Paleta de cores do quiz
 const COLORS = {
-  background: rgb(0.96, 0.94, 0.92), // #F5F1EA
-  dark: rgb(0.24, 0.20, 0.15), // #3E342C
-  medium: rgb(0.29, 0.25, 0.21), // #4A3F35
-  accent: rgb(0.58, 0.47, 0.36), // #956F5C (accent color)
-  white: rgb(1, 1, 1), // #FFFFFF
+  background: rgb(0.96, 0.94, 0.92),
+  dark: rgb(0.24, 0.20, 0.15),
+  medium: rgb(0.29, 0.25, 0.21),
+  accent: rgb(0.58, 0.47, 0.36),
+  white: rgb(1, 1, 1),
+  mutedBorder: rgb(0.88, 0.84, 0.79),
 };
 
-// Remove emojis and non-ASCII characters that WinAnsi cannot encode
-function sanitizeText(text: string): string {
+const PAGE_WIDTH = 595;
+const PAGE_HEIGHT = 842;
+const MARGIN_X = 48;
+const TOP_MARGIN = 56;
+const BOTTOM_MARGIN = 56;
+const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_X * 2;
+
+export function normalizePdfText(text: string): string {
   return text
-    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '') // Remove emoji pairs
-    .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
-    .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "")
+    .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
+}
+
+function stripLeadingEmoji(text: string): string {
+  return normalizePdfText(text.replace(/^[\uD800-\uDBFF][\uDC00-\uDFFF]\s*/, ""));
+}
+
+function wrapText(text: string, maxCharsPerLine: number): string[] {
+  const normalized = normalizePdfText(text);
+  if (!normalized) return [""];
+
+  const words = normalized.split(" ");
+  const lines: string[] = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    const candidate = currentLine ? `${currentLine} ${word}` : word;
+
+    if (candidate.length > maxCharsPerLine && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = candidate;
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
+
+function createPage(pdfDoc: PDFDocument): { page: PDFPage; yPosition: number } {
+  const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+
+  page.drawRectangle({
+    x: 0,
+    y: 0,
+    width: PAGE_WIDTH,
+    height: PAGE_HEIGHT,
+    color: COLORS.white,
+  });
+
+  return {
+    page,
+    yPosition: PAGE_HEIGHT - TOP_MARGIN,
+  };
+}
+
+function drawWrappedLines(params: {
+  page: PDFPage;
+  text: string;
+  x: number;
+  y: number;
+  font: PDFFont;
+  size: number;
+  color: ReturnType<typeof rgb>;
+  maxCharsPerLine: number;
+  lineHeight: number;
+}): number {
+  const lines = wrapText(params.text, params.maxCharsPerLine);
+  let currentY = params.y;
+
+  for (const line of lines) {
+    params.page.drawText(line, {
+      x: params.x,
+      y: currentY,
+      size: params.size,
+      font: params.font,
+      color: params.color,
+    });
+    currentY -= params.lineHeight;
+  }
+
+  return currentY;
 }
 
 export async function generateDiagnosticPDF(diagnosticData: DiagnosticData): Promise<Buffer> {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4 size
-  const { width, height } = page.getSize();
+  const regularFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
-  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-  const timesRomanBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+  let { page, yPosition } = createPage(pdfDoc);
 
-  let yPosition = height - 50;
+  const ensureSpace = (spaceNeeded: number) => {
+    if (yPosition - spaceNeeded < BOTTOM_MARGIN) {
+      const newPage = createPage(pdfDoc);
+      page = newPage.page;
+      yPosition = newPage.yPosition;
+    }
+  };
 
-  // Decorative header with background
-  page.drawRectangle({
-    x: 0,
-    y: yPosition - 80,
-    width: width,
-    height: 80,
-    color: COLORS.background,
-  });
-
-  // Draw decorative line
-  page.drawLine({
-    start: { x: 50, y: yPosition - 85 },
-    end: { x: width - 50, y: yPosition - 85 },
-    thickness: 2,
-    color: COLORS.accent,
-  });
-
-  // Title
-  page.drawText("+ DIAGNÓSTICO ESPIRITUAL +", {
-    x: 50,
-    y: yPosition - 40,
-    size: 20,
-    font: timesRomanBoldFont,
-    color: COLORS.dark,
-  });
-
-  yPosition -= 100;
-
-  // Profile Section with background
-  page.drawRectangle({
-    x: 40,
-    y: yPosition - 100,
-    width: width - 80,
-    height: 100,
-    color: COLORS.background,
-    borderColor: COLORS.accent,
-    borderWidth: 1,
-  });
-
-  page.drawText("Seu Perfil Espiritual", {
-    x: 60,
-    y: yPosition - 20,
-    size: 14,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 40;
-
-  page.drawText(sanitizeText(diagnosticData.profileName), {
-    x: 60,
-    y: yPosition,
-    size: 16,
-    font: timesRomanBoldFont,
-    color: COLORS.dark,
-  });
-
-  yPosition -= 25;
-
-  // Wrap description text
-  const descriptionLines = wrapText(sanitizeText(diagnosticData.profileDescription), 80);
-  descriptionLines.forEach((line) => {
-    page.drawText(line, {
-      x: 60,
+  const drawSectionTitle = (title: string) => {
+    ensureSpace(24);
+    page.drawText(normalizePdfText(title), {
+      x: MARGIN_X,
       y: yPosition,
-      size: 10,
-      font: timesRomanFont,
-      color: COLORS.medium,
+      size: 14,
+      font: boldFont,
+      color: COLORS.dark,
     });
-    yPosition -= 12;
-  });
+    yPosition -= 22;
+  };
 
-  yPosition -= 25;
+  const drawBulletList = (items: string[], prefixFactory: (index: number) => string) => {
+    for (let index = 0; index < items.length; index += 1) {
+      const prefix = prefixFactory(index);
+      const wrapped = wrapText(`${prefix}${items[index]}`, 72);
 
-  // Strengths Section
-  page.drawText("* Seus Pontos Fortes", {
-    x: 50,
+      ensureSpace(wrapped.length * 14 + 4);
+
+      wrapped.forEach((line) => {
+        page.drawText(line, {
+          x: MARGIN_X + 10,
+          y: yPosition,
+          size: 11,
+          font: regularFont,
+          color: COLORS.medium,
+        });
+        yPosition -= 14;
+      });
+    }
+
+    yPosition -= 10;
+  };
+
+  const displayProfileName = stripLeadingEmoji(diagnosticData.profileName);
+  const displayDescription = normalizePdfText(diagnosticData.profileDescription);
+  const displayNextStep = normalizePdfText(
+    diagnosticData.nextSteps[0] || "Continue sua jornada espiritual com fé e esperança.",
+  );
+
+  page.drawText("Seu Diagnóstico Espiritual", {
+    x: MARGIN_X,
     y: yPosition,
     size: 12,
-    font: timesRomanBoldFont,
+    font: boldFont,
     color: COLORS.accent,
   });
 
-  yPosition -= 18;
+  yPosition -= 32;
 
-  diagnosticData.strengths.forEach((strength) => {
-      const strengthLines = wrapText(sanitizeText(strength), 75);
-    strengthLines.forEach((line, index) => {
-      page.drawText(index === 0 ? `- ${line}` : `  ${line}`, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
-      });
-      yPosition -= 12;
-    });
-  });
-
-  yPosition -= 12;
-
-  // Challenges Section
-  page.drawText("• Desafios a Trabalhar", {
-    x: 50,
+  page.drawText(displayProfileName, {
+    x: MARGIN_X,
     y: yPosition,
-    size: 12,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 18;
-
-  diagnosticData.challenges.forEach((challenge) => {
-      const challengeLines = wrapText(sanitizeText(challenge), 75);
-    challengeLines.forEach((line, index) => {
-      page.drawText(index === 0 ? `- ${line}` : `  ${line}`, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
-      });
-      yPosition -= 12;
-    });
-  });
-
-  yPosition -= 12;
-
-  // Recommendations Section
-  page.drawText(">> Recomendações", {
-    x: 50,
-    y: yPosition,
-    size: 12,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 18;
-
-  diagnosticData.recommendations.forEach((rec, index) => {
-    const recLines = wrapText(sanitizeText(rec), 75);
-    recLines.forEach((line, lineIndex) => {
-      const prefix = lineIndex === 0 ? `${index + 1}. ` : "   ";
-      page.drawText(prefix + line, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
-      });
-      yPosition -= 12;
-    });
-  });
-
-  yPosition -= 12;
-
-  // Next Steps Section with emphasis
-  page.drawRectangle({
-    x: 40,
-    y: yPosition - 50,
-    width: width - 80,
-    height: 50,
-    color: COLORS.background,
-    borderColor: COLORS.accent,
-    borderWidth: 1,
-  });
-
-  page.drawText(">> Próximo Passo", {
-    x: 60,
-    y: yPosition - 10,
-    size: 11,
-    font: timesRomanBoldFont,
+    size: 24,
+    font: boldFont,
     color: COLORS.dark,
   });
 
-  yPosition -= 28;
+  yPosition -= 22;
 
-  diagnosticData.nextSteps.forEach((step) => {
-    const stepLines = wrapText(sanitizeText(step), 75);
-    stepLines.forEach((line) => {
-      page.drawText(`"${line}"`, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
-      });
-      yPosition -= 12;
-    });
+  page.drawRectangle({
+    x: MARGIN_X,
+    y: yPosition - 78,
+    width: CONTENT_WIDTH,
+    height: 78,
+    color: COLORS.background,
+    borderColor: COLORS.mutedBorder,
+    borderWidth: 1,
   });
 
   yPosition -= 20;
+  yPosition = drawWrappedLines({
+    page,
+    text: displayDescription,
+    x: MARGIN_X + 14,
+    y: yPosition,
+    font: regularFont,
+    size: 12,
+    color: COLORS.medium,
+    maxCharsPerLine: 74,
+    lineHeight: 16,
+  });
 
-  // Footer with decorative line
-  page.drawLine({
-    start: { x: 50, y: yPosition },
-    end: { x: width - 50, y: yPosition },
-    thickness: 1,
+  yPosition -= 8;
+
+  page.drawText("\"Este é o momento certo para dar o próximo passo em sua jornada com Deus.\"", {
+    x: MARGIN_X + 14,
+    y: yPosition,
+    size: 10,
+    font: regularFont,
     color: COLORS.accent,
   });
 
-  yPosition -= 15;
+  yPosition -= 34;
 
-  page.drawText("Este diagnóstico é uma ferramenta de reflexão espiritual.", {
-    x: 50,
-    y: yPosition,
-    size: 8,
-    font: timesRomanFont,
-    color: COLORS.medium,
+  drawSectionTitle("Seus Pontos Fortes");
+  drawBulletList(diagnosticData.strengths, () => "✓ ");
+
+  drawSectionTitle("Desafios a Trabalhar");
+  drawBulletList(diagnosticData.challenges, () => "• ");
+
+  drawSectionTitle("Recomendações");
+  drawBulletList(diagnosticData.recommendations, (index) => `${index + 1}. `);
+
+  ensureSpace(86);
+  page.drawRectangle({
+    x: MARGIN_X,
+    y: yPosition - 60,
+    width: CONTENT_WIDTH,
+    height: 60,
+    color: COLORS.background,
+    borderColor: COLORS.accent,
+    borderWidth: 1,
   });
 
-  yPosition -= 10;
-
-  page.drawText("Para orientação profunda, busque um conselheiro ou pastor de sua comunidade.", {
-    x: 50,
-    y: yPosition,
-    size: 8,
-    font: timesRomanFont,
-    color: COLORS.medium,
+  page.drawText("Próximo Passo", {
+    x: MARGIN_X + 14,
+    y: yPosition - 18,
+    size: 12,
+    font: boldFont,
+    color: COLORS.dark,
   });
 
-  yPosition -= 15;
+  const nextStepLines = wrapText(`\"${displayNextStep}\"`, 72);
+  let nextStepY = yPosition - 38;
+  for (const line of nextStepLines) {
+    page.drawText(line, {
+      x: MARGIN_X + 14,
+      y: nextStepY,
+      size: 11,
+      font: regularFont,
+      color: COLORS.medium,
+    });
+    nextStepY -= 14;
+  }
 
-  page.drawText("+ Que a paz de Deus esteja com você +", {
-    x: 50,
-    y: yPosition,
-    size: 9,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
+  yPosition = nextStepY - 26;
+  ensureSpace(32);
+
+  page.drawText(
+    "Este diagnóstico é uma ferramenta de reflexão espiritual. Para orientação profunda, busque um conselheiro ou pastor de sua comunidade.",
+    {
+      x: MARGIN_X,
+      y: yPosition,
+      size: 9,
+      font: regularFont,
+      color: COLORS.medium,
+    },
+  );
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
-}
-
-function wrapText(text: string, maxCharsPerLine: number): string[] {
-  const words = text.split(" ");
-  const lines: string[] = [];
-  let currentLine = "";
-
-  words.forEach((word) => {
-    if ((currentLine + word).length > maxCharsPerLine) {
-      if (currentLine) lines.push(currentLine.trim());
-      currentLine = word;
-    } else {
-      currentLine += (currentLine ? " " : "") + word;
-    }
-  });
-
-  if (currentLine) lines.push(currentLine.trim());
-  return lines;
 }
