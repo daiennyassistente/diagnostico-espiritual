@@ -11,6 +11,7 @@ import Result from "./pages/Result";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Admin from "./pages/Admin";
 import AdminDashboard from "./pages/AdminDashboard";
+import { AdminLogin } from "./pages/AdminLogin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -21,6 +22,7 @@ function Router() {
       <Route path={"/resultado"} component={Resultado} />
       <Route path={"/result"} component={Result} />
       <Route path={"/checkout-success"} component={CheckoutSuccess} />
+      <Route path={"/admin-login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin-legacy"} component={Admin} />
       <Route path={"/404"} component={NotFound} />

@@ -308,3 +308,7 @@
 
 ## Filtros no Admin Legacy
 - [ ] Adicionar filtro de busca no admin legacy tambem
+
+## Credenciais Admin Solicitadas
+- Usuario: Daienny
+- Senha: daivitoria23

@@ -1,4 +1,5 @@
 import { drizzle } from "drizzle-orm/mysql2";
+import crypto from "crypto";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import {
   InsertDiagnosticHistory,
@@ -444,5 +445,184 @@ export async function getAdminSnapshot() {
     users: usersList,
     buyers,
     diagnostics,
+  };
+}
+
+
+// ============= PASSWORD AUTHENTICATION =============
+
+/**
+ * Simple password hashing using SHA-256 + salt
+ * For production, consider using bcrypt or argon2
+ */
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha256").toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(password: string, hash: string): boolean {
+  try {
+    const [salt, storedHash] = hash.split(":");
+    const computed = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha256").toString("hex");
+    return computed === storedHash;
+  } catch {
+    return false;
+  }
+}
+
+export async function getUserByName(name: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select().from(users).where(eq(users.name, name)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createOrUpdateAdminUser(name: string, password: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const passwordHash = hashPassword(password);
+  const openId = `admin-${name}-${Date.now()}`;
+
+  const existingUser = await getUserByName(name);
+  
+  if (existingUser) {
+    // Update existing user
+    await db
+      .update(users)
+      .set({
+        passwordHash,
+        role: "admin",
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, existingUser.id));
+    return existingUser;
+  } else {
+    // Create new admin user
+    const result = await db.insert(users).values({
+      openId,
+      name,
+      passwordHash,
+      role: "admin",
+      loginMethod: "password",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastSignedIn: new Date(),
+    });
+    
+    return await getUserByName(name);
+  }
+}
+
+export async function authenticateUser(name: string, password: string) {
+  const user = await getUserByName(name);
+  
+  if (!user || !user.passwordHash) {
+    return null;
+  }
+
+  if (verifyPassword(password, user.passwordHash)) {
+    // Update lastSignedIn
+    const db = await getDb();
+    if (db) {
+      await db
+        .update(users)
+        .set({ lastSignedIn: new Date() })
+        .where(eq(users.id, user.id));
+    }
+    return user;
+  }
+
+  return null;
+}
+
+// ============= SEARCH/FILTER FUNCTIONS =============
+
+export async function searchLeads(query: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const searchPattern = `%${query}%`;
+  const results = await db
+    .select({
+      id: leads.id,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      createdAt: leads.createdAt,
+      hasQuizResponse: sql<boolean>`EXISTS(SELECT 1 FROM ${quizResponses} WHERE ${quizResponses.leadId} = ${leads.id})`,
+    })
+    .from(leads)
+    .where(
+      sql`${leads.email} LIKE ${searchPattern} OR ${leads.whatsapp} LIKE ${searchPattern}`
+    )
+    .orderBy(desc(leads.createdAt));
+
+  return results;
+}
+
+export async function getAllLeadsWithQuizStatus() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const results = await db
+    .select({
+      id: leads.id,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      createdAt: leads.createdAt,
+      hasQuizResponse: sql<boolean>`EXISTS(SELECT 1 FROM ${quizResponses} WHERE ${quizResponses.leadId} = ${leads.id})`,
+      hasDiagnostic: sql<boolean>`EXISTS(SELECT 1 FROM ${diagnosticHistory} WHERE ${diagnosticHistory.leadId} = ${leads.id})`,
+      hasPayment: sql<boolean>`EXISTS(SELECT 1 FROM ${payments} WHERE ${payments.leadId} = ${leads.id})`,
+    })
+    .from(leads)
+    .orderBy(desc(leads.createdAt));
+
+  return results;
+}
+
+export async function getPaymentWithDiagnostic(paymentId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const payment = await db
+    .select({
+      id: payments.id,
+      leadId: payments.leadId,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      amount: payments.amount,
+      currency: payments.currency,
+      status: payments.status,
+      productName: payments.productName,
+      createdAt: payments.createdAt,
+    })
+    .from(payments)
+    .innerJoin(leads, eq(payments.leadId, leads.id))
+    .where(eq(payments.id, paymentId))
+    .limit(1);
+
+  if (payment.length === 0) return null;
+
+  const diagnostic = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, payment[0].leadId))
+    .limit(1);
+
+  return {
+    ...payment[0],
+    diagnostic: diagnostic.length > 0 ? diagnostic[0] : null,
   };
 }

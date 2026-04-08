@@ -14,6 +14,10 @@ import {
   getAdminUsers,
   getAllQuizResponses,
   getResponseStatistics,
+  authenticateUser,
+  searchLeads,
+  getAllLeadsWithQuizStatus,
+  getPaymentWithDiagnostic,
 } from "./db";
 import Stripe from "stripe";
 
@@ -233,6 +237,15 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    loginWithPassword: publicProcedure
+      .input(z.object({ name: z.string(), password: z.string() }))
+      .mutation(async ({ input }) => {
+        const user = await authenticateUser(input.name, input.password);
+        if (!user) {
+          throw new Error("Credenciais inválidas");
+        }
+        return { success: true, user: { id: user.id, name: user.name, role: user.role } };
+      }),
   }),
 
   admin: router({
@@ -251,6 +264,19 @@ export const appRouter = router({
     diagnostics: adminProcedure.query(async () => {
       return await getAdminDiagnosticResults();
     }),
+    searchLeads: adminProcedure
+      .input(z.object({ query: z.string() }))
+      .query(async ({ input }) => {
+        return await searchLeads(input.query);
+      }),
+    getAllLeads: adminProcedure.query(async () => {
+      return await getAllLeadsWithQuizStatus();
+    }),
+    getPaymentDetails: adminProcedure
+      .input(z.object({ paymentId: z.number() }))
+      .query(async ({ input }) => {
+        return await getPaymentWithDiagnostic(input.paymentId);
+      }),
   }),
 
   quiz: router({
@@ -508,6 +534,8 @@ Seja conciso, conversacional e encorajador. Use tom amigável como se estivesse 
         }
       }),
   }),
+
+
 });
 
 export type AppRouter = typeof appRouter;
