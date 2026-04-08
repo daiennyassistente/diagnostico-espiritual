@@ -274,3 +274,37 @@
 ## Correção Descoberta na Validação do Admin
 - [x] Aplicar no banco real a tabela `diagnostic_history` já definida no schema para eliminar o erro 500 do snapshot administrativo
 - [x] Revalidar a área `/admin` após a criação da tabela para confirmar carregamento de Usuários, Compradores e Dashboard de Resultados
+
+## Bug Relatado - Erro ao abrir /admin na web publicada
+- [x] Reproduzir o erro de acesso à área administrativa no domínio web principal
+- [x] Identificar se a falha vem da proteção de acesso, da rota publicada ou de erro de execução
+- [x] Corrigir o problema para permitir abertura correta da área administrativa na web
+- [x] Validar novamente o acesso ao /admin no ambiente web após a correção
+
+## Melhorias Solicitadas - Área Administrativa
+- [ ] Listar na seção Usuários todos que iniciaram o quiz (leads que começaram o fluxo)
+- [ ] Adicionar filtros de busca na seção Usuários (por nome, email, data, etc)
+- [ ] Implementar histórico completo de Compradores com todas as informações (email, data, valor, status, etc)
+- [ ] Adicionar funcionalidade de recuperar/baixar arquivos (PDFs do devocional) na seção Compradores
+- [ ] Validar as novas funcionalidades em execução e salvar checkpoint
+
+## Autenticação com Nome/Senha (Basica)
+- [ ] Adicionar coluna de senha (hash) na tabela users do banco
+- [ ] Implementar procedimento de hash basico de senhas
+- [ ] Criar procedimento tRPC de login com nome/senha
+- [ ] Criar página de login com formulário de nome/senha
+- [ ] Integrar login com nome/senha na área administrativa
+- [ ] Testar fluxo completo de login com nome/senha
+
+## Filtros Basicos de Usuarios
+- [ ] Implementar filtro por nome/email na seção Usuarios
+- [ ] Listar todos que iniciaram o quiz
+- [ ] Testar filtros em execução
+
+## Historico de Compradores com Recuperacao de Arquivos
+- [ ] Listar historico completo de compradores
+- [ ] Implementar opção de baixar/recuperar PDFs do devocional
+- [ ] Testar download de arquivos
+
+## Filtros no Admin Legacy
+- [ ] Adicionar filtro de busca no admin legacy tambem
