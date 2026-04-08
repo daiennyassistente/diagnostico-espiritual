@@ -597,24 +597,6 @@ export default function Result() {
           {/* Botões de compra com opções de pagamento */}
           <div className="space-y-3">
             <Button
-              onClick={() => handleBuyGuide('stripe')}
-              disabled={isBuyingGuide}
-              className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 text-lg"
-            >
-              {isBuyingGuide && paymentMethod === 'stripe' ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                <>
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  Comprar com Cartão
-                </>
-              )}
-            </Button>
-            
-            <Button
               onClick={() => handleBuyGuide('mercadopago')}
               disabled={isBuyingGuide}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 text-lg"
@@ -627,7 +609,7 @@ export default function Result() {
               ) : (
                 <>
                   <BookOpen className="w-5 h-5 mr-2" />
-                  Comprar com Pix
+                  Comprar Guia Devocional com Pix
                 </>
               )}
             </Button>
