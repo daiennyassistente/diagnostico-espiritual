@@ -530,8 +530,14 @@ export async function createOrUpdateAdminUser(name: string, password: string) {
   }
 }
 
-export async function authenticateUser(name: string, password: string) {
-  const user = await getUserByName(name);
+export async function authenticateUser(email: string, password: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const user = result.length > 0 ? result[0] : undefined;
   
   if (!user || !user.passwordHash) {
     return null;

@@ -244,9 +244,9 @@ export const appRouter = router({
       } as const;
     }),
     loginWithPassword: publicProcedure
-      .input(z.object({ name: z.string(), password: z.string() }))
+      .input(z.object({ email: z.string(), password: z.string() }))
       .mutation(async ({ input, ctx }) => {
-        const user = await authenticateUser(input.name, input.password);
+        const user = await authenticateUser(input.email, input.password);
         if (!user) {
           throw new Error("Credenciais inválidas");
         }

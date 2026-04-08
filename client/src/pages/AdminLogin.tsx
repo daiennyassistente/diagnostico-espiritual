@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 
 export function AdminLogin() {
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [, setLocation] = useLocation();
@@ -23,7 +23,7 @@ export function AdminLogin() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    loginMutation.mutate({ name, password });
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -40,13 +40,13 @@ export function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Usuário
+                E-mail
               </label>
               <Input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Digite seu usuário"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Digite seu e-mail"
                 disabled={loginMutation.isPending}
                 className="w-full"
               />
@@ -74,7 +74,7 @@ export function AdminLogin() {
 
             <Button
               type="submit"
-              disabled={loginMutation.isPending || !name || !password}
+              disabled={loginMutation.isPending || !email || !password}
               className="w-full bg-amber-900 hover:bg-amber-800"
             >
               {loginMutation.isPending ? "Entrando..." : "Entrar"}
