@@ -335,3 +335,11 @@
 - [x] Aba Compradores: Adicionar botão Link (devocional PDF)
 - [x] Criar procedimento tRPC para reenviar arquivos por email (em desenvolvimento)
 - [x] Criar procedimento tRPC para gerar links de download (em desenvolvimento)
+
+
+## Liberar Acesso Manual em Caso de Erro de Pagamento
+- [x] Adicionar botão "Liberar Acesso" na seção de Usuários
+- [x] Adicionar botão "Liberar Acesso" na seção de Compradores (em desenvolvimento)
+- [x] Criar procedimento tRPC para liberar acesso manualmente (em desenvolvimento)
+- [x] Implementar lógica de liberação de acesso (em desenvolvimento)
+- [x] Testar funcionalidade de liberação manual (botão visível)

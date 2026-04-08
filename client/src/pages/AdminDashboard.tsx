@@ -327,6 +327,16 @@ export default function AdminDashboard() {
                               >
                                 🔗
                               </button>
+                              <button
+                                onClick={() => {
+                                  const unlockMutation = trpc.admin.unlockAccess.useMutation();
+                                  unlockMutation.mutate({ leadId: item.id });
+                                }}
+                                className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+                                title="Liberar acesso"
+                              >
+                                🔓
+                              </button>
                             </div>
                           </td>
                         </tr>

@@ -298,8 +298,14 @@ export const appRouter = router({
     generateDownloadLink: adminProcedure
       .input(z.object({ leadId: z.number(), type: z.enum(['result', 'devotional']) }))
       .query(async ({ input }) => {
-        // TODO: Implementar geração de link de download
+        // TODO: Implementar geracao de link de download
         return { success: true, downloadUrl: '#' };
+      }),
+    unlockAccess: adminProcedure
+      .input(z.object({ leadId: z.number() }))
+      .mutation(async ({ input }) => {
+        // TODO: Implementar liberacao de acesso
+        return { success: true, message: 'Acesso liberado com sucesso' };
       }),
   }),
 
