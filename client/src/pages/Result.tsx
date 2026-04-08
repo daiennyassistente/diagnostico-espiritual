@@ -231,10 +231,28 @@ export default function Result() {
       });
 
       if (pdfResponse.success && pdfResponse.pdfBase64) {
-        const link = document.createElement("a");
-        link.href = `data:application/pdf;base64,${pdfResponse.pdfBase64}`;
-        link.download = "diagnostico-espiritual.pdf";
+        // Converter base64 para Blob
+        const binaryString = atob(pdfResponse.pdfBase64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        
+        // Criar URL do blob
+        const url = URL.createObjectURL(blob);
+        
+        // Criar link e fazer download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'diagnostico-espiritual.pdf';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+        
+        // Limpar URL do blob
+        URL.revokeObjectURL(url);
+        
         toast.success("PDF baixado com sucesso!");
       }
     } catch (error) {
@@ -334,7 +352,7 @@ export default function Result() {
         {
           onSuccess: (data: any) => {
             if (data.checkoutUrl) {
-              window.open(data.checkoutUrl, "_blank");
+              window.location.href = data.checkoutUrl;
               toast.success("Redirecionando para o checkout...");
             }
           },
@@ -357,7 +375,7 @@ export default function Result() {
         {
           onSuccess: (data: any) => {
             if (data.checkoutUrl) {
-              window.open(data.checkoutUrl, "_blank");
+              window.location.href = data.checkoutUrl;
               toast.success("Redirecionando para o Pix...");
             }
           },
@@ -609,7 +627,7 @@ export default function Result() {
               ) : (
                 <>
                   <BookOpen className="w-5 h-5 mr-2" />
-                  Comprar Guia Devocional com Pix
+                  Adquirir
                 </>
               )}
             </Button>

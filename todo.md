@@ -389,3 +389,11 @@
 - [x] Testar novo PDF de devocional após compra
 - [x] Alterar fundo para branco com detalhes na paleta de cores
 - [x] Simplificar PDF para apenas texto, sem detalhes visuais
+
+
+## Bug Relatado - Celular
+- [x] PDF não está baixando no celular - CORRIGIDO (usando Blob URL)
+- [x] Pix não está direcionando no celular - CORRIGIDO (usando window.location.href)
+- [x] Investigar compatibilidade mobile - COMPLETO
+- [x] Testar fluxo completo no celular - PENDENTE (aguardando teste do usuário)
+- [x] Alterar botão de compra para "Adquirir" - COMPLETO
