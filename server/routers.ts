@@ -1,7 +1,9 @@
-import { getSessionCookieOptions } from "./_core/cookies";
-import { COOKIE_NAME } from "../shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
+import { sdk } from "./_core/sdk";
+import { getSessionCookieOptions } from "./_core/cookies";
+import type { Response } from "express";
 import { z } from "zod";
 import {
   createDiagnosticHistoryEntry,
@@ -239,11 +241,21 @@ export const appRouter = router({
     }),
     loginWithPassword: publicProcedure
       .input(z.object({ name: z.string(), password: z.string() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const user = await authenticateUser(input.name, input.password);
         if (!user) {
           throw new Error("Credenciais inválidas");
         }
+
+        // Create session token for password-based login
+        const sessionToken = await sdk.createSessionToken(user.openId, {
+          name: user.name || "",
+          expiresInMs: ONE_YEAR_MS,
+        });
+
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        (ctx.res as Response).cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
         return { success: true, user: { id: user.id, name: user.name, role: user.role } };
       }),
   }),

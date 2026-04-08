@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe-webhook";
+import { createOrUpdateAdminUser } from "../db";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -29,6 +30,14 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  // Initialize admin user on startup
+  try {
+    await createOrUpdateAdminUser("Daienny", "daivitoria23");
+    console.log("[Admin] Daienny user initialized/updated");
+  } catch (error) {
+    console.warn("[Admin] Failed to initialize admin user:", error);
+  }
+
   const app = express();
   const server = createServer(app);
   // Stripe webhook must be registered BEFORE express.json() to access raw body

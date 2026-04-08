@@ -37,14 +37,18 @@ const STEP_LABELS = [
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState<'respostas' | 'estatisticas'>('respostas');
-  const [searchEmail, setSearchEmail] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: allResponses, isLoading: loadingResponses } = trpc.quiz.getAllResponses.useQuery();
   const { data: statistics, isLoading: loadingStats } = trpc.quiz.getStatistics.useQuery();
 
-  const filteredResponses = allResponses?.filter((r: QuizResponse) =>
-    r.email.toLowerCase().includes(searchEmail.toLowerCase())
-  ) || [];
+  const filteredResponses = allResponses?.filter((r: QuizResponse) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      r.email.toLowerCase().includes(query) ||
+      r.whatsapp.toLowerCase().includes(query)
+    );
+  }) || [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,9 +87,9 @@ export default function Admin() {
           <div className="space-y-6">
             <div className="flex gap-4">
               <Input
-                placeholder="Buscar por e-mail..."
-                value={searchEmail}
-                onChange={(e) => setSearchEmail(e.target.value)}
+                placeholder="Buscar por e-mail ou WhatsApp..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-md"
               />
             </div>

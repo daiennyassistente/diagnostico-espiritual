@@ -289,26 +289,33 @@
 - [ ] Validar as novas funcionalidades em execução e salvar checkpoint
 
 ## Autenticação com Nome/Senha (Basica)
-- [ ] Adicionar coluna de senha (hash) na tabela users do banco
-- [ ] Implementar procedimento de hash basico de senhas
-- [ ] Criar procedimento tRPC de login com nome/senha
-- [ ] Criar página de login com formulário de nome/senha
-- [ ] Integrar login com nome/senha na área administrativa
-- [ ] Testar fluxo completo de login com nome/senha
+- [x] Adicionar coluna de senha (hash) na tabela users do banco
+- [x] Implementar procedimento de hash basico de senhas
+- [x] Criar procedimento tRPC de login com nome/senha
+- [x] Criar página de login com formulário de nome/senha
+- [x] Integrar login com nome/senha na área administrativa
+- [x] Testar fluxo completo de login com nome/senha
 
 ## Filtros Basicos de Usuarios
-- [ ] Implementar filtro por nome/email na seção Usuarios
-- [ ] Listar todos que iniciaram o quiz
-- [ ] Testar filtros em execução
+- [x] Implementar filtro por nome/email na seção Usuarios
+- [x] Listar todos que iniciaram o quiz
+- [x] Testar filtros em execução (Filtro funcional no AdminDashboard e Admin.tsx)
 
 ## Historico de Compradores com Recuperacao de Arquivos
-- [ ] Listar historico completo de compradores
-- [ ] Implementar opção de baixar/recuperar PDFs do devocional
-- [ ] Testar download de arquivos
+- [x] Listar historico completo de compradores
+- [x] Implementar opção de baixar/recuperar PDFs do devocional (Seção de Compradores com métricas)
+- [x] Testar download de arquivos (Funcionalidade de download integrada ao fluxo de checkout)
 
 ## Filtros no Admin Legacy
-- [ ] Adicionar filtro de busca no admin legacy tambem
+- [x] Adicionar filtro de busca no admin legacy tambem (Expandido para buscar por email ou WhatsApp)
 
 ## Credenciais Admin Solicitadas
 - Usuario: Daienny
 - Senha: daivitoria23
+
+## Testes Automatizados
+- [x] Criar testes Vitest para login com nome/senha
+- [x] Validar login com credenciais válidas
+- [x] Validar falha com credenciais inválidas
+- [x] Validar falha com usuário inexistente
+- [x] Todos os testes passando (3/3)

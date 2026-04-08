@@ -130,6 +130,7 @@ function EmptyState({ title, description }: { title: string; description: string
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
 
   const snapshotQuery = trpc.admin.snapshot.useQuery(undefined, {
@@ -148,6 +149,15 @@ export default function AdminDashboard() {
   );
 
   const latestDiagnostics = useMemo(() => diagnostics.slice(0, 6), [diagnostics]);
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users;
+    const query = searchQuery.toLowerCase();
+    return users.filter((user) =>
+      (user.name?.toLowerCase().includes(query) || false) ||
+      (user.email?.toLowerCase().includes(query) || false)
+    );
+  }, [users, searchQuery]);
 
   const renderContent = () => {
     if (snapshotQuery.isLoading) {
@@ -180,6 +190,16 @@ export default function AdminDashboard() {
             title="Contas e permissões"
             description="Esta seção usa a base real de autenticação do projeto para listar usuários, papel de acesso e atividade recente."
           />
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Buscar por nome ou email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </div>
 
           <div className="grid gap-4 md:grid-cols-3">
             <MetricCard
@@ -222,7 +242,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((item) => (
+                    {filteredUsers.map((item) => (
                       <tr key={item.id} className="border-t border-border/50 align-top">
                         <td className="px-5 py-4 text-foreground">{item.name || "Sem nome"}</td>
                         <td className="px-5 py-4 text-muted-foreground">{item.email || "-"}</td>
