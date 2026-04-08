@@ -400,4 +400,8 @@
 
 - [ ] Botão "Criar Pix" do Mercado Pago não está respondendo no iPhone - Criar alternativa
 
-- [x] Alterar preço do devocional de R$ 9,90 para R$ 12,90
+- [x] Alterar preço do devocional de R$ 9,90 para R$ 12,90 - COMPLETO
+
+- [x] Erro ao redirecionar após pagamento Mercado Pago - CORRIGIDO (webhook criado)
+- [x] PDF não está sendo enviado por email após pagamento confirmado - CORRIGIDO (webhook criado)
+- [x] Webhook do Mercado Pago pode não estar disparando corretamente - CORRIGIDO (webhook criado e registrado)
