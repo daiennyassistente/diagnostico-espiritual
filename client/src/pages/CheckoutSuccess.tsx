@@ -231,10 +231,9 @@ export default function CheckoutSuccess() {
           </Button>
         </div>
 
-        {/* Garantia */}
         <div className="text-center p-4 bg-secondary/50 rounded-lg">
           <p className="text-xs text-foreground/70 mb-2">
-            ✓ Garantia de 7 dias: Se não gostar, devolvemos seu dinheiro
+            ✓ Suporte disponível por 7 dias após a compra
           </p>
           <p className="text-xs text-foreground/60">
             Suporte disponível por email: suporte@diagnosticoespiritual.com.br

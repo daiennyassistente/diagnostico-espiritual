@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2, Share2, RotateCcw, Heart, BookOpen, Zap } from "lucide-react";
@@ -15,22 +15,48 @@ interface AIResult {
 }
 
 export default function Result() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const [result, setResult] = useState<AIResult | null>(null);
   const [responses, setResponses] = useState<Record<string, string> | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSharing, setIsSharing] = useState(false);
+  const fallbackTimeoutRef = useRef<number | null>(null);
+  const generationStartedRef = useRef(false);
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
 
+  const clearQuizSessionState = () => {
+    if (typeof window === "undefined") return;
+
+    window.sessionStorage.removeItem("quizIsNavigatingToResult");
+    window.sessionStorage.removeItem("quizNavigationStartedAt");
+    window.sessionStorage.removeItem("quizIsProcessing");
+    window.sessionStorage.removeItem("quizProcessingStartedAt");
+    window.sessionStorage.removeItem("quizProcessingStep");
+    window.sessionStorage.removeItem("quizCurrentStep");
+    window.sessionStorage.removeItem("quizResponsesDraft");
+    window.sessionStorage.removeItem("quizShowLeadForm");
+    window.sessionStorage.removeItem("quizLeadDraft");
+    window.sessionStorage.removeItem("quizHasStarted");
+    window.sessionStorage.removeItem("quizPendingResultRedirect");
+    window.sessionStorage.removeItem("quizPendingResultRedirectAt");
+  };
+
   useEffect(() => {
+    if (generationStartedRef.current) {
+      return;
+    }
+
+    generationStartedRef.current = true;
+
     const savedResponses = localStorage.getItem("quizResponses");
     const savedResult = localStorage.getItem("quizResult");
 
     if (!savedResponses) {
-      setLocation("/");
+      clearQuizSessionState();
+      setLocation("/quiz");
       return;
     }
 
@@ -42,6 +68,7 @@ export default function Result() {
         const parsedResult = JSON.parse(savedResult);
         setResult(parsedResult);
         setIsLoading(false);
+        clearQuizSessionState();
         return;
       } catch {
         localStorage.removeItem("quizResult");
@@ -131,24 +158,51 @@ export default function Result() {
       };
     };
 
+    const applyFallbackResult = (message?: string) => {
+      const fallbackResult = buildFallbackResult(parsed);
+      setResult(fallbackResult);
+      localStorage.setItem("quizResult", JSON.stringify(fallbackResult));
+      if (message) {
+        toast.error(message);
+      }
+      setIsLoading(false);
+      clearQuizSessionState();
+    };
+
+    fallbackTimeoutRef.current = window.setTimeout(() => {
+      applyFallbackResult("A análise inteligente demorou mais que o esperado. Exibimos seu diagnóstico com base nas respostas do quiz.");
+    }, 8000);
+
     generateResultMutation.mutate(
       { responses: parsed },
       {
         onSuccess: (data: any) => {
+          if (fallbackTimeoutRef.current) {
+            window.clearTimeout(fallbackTimeoutRef.current);
+            fallbackTimeoutRef.current = null;
+          }
           setResult(data);
           localStorage.setItem("quizResult", JSON.stringify(data));
           setIsLoading(false);
+          clearQuizSessionState();
         },
         onError: (error) => {
           console.error("Erro ao gerar resultado:", error);
-          const fallbackResult = buildFallbackResult(parsed);
-          setResult(fallbackResult);
-          localStorage.setItem("quizResult", JSON.stringify(fallbackResult));
-          toast.error("A análise instantânea ficou indisponível. Exibimos seu diagnóstico com base nas respostas do quiz.");
-          setIsLoading(false);
+          if (fallbackTimeoutRef.current) {
+            window.clearTimeout(fallbackTimeoutRef.current);
+            fallbackTimeoutRef.current = null;
+          }
+          applyFallbackResult("A análise instantânea ficou indisponível. Exibimos seu diagnóstico com base nas respostas do quiz.");
         },
       }
     );
+
+    return () => {
+      if (fallbackTimeoutRef.current) {
+        window.clearTimeout(fallbackTimeoutRef.current);
+        fallbackTimeoutRef.current = null;
+      }
+    };
   }, [setLocation]);
 
   const handleDownloadPDF = async () => {
@@ -183,7 +237,9 @@ export default function Result() {
 
   const handleRetakeQuiz = () => {
     localStorage.removeItem("quizResponses");
+    localStorage.removeItem("quizResult");
     localStorage.removeItem("quizLeadId");
+    clearQuizSessionState();
     setLocation("/quiz");
   };
 
@@ -495,7 +551,7 @@ export default function Result() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-4xl font-bold text-accent">R$ 9,90</span>
             </div>
-            <p className="text-xs text-foreground/60">Acesso imediato ao PDF + Suporte por 30 dias</p>
+            <p className="text-xs text-foreground/60">Acesso imediato ao PDF + Suporte por 7 dias</p>
           </div>
 
           {/* Botão de compra com urgência */}
@@ -517,29 +573,30 @@ export default function Result() {
             )}
           </Button>
 
-          {/* Garantia */}
-          <p className="text-center text-xs text-foreground/70">
-            ✓ Garantia: Se não gostar, devolvemos seu dinheiro em 7 dias
-          </p>
-        </div>
+          <div className="text-center text-sm text-foreground/70 mb-6">
+            <p>
+              ✓ Entrega imediata do PDF após a confirmação do pagamento
+            </p>
+          </div>
 
-        {/* Depoimento social proof (opcional) */}
-        <div className="bg-white/30 rounded-lg p-4 mb-8">
-          <p className="text-sm text-foreground italic text-center">
-            "Este devocional mudou minha forma de orar e me aproximou muito mais de Deus. 
-            Recomendo para quem quer uma conexão real e transformadora."
-          </p>
-          <p className="text-xs text-foreground/70 text-center mt-2">— Marina S., Brasília</p>
-        </div>
+          {/* Depoimento social proof (opcional) */}
+          <div className="bg-white/30 rounded-lg p-4 mb-8">
+            <p className="text-sm text-foreground italic text-center">
+              "Este devocional mudou minha forma de orar e me aproximou muito mais de Deus.
+              Recomendo para quem quer uma conexão real e transformadora."
+            </p>
+            <p className="text-xs text-foreground/70 text-center mt-2">— Marina S., Brasília</p>
+          </div>
 
-        {/* CTA secundária */}
-        <div className="text-center">
-          <p className="text-foreground text-sm mb-3">
-            Não tem certeza? Comece com seu diagnóstico grátis e veja a diferença.
-          </p>
-          <p className="text-xs text-foreground/60">
-            Oferta válida por tempo limitado. Aproveite agora!
-          </p>
+          {/* CTA secundária */}
+          <div className="text-center">
+            <p className="text-foreground text-sm mb-3">
+              Não tem certeza? Comece com seu diagnóstico grátis e veja a diferença.
+            </p>
+            <p className="text-xs text-foreground/60">
+              Oferta válida por tempo limitado. Aproveite agora!
+            </p>
+          </div>
         </div>
       </div>
     </div>

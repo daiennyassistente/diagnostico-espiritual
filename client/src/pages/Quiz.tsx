@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -136,30 +136,170 @@ const PROCESSING_MESSAGES = [
   'Seu diagnóstico está pronto!',
 ];
 
+const readSessionJSON = <T,>(key: string, fallback: T): T => {
+  if (typeof window === 'undefined') return fallback;
+
+  try {
+    const storedValue = window.sessionStorage.getItem(key);
+    return storedValue ? (JSON.parse(storedValue) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const readSessionNumber = (key: string, fallback: number) => {
+  if (typeof window === 'undefined') return fallback;
+
+  const storedValue = window.sessionStorage.getItem(key);
+  const parsedValue = storedValue ? Number(storedValue) : fallback;
+  return Number.isFinite(parsedValue) ? parsedValue : fallback;
+};
+
+const readRecentNavigationFlag = () => {
+  if (typeof window === 'undefined') return false;
+
+  const startedAt = Number(window.sessionStorage.getItem('quizNavigationStartedAt') || '0');
+  const isFlagged = window.sessionStorage.getItem('quizIsNavigatingToResult') === '1';
+
+  return isFlagged && Date.now() - startedAt < 15000;
+};
+
+const readRecentProcessingFlag = () => {
+  if (typeof window === 'undefined') return false;
+
+  const startedAt = Number(window.sessionStorage.getItem('quizProcessingStartedAt') || '0');
+  const isFlagged = window.sessionStorage.getItem('quizIsProcessing') === '1';
+
+  return isFlagged && Date.now() - startedAt < 30000;
+};
+
+const readPendingResultRedirect = () => {
+  if (typeof window === 'undefined') return false;
+
+  const startedAt = Number(window.sessionStorage.getItem('quizPendingResultRedirectAt') || '0');
+  const isFlagged = window.sessionStorage.getItem('quizPendingResultRedirect') === '1';
+
+  return isFlagged && Date.now() - startedAt < 15000;
+};
+
 export default function Quiz() {
   const [, setLocation] = useLocation();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [responses, setResponses] = useState<Record<number, string>>({});
-  const [showLeadForm, setShowLeadForm] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingStep, setProcessingStep] = useState(0);
-  const [leadData, setLeadData] = useState({ whatsapp: '', email: '' });
+  const [currentStep, setCurrentStep] = useState(() => readSessionNumber('quizCurrentStep', 0));
+  const [responses, setResponses] = useState<Record<number, string>>(() =>
+    readSessionJSON<Record<number, string>>('quizResponsesDraft', {})
+  );
+  const [showLeadForm, setShowLeadForm] = useState(() => readSessionJSON<boolean>('quizShowLeadForm', false));
+  const [isProcessing, setIsProcessing] = useState(() => readRecentProcessingFlag());
+  const [processingStep, setProcessingStep] = useState(() => readSessionNumber('quizProcessingStep', 0));
+  const [leadData, setLeadData] = useState(() =>
+    readSessionJSON('quizLeadDraft', { whatsapp: '', email: '' })
+  );
+  const [hasStarted, setHasStarted] = useState(() => {
+    const storedStarted = readSessionJSON<boolean>('quizHasStarted', false);
+    const storedStep = readSessionNumber('quizCurrentStep', 0);
+    const storedResponses = readSessionJSON<Record<number, string>>('quizResponsesDraft', {});
+
+    return storedStarted || storedStep > 0 || Object.keys(storedResponses).length > 0;
+  });
+  const [isNavigatingToResult, setIsNavigatingToResult] = useState(() => readRecentNavigationFlag() || readPendingResultRedirect());
+  const advanceTimeoutRef = useRef<number | null>(null);
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
   const submitResponsesMutation = trpc.quiz.submitResponses.useMutation();
 
   const isQuizComplete = currentStep >= QUIZ_STEPS.length;
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.sessionStorage.setItem('quizCurrentStep', String(currentStep));
+    window.sessionStorage.setItem('quizResponsesDraft', JSON.stringify(responses));
+    window.sessionStorage.setItem('quizShowLeadForm', JSON.stringify(showLeadForm));
+    window.sessionStorage.setItem('quizLeadDraft', JSON.stringify(leadData));
+    window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
+  }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (isNavigatingToResult) {
+      window.sessionStorage.setItem('quizIsNavigatingToResult', '1');
+      window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
+      return;
+    }
+
+    window.sessionStorage.removeItem('quizIsNavigatingToResult');
+    window.sessionStorage.removeItem('quizNavigationStartedAt');
+  }, [isNavigatingToResult]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (isProcessing) {
+      window.sessionStorage.setItem('quizIsProcessing', '1');
+      window.sessionStorage.setItem('quizProcessingStartedAt', String(Date.now()));
+      window.sessionStorage.setItem('quizProcessingStep', String(processingStep));
+      return;
+    }
+
+    window.sessionStorage.removeItem('quizIsProcessing');
+    window.sessionStorage.removeItem('quizProcessingStartedAt');
+    window.sessionStorage.removeItem('quizProcessingStep');
+  }, [isProcessing, processingStep]);
+
+  useEffect(() => {
+    if (hasStarted) return;
+
+    if (currentStep > 0 || Object.keys(responses).length > 0 || showLeadForm || isProcessing || isNavigatingToResult) {
+      setHasStarted(true);
+    }
+  }, [currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult, hasStarted]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!readPendingResultRedirect()) return;
+
+    setHasStarted(true);
+    setShowLeadForm(false);
+    setIsProcessing(false);
+    setIsNavigatingToResult(true);
+    window.sessionStorage.setItem('quizIsNavigatingToResult', '1');
+    window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
+
+    const redirectTimer = window.setTimeout(() => {
+      setLocation('/result');
+    }, 0);
+
+    return () => {
+      window.clearTimeout(redirectTimer);
+    };
+  }, [setLocation]);
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimeoutRef.current) {
+        window.clearTimeout(advanceTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSelectOption = (option: string) => {
-    setResponses({
-      ...responses,
-      [currentStep]: option,
-    });
-    
+    const selectedStep = currentStep;
+
+    setHasStarted(true);
+    setResponses((previousResponses) => ({
+      ...previousResponses,
+      [selectedStep - 1]: option,
+    }));
+
+    if (advanceTimeoutRef.current) {
+      window.clearTimeout(advanceTimeoutRef.current);
+    }
+
     // Avanço automático após 600ms para o usuário ver a seleção
-    setTimeout(() => {
-      if (currentStep < QUIZ_STEPS.length - 1) {
-        setCurrentStep(currentStep + 1);
+    advanceTimeoutRef.current = window.setTimeout(() => {
+      if (selectedStep < QUIZ_STEPS.length) {
+        setCurrentStep((previousStep) => previousStep + 1);
       } else {
         setShowLeadForm(true);
       }
@@ -167,13 +307,15 @@ export default function Quiz() {
   };
 
   const handleNext = () => {
-    if (!responses[currentStep]) {
+    if (!responses[currentStep - 1]) {
       toast.error('Por favor, selecione uma opção para continuar');
       return;
     }
 
-    if (currentStep < QUIZ_STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+    setHasStarted(true);
+
+    if (currentStep < QUIZ_STEPS.length) {
+      setCurrentStep((previousStep) => previousStep + 1);
     } else {
       setShowLeadForm(true);
     }
@@ -214,13 +356,28 @@ export default function Quiz() {
 
     let redirectedToResult = false;
 
+    setHasStarted(true);
+    setIsNavigatingToResult(false);
     setIsProcessing(true);
     setShowLeadForm(false);
     setProcessingStep(0);
 
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('quizIsProcessing', '1');
+      window.sessionStorage.setItem('quizProcessingStartedAt', String(Date.now()));
+      window.sessionStorage.setItem('quizProcessingStep', '0');
+      window.sessionStorage.setItem('quizHasStarted', JSON.stringify(true));
+      window.sessionStorage.setItem('quizShowLeadForm', JSON.stringify(false));
+    }
+
     try {
       for (let i = 0; i < PROCESSING_MESSAGES.length; i++) {
         setProcessingStep(i);
+
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('quizProcessingStep', String(i));
+        }
+
         await new Promise(resolve => setTimeout(resolve, 1200));
       }
 
@@ -252,7 +409,15 @@ export default function Quiz() {
           whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         }));
 
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('quizIsNavigatingToResult', '1');
+          window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
+          window.sessionStorage.setItem('quizPendingResultRedirect', '1');
+          window.sessionStorage.setItem('quizPendingResultRedirectAt', String(Date.now()));
+        }
+
         redirectedToResult = true;
+        setIsNavigatingToResult(true);
         toast.success('Diagnóstico enviado com sucesso!');
         setLocation('/result');
         return;
@@ -267,12 +432,15 @@ export default function Quiz() {
     } finally {
       if (!redirectedToResult) {
         setIsProcessing(false);
+        setIsNavigatingToResult(false);
       }
     }
   };
 
+  const hasPendingResultRedirect = readPendingResultRedirect();
+
   // Tela de abertura
-  if (currentStep === 0 && Object.keys(responses).length === 0) {
+  if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult && !hasPendingResultRedirect) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full">
@@ -287,7 +455,10 @@ export default function Quiz() {
               Leva menos de 2 minutos e pode te ajudar a enxergar com mais clareza a fase espiritual que você está vivendo agora.
             </p>
             <Button
-              onClick={() => setCurrentStep(1)}
+              onClick={() => {
+                setHasStarted(true);
+                setCurrentStep(1);
+              }}
               className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
             >
               Quero começar meu diagnóstico
@@ -299,15 +470,18 @@ export default function Quiz() {
   }
 
   // Tela de processamento
-  if (isProcessing) {
-    const progress = ((processingStep + 1) / PROCESSING_MESSAGES.length) * 100;
+  if (isProcessing || isNavigatingToResult || hasPendingResultRedirect) {
+    const visibleProcessingStep = (isNavigatingToResult || hasPendingResultRedirect)
+      ? PROCESSING_MESSAGES.length - 1
+      : processingStep;
+    const progress = ((visibleProcessingStep + 1) / PROCESSING_MESSAGES.length) * 100;
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-foreground">
-              {PROCESSING_MESSAGES[processingStep]}
+              {PROCESSING_MESSAGES[visibleProcessingStep]}
             </h2>
             <p className="text-foreground/60">
               Processando seu diagnóstico espiritual...
@@ -334,7 +508,7 @@ export default function Quiz() {
               <div
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  i <= processingStep ? 'bg-primary' : 'bg-muted'
+                  i <= visibleProcessingStep ? 'bg-primary' : 'bg-muted'
                 }`}
               />
             ))}
