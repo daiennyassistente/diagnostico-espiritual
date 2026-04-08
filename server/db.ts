@@ -686,3 +686,58 @@ export async function getLeadWithDiagnostic(leadId: number) {
     diagnostic: diagnostic.length > 0 ? diagnostic[0] : null,
   };
 }
+
+
+// Quiz Questions Management
+export async function getAllQuizQuestions() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  const questions = await db.select().from(quizQuestions).orderBy(quizQuestions.step);
+  return questions.map(q => ({
+    ...q,
+    options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+  }));
+}
+
+export async function updateQuizQuestion(id: number, question: string, options: string[]) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  await db.update(quizQuestions)
+    .set({ 
+      question, 
+      options: JSON.stringify(options),
+      updatedAt: new Date()
+    })
+    .where(eq(quizQuestions.id, id));
+  return { success: true };
+}
+
+export async function createQuizQuestion(step: number, question: string, options: string[]) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  await db.insert(quizQuestions).values({
+    step,
+    question,
+    options: JSON.stringify(options)
+  });
+  return { success: true };
+}
+
+export async function deleteQuizQuestion(id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  await db.delete(quizQuestions).where(eq(quizQuestions.id, id));
+  return { success: true };
+}

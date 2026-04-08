@@ -20,6 +20,10 @@ import {
   searchLeads,
   getAllLeadsWithQuizStatus,
   getPaymentWithDiagnostic,
+  getAllQuizQuestions,
+  updateQuizQuestion,
+  createQuizQuestion,
+  deleteQuizQuestion,
 } from "./db";
 import Stripe from "stripe";
 
@@ -248,7 +252,8 @@ export const appRouter = router({
         }
 
         // Create session token for password-based login
-        const sessionToken = await sdk.createSessionToken(user.openId, {
+        const openId = user.openId || `user-${user.id}`;
+        const sessionToken = await sdk.createSessionToken(openId, {
           name: user.name || "",
           expiresInMs: ONE_YEAR_MS,
         });
@@ -261,6 +266,30 @@ export const appRouter = router({
   }),
 
   admin: router({
+    // Quiz Questions Management
+    getQuestions: adminProcedure.query(async () => {
+      const { getAllQuizQuestions } = await import('./db');
+      return await getAllQuizQuestions();
+    }),
+    updateQuestion: adminProcedure
+      .input(z.object({ id: z.number(), question: z.string(), options: z.array(z.string()) }))
+      .mutation(async ({ input }) => {
+        const { updateQuizQuestion } = await import('./db');
+        return await updateQuizQuestion(input.id, input.question, input.options);
+      }),
+    createQuestion: adminProcedure
+      .input(z.object({ step: z.number(), question: z.string(), options: z.array(z.string()) }))
+      .mutation(async ({ input }) => {
+        const { createQuizQuestion } = await import('./db');
+        return await createQuizQuestion(input.step, input.question, input.options);
+      }),
+    deleteQuestion: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteQuizQuestion } = await import('./db');
+        return await deleteQuizQuestion(input.id);
+      }),
+
     snapshot: adminProcedure.query(async () => {
       return await getAdminSnapshot();
     }),

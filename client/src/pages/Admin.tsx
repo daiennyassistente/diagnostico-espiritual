@@ -1,8 +1,9 @@
+'use client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { trpc } from '@/lib/trpc';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Edit, Trash2, Plus } from 'lucide-react';
 
 interface QuizResponse {
   id: number;
@@ -22,6 +23,15 @@ interface QuizResponse {
   createdAt: Date;
 }
 
+interface QuizQuestion {
+  id: number;
+  step: number;
+  question: string;
+  options: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const STEP_LABELS = [
   'Como você se sente espiritualmente hoje?',
   'O que mais tem dificultado sua constância com Deus?',
@@ -36,11 +46,19 @@ const STEP_LABELS = [
 ];
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState<'respostas' | 'estatisticas'>('respostas');
+  const [activeTab, setActiveTab] = useState<'respostas' | 'estatisticas' | 'perguntas'>('respostas');
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [newOptions, setNewOptions] = useState<string[]>(['', '', '', '']);
+  const [newStep, setNewStep] = useState(1);
 
   const { data: allResponses, isLoading: loadingResponses } = trpc.quiz.getAllResponses.useQuery();
   const { data: statistics, isLoading: loadingStats } = trpc.quiz.getStatistics.useQuery();
+  const { data: questions, isLoading: loadingQuestions, refetch: refetchQuestions } = trpc.admin.getQuestions.useQuery();
+  const updateQuestionMutation = trpc.admin.updateQuestion.useMutation({ onSuccess: () => refetchQuestions() });
+  const createQuestionMutation = trpc.admin.createQuestion.useMutation({ onSuccess: () => { refetchQuestions(); setNewQuestion(''); setNewOptions(['', '', '', '']); setNewStep(1); } });
+  const deleteQuestionMutation = trpc.admin.deleteQuestion.useMutation({ onSuccess: () => refetchQuestions() });
 
   const filteredResponses = allResponses?.filter((r: QuizResponse) => {
     const query = searchQuery.toLowerCase();
@@ -49,6 +67,32 @@ export default function Admin() {
       r.whatsapp.toLowerCase().includes(query)
     );
   }) || [];
+
+  const handleEditQuestion = (q: QuizQuestion) => {
+    setEditingQuestion(q);
+    setNewQuestion(q.question);
+    setNewOptions(q.options);
+    setNewStep(q.step);
+  };
+
+  const handleSaveQuestion = async () => {
+    if (editingQuestion) {
+      await updateQuestionMutation.mutateAsync({
+        id: editingQuestion.id,
+        question: newQuestion,
+        options: newOptions.filter(o => o.trim())
+      });
+      setEditingQuestion(null);
+    }
+  };
+
+  const handleCreateQuestion = async () => {
+    await createQuestionMutation.mutateAsync({
+      step: newStep,
+      question: newQuestion,
+      options: newOptions.filter(o => o.trim())
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,10 +103,10 @@ export default function Admin() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-border">
+        <div className="flex gap-4 mb-8 border-b border-border overflow-x-auto">
           <button
             onClick={() => setActiveTab('respostas')}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
               activeTab === 'respostas'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-foreground/60 hover:text-foreground'
@@ -72,13 +116,23 @@ export default function Admin() {
           </button>
           <button
             onClick={() => setActiveTab('estatisticas')}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
               activeTab === 'estatisticas'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-foreground/60 hover:text-foreground'
             }`}
           >
             Estatísticas
+          </button>
+          <button
+            onClick={() => setActiveTab('perguntas')}
+            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'perguntas'
+                ? 'text-primary border-b-2 border-primary'
+                : 'text-foreground/60 hover:text-foreground'
+            }`}
+          >
+            Gerenciar Perguntas
           </button>
         </div>
 
@@ -99,48 +153,29 @@ export default function Admin() {
                 <Loader2 className="animate-spin text-primary" />
               </div>
             ) : filteredResponses.length === 0 ? (
-              <div className="text-center py-12 text-foreground/60">
-                Nenhuma resposta encontrada
+              <div className="text-center py-12">
+                <p className="text-foreground/60">Nenhuma resposta encontrada</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredResponses.map((response: QuizResponse) => (
-                  <div key={response.id} className="bg-white rounded-lg p-6 border border-border">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div>
-                        <p className="text-sm text-foreground/60">E-mail</p>
-                        <p className="font-medium text-foreground">{response.email}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-foreground/60">WhatsApp</p>
-                        <p className="font-medium text-foreground">{response.whatsapp}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-foreground/60">Data</p>
-                        <p className="font-medium text-foreground">
-                          {String(new Date(response.createdAt as any).toLocaleDateString('pt-BR'))}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 border-t border-border pt-6">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((step) => {
-                        const stepKey = `step${step}` as keyof QuizResponse;
-                        const answer = response[stepKey];
-                        return (
-                          <div key={step} className="text-sm">
-                            <p className="font-medium text-foreground mb-1">
-                              Etapa {step}: {STEP_LABELS[step - 1]}
-                            </p>
-                            <p className="text-foreground/80 ml-4">
-                              {String(answer || '(sem resposta)')}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="border-b border-border">
+                    <tr>
+                      <th className="text-left py-3 px-4 font-semibold">Email</th>
+                      <th className="text-left py-3 px-4 font-semibold">WhatsApp</th>
+                      <th className="text-left py-3 px-4 font-semibold">Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredResponses.map((response: QuizResponse) => (
+                      <tr key={response.id} className="border-b border-border hover:bg-muted/50">
+                        <td className="py-3 px-4">{response.email}</td>
+                        <td className="py-3 px-4">{response.whatsapp}</td>
+                        <td className="py-3 px-4">{new Date(response.createdAt).toLocaleDateString('pt-BR')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -154,54 +189,170 @@ export default function Admin() {
                 <Loader2 className="animate-spin text-primary" />
               </div>
             ) : statistics ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Object.entries(statistics).map(([step, data]: [string, any]) => (
+                  <div key={step} className="border border-border rounded-lg p-6">
+                    <h3 className="font-semibold mb-4">{STEP_LABELS[parseInt(step) - 1]}</h3>
+                    <div className="space-y-2">
+                      {Object.entries(data).map(([option, count]: [string, any]) => (
+                        <div key={option} className="flex justify-between">
+                          <span className="text-foreground/70">{option}</span>
+                          <span className="font-semibold">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-foreground/60">Nenhuma estatística disponível</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Gerenciar Perguntas Tab */}
+        {activeTab === 'perguntas' && (
+          <div className="space-y-6">
+            {loadingQuestions ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="animate-spin text-primary" />
+              </div>
+            ) : (
               <>
-                <div className="bg-white rounded-lg p-6 border border-border">
-                  <h2 className="text-2xl font-bold text-foreground mb-4">
-                    Total de Respostas: {statistics.totalRespostas}
-                  </h2>
+                {/* Nova Pergunta */}
+                <div className="border border-border rounded-lg p-6 bg-muted/50">
+                  <h3 className="font-semibold mb-4">Adicionar Nova Pergunta</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium">Etapa</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={newStep}
+                        onChange={(e) => setNewStep(parseInt(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Pergunta</label>
+                      <Input
+                        value={newQuestion}
+                        onChange={(e) => setNewQuestion(e.target.value)}
+                        placeholder="Digite a pergunta"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Opções</label>
+                      {newOptions.map((option, idx) => (
+                        <Input
+                          key={idx}
+                          value={option}
+                          onChange={(e) => {
+                            const updated = [...newOptions];
+                            updated[idx] = e.target.value;
+                            setNewOptions(updated);
+                          }}
+                          placeholder={`Opção ${idx + 1}`}
+                          className="mt-1 mb-2"
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      onClick={handleCreateQuestion}
+                      disabled={createQuestionMutation.isPending || !newQuestion}
+                      className="w-full"
+                    >
+                      {createQuestionMutation.isPending ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" />}
+                      Adicionar Pergunta
+                    </Button>
+                  </div>
                 </div>
 
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((step) => {
-                  const stepKey = `step${step}` as keyof typeof statistics;
-                  const stepStats = statistics[stepKey] as Record<string, number>;
-
-                  return (
-                    <div key={step} className="bg-white rounded-lg p-6 border border-border">
-                      <h3 className="text-lg font-bold text-foreground mb-4">
-                        Etapa {step}: {STEP_LABELS[step - 1]}
-                      </h3>
-
-                      <div className="space-y-3">
-                        {Object.entries(stepStats)
-                          .sort(([, a], [, b]) => b - a)
-                          .map(([answer, count]) => {
-                            const percentage = statistics.totalRespostas
-                              ? Math.round((count / statistics.totalRespostas) * 100)
-                              : 0;
-
-                            return (
-                              <div key={answer} className="space-y-1">
-                                <div className="flex justify-between text-sm">
-                                  <span className="text-foreground">{answer}</span>
-                                  <span className="text-foreground/60">
-                                    {count} ({percentage}%)
-                                  </span>
-                                </div>
-                                <div className="w-full bg-muted rounded-full h-2">
-                                  <div
-                                    className="bg-primary h-2 rounded-full transition-all duration-300"
-                                    style={{ width: `${percentage}%` }}
-                                  />
-                                </div>
+                {/* Lista de Perguntas */}
+                <div className="space-y-4">
+                  {questions?.map((q: QuizQuestion) => (
+                    <div key={q.id} className="border border-border rounded-lg p-6">
+                      {editingQuestion?.id === q.id ? (
+                        <div className="space-y-4">
+                          <Input
+                            value={newQuestion}
+                            onChange={(e) => setNewQuestion(e.target.value)}
+                            placeholder="Pergunta"
+                          />
+                          {newOptions.map((option, idx) => (
+                            <Input
+                              key={idx}
+                              value={option}
+                              onChange={(e) => {
+                                const updated = [...newOptions];
+                                updated[idx] = e.target.value;
+                                setNewOptions(updated);
+                              }}
+                              placeholder={`Opção ${idx + 1}`}
+                            />
+                          ))}
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={handleSaveQuestion}
+                              disabled={updateQuestionMutation.isPending}
+                              variant="default"
+                              className="flex-1"
+                            >
+                              {updateQuestionMutation.isPending ? <Loader2 className="animate-spin mr-2" /> : null}
+                              Salvar
+                            </Button>
+                            <Button
+                              onClick={() => setEditingQuestion(null)}
+                              variant="outline"
+                              className="flex-1"
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h4 className="font-semibold">Etapa {q.step}</h4>
+                              <p className="text-foreground/70 mt-1">{q.question}</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditQuestion(q)}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => deleteQuestionMutation.mutate({ id: q.id })}
+                                disabled={deleteQuestionMutation.isPending}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            {q.options.map((option, idx) => (
+                              <div key={idx} className="text-sm text-foreground/60">
+                                • {option}
                               </div>
-                            );
-                          })}
-                      </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </>
-            ) : null}
+            )}
           </div>
         )}
       </div>

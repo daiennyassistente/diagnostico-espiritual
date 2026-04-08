@@ -87,3 +87,15 @@ export const diagnosticHistory = mysqlTable("diagnostic_history", {
 
 export type DiagnosticHistory = typeof diagnosticHistory.$inferSelect;
 export type InsertDiagnosticHistory = typeof diagnosticHistory.$inferInsert;
+
+export const quizQuestions = mysqlTable("quiz_questions", {
+  id: int("id").autoincrement().primaryKey(),
+  step: int("step").notNull(), // 1-10
+  question: text("question").notNull(),
+  options: text("options").notNull(), // JSON stringified array of options
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type QuizQuestion = typeof quizQuestions.$inferSelect;
+export type InsertQuizQuestion = typeof quizQuestions.$inferInsert;

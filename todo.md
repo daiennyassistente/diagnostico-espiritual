@@ -343,3 +343,11 @@
 - [x] Criar procedimento tRPC para liberar acesso manualmente (implementado)
 - [x] Implementar lógica de liberação de acesso (implementado)
 - [x] Testar funcionalidade de liberação manual (testado)
+
+
+## Gerenciamento de Perguntas do Quiz (Admin Legacy)
+- [x] Criar tabela de perguntas no banco de dados (10 perguntas padrão criadas)
+- [x] Implementar procedimentos tRPC para CRUD de perguntas (getQuestions, updateQuestion, createQuestion, deleteQuestion)
+- [x] Criar interface de gerenciamento na página admin-legacy (aba "Gerenciar Perguntas" adicionada)
+- [x] Testar edição, adição e remoção de perguntas (todos os botões visíveis e funcionais)
+- [x] Testar integração com o quiz em tempo real (10 perguntas carregadas corretamente)
