@@ -272,6 +272,7 @@ export default function AdminDashboard() {
                       <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Tipo</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data da resposta</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -291,6 +292,35 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">{formatDateTime(item.updatedAt)}</td>
+                          <td className="px-5 py-4">
+                            <div className="flex gap-2">
+                              {whatsappStr && (
+                                <a
+                                  href={`https://wa.me/${whatsappStr.split('').filter((c) => /[0-9]/.test(c)).join('')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+                                  title="Abrir WhatsApp"
+                                >
+                                  💬
+                                </a>
+                              )}
+                              <button
+                                onClick={() => alert('Funcionalidade de reenvio em desenvolvimento')}
+                                className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                title="Reenviar resultado"
+                              >
+                                📧
+                              </button>
+                              <button
+                                onClick={() => alert('Link para resultado + guia em desenvolvimento')}
+                                className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
+                                title="Link para resultado + guia"
+                              >
+                                🔗
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       );
                     })}
@@ -350,6 +380,7 @@ export default function AdminDashboard() {
                       <th className="px-5 py-4 font-semibold text-foreground">Produto</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Status</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Ações</th>
                     </tr>
                   </thead>
                   <tbody>

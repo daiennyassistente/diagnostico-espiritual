@@ -324,3 +324,14 @@
 - [x] Modificar seção "Usuários" do AdminDashboard para mostrar todos que fizeram o quiz (leads com respostas) em vez de usuários autenticados
 - [x] Incluir informações de email, WhatsApp e data de resposta na tabela
 - [x] Manter filtro de busca funcional para a nova lista
+
+
+## Botões de Ação nas Abas de Usuários e Compradores
+- [ ] Aba Usuários: Adicionar botão WhatsApp (abrir conversa)
+- [ ] Aba Usuários: Adicionar botão Reenviar (resultado PDF)
+- [ ] Aba Usuários: Adicionar botão Link (resultado + guia devocional)
+- [ ] Aba Compradores: Adicionar botão WhatsApp (abrir conversa)
+- [ ] Aba Compradores: Adicionar botão Reenviar (devocional PDF)
+- [ ] Aba Compradores: Adicionar botão Link (devocional PDF)
+- [ ] Criar procedimento tRPC para reenviar arquivos por email
+- [ ] Criar procedimento tRPC para gerar links de download

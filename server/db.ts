@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import crypto from "crypto";
+import bcrypt from "bcrypt";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import {
   InsertDiagnosticHistory,
@@ -466,6 +467,12 @@ export function hashPassword(password: string): string {
 
 export function verifyPassword(password: string, hash: string): boolean {
   try {
+    // Check if it's a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+    if (hash.startsWith("$2a$") || hash.startsWith("$2b$") || hash.startsWith("$2y$")) {
+      return bcrypt.compareSync(password, hash);
+    }
+    
+    // Otherwise, assume it's PBKDF2 format (salt:hash)
     const [salt, storedHash] = hash.split(":");
     const computed = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha256").toString("hex");
     return computed === storedHash;
