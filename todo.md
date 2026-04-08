@@ -397,3 +397,5 @@
 - [x] Investigar compatibilidade mobile - COMPLETO
 - [x] Testar fluxo completo no celular - PENDENTE (aguardando teste do usuário)
 - [x] Alterar botão de compra para "Adquirir" - COMPLETO
+
+- [ ] Botão "Criar Pix" do Mercado Pago não está respondendo no iPhone - Criar alternativa

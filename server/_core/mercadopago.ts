@@ -55,5 +55,13 @@ export async function createMercadoPagoPreference(options: {
 }
 
 export function getMercadoPagoInitPoint(preference: any): string | null {
-  return preference?.init_point || null;
+  const initPoint = preference?.init_point || null;
+  if (!initPoint) return null;
+  
+  // Adicionar parâmetro para forçar Pix no mobile
+  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  const isMobile = /iPhone|iPad|Android/i.test(userAgent);
+  
+  // Adicionar parâmetro para melhor compatibilidade
+  return `${initPoint}#payment-method-id=pix`;
 }
