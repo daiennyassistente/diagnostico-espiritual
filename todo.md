@@ -282,11 +282,11 @@
 - [x] Validar novamente o acesso ao /admin no ambiente web após a correção
 
 ## Melhorias Solicitadas - Área Administrativa
-- [ ] Listar na seção Usuários todos que iniciaram o quiz (leads que começaram o fluxo)
-- [ ] Adicionar filtros de busca na seção Usuários (por nome, email, data, etc)
-- [ ] Implementar histórico completo de Compradores com todas as informações (email, data, valor, status, etc)
-- [ ] Adicionar funcionalidade de recuperar/baixar arquivos (PDFs do devocional) na seção Compradores
-- [ ] Validar as novas funcionalidades em execução e salvar checkpoint
+- [x] Listar na seção Usuários todos que iniciaram o quiz (leads que começaram o fluxo) - COMPLETO
+- [x] Adicionar filtros de busca na seção Usuários (por nome, email, data, etc) - COMPLETO
+- [x] Implementar histórico completo de Compradores com todas as informações (email, data, valor, status, etc) - COMPLETO
+- [x] Adicionar funcionalidade de recuperar/baixar arquivos (PDFs do devocional) na seção Compradores - COMPLETO
+- [x] Validar as novas funcionalidades em execução e salvar checkpoint - COMPLETO
 
 ## Autenticação com Nome/Senha (Basica)
 - [x] Adicionar coluna de senha (hash) na tabela users do banco
@@ -351,3 +351,11 @@
 - [x] Criar interface de gerenciamento na página admin-legacy (aba "Gerenciar Perguntas" adicionada)
 - [x] Testar edição, adição e remoção de perguntas (todos os botões visíveis e funcionais)
 - [x] Testar integração com o quiz em tempo real (10 perguntas carregadas corretamente)
+
+
+## Ajuste de Login - Email em vez de Usuário
+- [ ] Alterar página AdminLogin.tsx para usar email em vez de nome de usuário
+- [ ] Atualizar procedimento tRPC loginWithPassword para autenticar por email
+- [ ] Atualizar função authenticateUser para buscar por email
+- [ ] Testar novo login com email e senha
+- [ ] Atualizar credenciais do admin para usar email
