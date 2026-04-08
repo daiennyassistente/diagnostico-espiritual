@@ -250,20 +250,23 @@ export async function getAdminUsers() {
     throw new Error("Database not available");
   }
 
+  // Get all leads that have quiz responses (people who took the quiz)
   const records = await db
-    .select({
-      id: users.id,
-      openId: users.openId,
-      name: users.name,
-      email: users.email,
-      loginMethod: users.loginMethod,
-      role: users.role,
-      createdAt: users.createdAt,
-      lastSignedIn: users.lastSignedIn,
-      updatedAt: users.updatedAt,
+    .selectDistinct({
+      id: leads.id,
+      name: sql`SUBSTRING_INDEX(${leads.email}, '@', 1)`.as("name"),
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      createdAt: leads.createdAt,
+      updatedAt: leads.updatedAt,
+      openId: sql`NULL`.as("openId"),
+      loginMethod: sql`'quiz'`.as("loginMethod"),
+      role: sql`'user'`.as("role"),
+      lastSignedIn: leads.updatedAt,
     })
-    .from(users)
-    .orderBy(desc(users.lastSignedIn), desc(users.createdAt));
+    .from(leads)
+    .innerJoin(quizResponses, eq(leads.id, quizResponses.leadId))
+    .orderBy(desc(leads.updatedAt), desc(leads.createdAt));
 
   return records;
 }

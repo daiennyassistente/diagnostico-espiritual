@@ -319,3 +319,8 @@
 - [x] Validar falha com credenciais inválidas
 - [x] Validar falha com usuário inexistente
 - [x] Todos os testes passando (3/3)
+
+## Ajustes Solicitados
+- [x] Modificar seção "Usuários" do AdminDashboard para mostrar todos que fizeram o quiz (leads com respostas) em vez de usuários autenticados
+- [x] Incluir informações de email, WhatsApp e data de resposta na tabela
+- [x] Manter filtro de busca funcional para a nova lista
