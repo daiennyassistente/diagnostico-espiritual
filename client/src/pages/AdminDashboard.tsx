@@ -306,14 +306,22 @@ export default function AdminDashboard() {
                                 </a>
                               )}
                               <button
-                                onClick={() => alert('Funcionalidade de reenvio em desenvolvimento')}
+                                onClick={() => {
+                                  const resendMutation = trpc.admin.resendEmail.useMutation();
+                                  resendMutation.mutate({ email: emailStr, type: 'result' });
+                                }}
                                 className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
                                 title="Reenviar resultado"
                               >
                                 📧
                               </button>
                               <button
-                                onClick={() => alert('Link para resultado + guia em desenvolvimento')}
+                                onClick={() => {
+                                  const linkMutation = trpc.admin.generateDownloadLink.useQuery({ leadId: item.id, type: 'result' });
+                                  if (linkMutation.data?.downloadUrl) {
+                                    window.open(linkMutation.data.downloadUrl, '_blank');
+                                  }
+                                }}
                                 className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
                                 title="Link para resultado + guia"
                               >

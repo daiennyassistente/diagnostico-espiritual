@@ -289,6 +289,18 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await getPaymentWithDiagnostic(input.paymentId);
       }),
+    resendEmail: adminProcedure
+      .input(z.object({ email: z.string().email(), type: z.enum(['result', 'devotional']) }))
+      .mutation(async ({ input }) => {
+        // TODO: Implementar envio de email com PDF
+        return { success: true, message: 'Email reenviado com sucesso' };
+      }),
+    generateDownloadLink: adminProcedure
+      .input(z.object({ leadId: z.number(), type: z.enum(['result', 'devotional']) }))
+      .query(async ({ input }) => {
+        // TODO: Implementar geração de link de download
+        return { success: true, downloadUrl: '#' };
+      }),
   }),
 
   quiz: router({

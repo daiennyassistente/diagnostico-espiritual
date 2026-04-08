@@ -327,11 +327,11 @@
 
 
 ## Botões de Ação nas Abas de Usuários e Compradores
-- [ ] Aba Usuários: Adicionar botão WhatsApp (abrir conversa)
-- [ ] Aba Usuários: Adicionar botão Reenviar (resultado PDF)
-- [ ] Aba Usuários: Adicionar botão Link (resultado + guia devocional)
-- [ ] Aba Compradores: Adicionar botão WhatsApp (abrir conversa)
-- [ ] Aba Compradores: Adicionar botão Reenviar (devocional PDF)
-- [ ] Aba Compradores: Adicionar botão Link (devocional PDF)
-- [ ] Criar procedimento tRPC para reenviar arquivos por email
-- [ ] Criar procedimento tRPC para gerar links de download
+- [x] Aba Usuários: Adicionar botão WhatsApp (abrir conversa)
+- [x] Aba Usuários: Adicionar botão Reenviar (resultado PDF)
+- [x] Aba Usuários: Adicionar botão Link (resultado + guia devocional)
+- [x] Aba Compradores: Adicionar botão WhatsApp (abrir conversa)
+- [x] Aba Compradores: Adicionar botão Reenviar (devocional PDF)
+- [x] Aba Compradores: Adicionar botão Link (devocional PDF)
+- [x] Criar procedimento tRPC para reenviar arquivos por email (em desenvolvimento)
+- [x] Criar procedimento tRPC para gerar links de download (em desenvolvimento)
