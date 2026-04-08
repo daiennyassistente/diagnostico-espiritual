@@ -388,3 +388,4 @@
 - [x] Fazer PDF do devocional usar o mesmo modelo visual do PDF de diagnóstico
 - [x] Testar novo PDF de devocional após compra
 - [x] Alterar fundo para branco com detalhes na paleta de cores
+- [x] Simplificar PDF para apenas texto, sem detalhes visuais
