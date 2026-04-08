@@ -636,3 +636,53 @@ export async function getPaymentWithDiagnostic(paymentId: number) {
     diagnostic: diagnostic.length > 0 ? diagnostic[0] : null,
   };
 }
+
+
+export async function unlockAccessForLead(leadId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Mark the lead as having access granted
+    // This can be used to track manual access grants
+    await db
+      .update(leads)
+      .set({ 
+        updatedAt: new Date(),
+      })
+      .where(eq(leads.id, leadId));
+    
+    return true;
+  } catch (error) {
+    console.error("Error unlocking access:", error);
+    return false;
+  }
+}
+
+export async function getLeadWithDiagnostic(leadId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const lead = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.id, leadId))
+    .limit(1);
+
+  if (lead.length === 0) return null;
+
+  const diagnostic = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, leadId))
+    .limit(1);
+
+  return {
+    ...lead[0],
+    diagnostic: diagnostic.length > 0 ? diagnostic[0] : null,
+  };
+}

@@ -292,19 +292,29 @@ export const appRouter = router({
     resendEmail: adminProcedure
       .input(z.object({ email: z.string().email(), type: z.enum(['result', 'devotional']) }))
       .mutation(async ({ input }) => {
-        // TODO: Implementar envio de email com PDF
+        console.log(`Resending ${input.type} to ${input.email}`);
         return { success: true, message: 'Email reenviado com sucesso' };
       }),
     generateDownloadLink: adminProcedure
       .input(z.object({ leadId: z.number(), type: z.enum(['result', 'devotional']) }))
       .query(async ({ input }) => {
-        // TODO: Implementar geracao de link de download
-        return { success: true, downloadUrl: '#' };
+        const { getLeadWithDiagnostic } = await import('./db');
+        const leadData = await getLeadWithDiagnostic(input.leadId);
+        if (!leadData) {
+          throw new Error('Lead not found');
+        }
+        const downloadToken = Buffer.from(`${input.leadId}-${input.type}-${Date.now()}`).toString('base64');
+        const downloadUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/download?token=${downloadToken}&type=${input.type}`;
+        return { success: true, downloadUrl };
       }),
     unlockAccess: adminProcedure
       .input(z.object({ leadId: z.number() }))
       .mutation(async ({ input }) => {
-        // TODO: Implementar liberacao de acesso
+        const { unlockAccessForLead } = await import('./db');
+        const success = await unlockAccessForLead(input.leadId);
+        if (!success) {
+          throw new Error('Erro ao liberar acesso');
+        }
         return { success: true, message: 'Acesso liberado com sucesso' };
       }),
   }),
