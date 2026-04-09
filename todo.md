@@ -449,4 +449,22 @@
 - [x] Criar testes vitest para validar o fluxo completo
 - [x] Corrigir função createQuizResponse para retornar ID inserido
 - [x] Todos os testes passando (4/4)
-- [ ] Salvar checkpoint final após validação
+- [x] Validar fluxo no navegador (nome, perguntas, avanço automático)
+- [x] Salvar checkpoint final após validação
+
+
+## Atualizacao da Oferta e PDF (2026-04-09)
+- [x] Atualizar pagina de resultado com nova oferta otimizada
+  - [x] Headline: "Voce nao precisa continuar se sentindo distante de Deus."
+  - [x] Subheadline: "Esse plano simples de 7 dias ja ajudou muitas pessoas..."
+  - [x] CTA: "Quero me reconectar com Deus"
+  - [x] Personalizacao: "Baseado nas suas respostas, recomendamos..."
+  - [x] Nome do produto: "Devocional: 7 Dias para se Reconectar com Deus"
+  - [x] Secao "O que voce recebe" com 5 itens
+  - [x] Bonus: "Checklist diario com Deus"
+- [x] Gerar PDF devocional "7 Dias para se Reconectar com Deus"
+  - [x] Usar modelo fornecido (DearMs.Carpenter.pdf)
+  - [x] Copiar modelo para cover-template.pdf
+  - [x] Sistema configurado para usar modelo como capa
+- [ ] Testar fluxo completo (quiz → resultado → PDF)
+- [ ] Salvar checkpoint final

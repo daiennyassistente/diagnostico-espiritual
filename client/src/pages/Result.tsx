@@ -523,52 +523,68 @@ export default function Result() {
             </span>
           </div>
 
-          {/* Título da oferta */}
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
-            📖 Devocional: 7 Dias para se Aproximar de Deus
+          {/* Headline Principal */}
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-4">
+            Você não precisa continuar se sentindo distante de Deus.
           </h2>
-          <p className="text-center text-accent font-semibold mb-6">
-            Personalizado especialmente para você, {userName}
+
+          {/* Subheadline */}
+          <p className="text-center text-lg text-foreground/90 mb-6 leading-relaxed">
+            Esse plano simples de 7 dias já ajudou muitas pessoas a retomarem sua vida espiritual — mesmo começando do zero.
           </p>
 
-          {/* Descrição emocional e urgente */}
-          <div className="bg-white/60 rounded-lg p-6 mb-6">
-            <p className="text-foreground text-center leading-relaxed font-semibold mb-3">
-              Você recebeu seu diagnóstico. Agora é hora de <strong>agir</strong>.
-            </p>
-            <p className="text-foreground text-center leading-relaxed">
-              Este devocional foi criado especialmente para sua situação espiritual. Com base em seu resultado, você receberá 7 dias de reflexões bíblicas profundas, práticas espirituais e orações que vão transformar sua conexão com Deus.
-            </p>
-            <p className="text-foreground/80 text-center text-sm mt-4 italic">
-              Cada dia foi pensado para ajudar você a sair dessa fase e retomar uma vida espiritual plena e significativa.
+          {/* Título do Produto */}
+          <div className="text-center mb-6 p-4 bg-white/60 rounded-lg">
+            <h3 className="text-2xl font-bold text-accent mb-2">📖 Devocional: 7 Dias para se Reconectar com Deus</h3>
+            <p className="text-foreground font-semibold">
+              Baseado nas suas respostas, recomendamos que você comece hoje esse devocional.
             </p>
           </div>
 
-          {/* Benefícios do guia */}
-          <div className="space-y-3 mb-8">
-            <div className="flex items-start gap-3">
-              <Heart className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-foreground">100% Personalizado para Você</p>
-                <p className="text-sm text-foreground/80">Baseado especificamente no seu diagnóstico e desafios espirituais</p>
-              </div>
-            </div>
+          {/* Descrição emocional e urgente */}
+          <div className="bg-white/60 rounded-lg p-6 mb-6">
+            <p className="text-foreground text-center leading-relaxed mb-3">
+              <strong>Em apenas 7 dias, você pode restaurar sua conexão com Deus, voltar a sentir paz e ter direção espiritual novamente.</strong>
+            </p>
+            <p className="text-foreground text-center leading-relaxed mb-4">
+              Mesmo que você esteja sem rotina, sem força ou se sentindo distante.
+            </p>
+            <p className="text-foreground text-center leading-relaxed">
+              Este devocional foi criado especialmente para sua situação espiritual. Você receberá 7 dias de reflexões bíblicas profundas, versículos específicos por situação, práticas espirituais diárias (5-10 min) e direcionamento espiritual baseado no seu resultado.
+            </p>
+          </div>
 
-            <div className="flex items-start gap-3">
-              <BookOpen className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-foreground">Fundamentado na Bíblia</p>
-                <p className="text-sm text-foreground/80">Cada dia inclui versículos, reflexões profundas e aplicações práticas baseadas na Palavra de Deus</p>
+          {/* O que você recebe */}
+          <div className="bg-white/40 rounded-lg p-6 mb-8">
+            <h4 className="font-bold text-foreground mb-4 text-center">📦 O que você recebe:</h4>
+            <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <span className="text-accent text-xl">✓</span>
+                <p className="text-foreground">Devocional guiado (7 dias)</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-accent text-xl">✓</span>
+                <p className="text-foreground">Versículos específicos por situação</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-accent text-xl">✓</span>
+                <p className="text-foreground">Reflexões simples e profundas</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-accent text-xl">✓</span>
+                <p className="text-foreground">Passos práticos diários (5–10 min)</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-accent text-xl">✓</span>
+                <p className="text-foreground">Direcionamento espiritual baseado no resultado</p>
               </div>
             </div>
+          </div>
 
-            <div className="flex items-start gap-3">
-              <Zap className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-foreground">Transformação Real em 7 Dias</p>
-                <p className="text-sm text-foreground/80">Práticas espirituais diárias que você pode começar hoje mesmo</p>
-              </div>
-            </div>
+          {/* Bônus */}
+          <div className="bg-accent/10 rounded-lg p-4 mb-8 border border-accent/30">
+            <h4 className="font-bold text-accent mb-2 text-center">🎁 BÔNUS ESPECIAL</h4>
+            <p className="text-center text-foreground font-semibold">✓ Checklist diário com Deus</p>
           </div>
 
           {/* Preço e CTA com Contador de Urgência */}
@@ -604,8 +620,8 @@ export default function Result() {
                 </>
               ) : (
                 <>
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  Adquirir Agora por R$ 12,90
+                  <Heart className="w-5 h-5 mr-2" />
+                  Quero me reconectar com Deus
                 </>
               )}
             </Button>
