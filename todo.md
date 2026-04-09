@@ -405,3 +405,5 @@
 - [x] Erro ao redirecionar após pagamento Mercado Pago - CORRIGIDO (webhook criado)
 - [x] PDF não está sendo enviado por email após pagamento confirmado - CORRIGIDO (webhook criado)
 - [x] Webhook do Mercado Pago pode não estar disparando corretamente - CORRIGIDO (webhook criado e registrado)
+
+- [ ] Configurar webhook no painel do Mercado Pago (URL: https://espiritualquiz-sx87ncqt.manus.space/api/mercadopago/webhook)

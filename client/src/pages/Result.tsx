@@ -607,7 +607,7 @@ export default function Result() {
           <div className="text-center mb-6">
             <p className="text-sm text-foreground/70 mb-2">Investimento único:</p>
             <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="text-4xl font-bold text-accent">R$ 9,90</span>
+              <span className="text-4xl font-bold text-accent">R$ 12,90</span>
             </div>
             <p className="text-xs text-foreground/60">Acesso imediato ao PDF + Suporte por 7 dias</p>
           </div>

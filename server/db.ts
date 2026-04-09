@@ -491,7 +491,7 @@ export async function getUserByName(name: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function createOrUpdateAdminUser(name: string, password: string) {
+export async function createOrUpdateAdminUser(name: string, password: string, email?: string) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -499,8 +499,13 @@ export async function createOrUpdateAdminUser(name: string, password: string) {
 
   const passwordHash = hashPassword(password);
   const openId = `admin-${name}-${Date.now()}`;
+  const adminEmail = email || `${name.toLowerCase()}@example.com`;
 
-  const existingUser = await getUserByName(name);
+  // Try to find by email first, then by name
+  let existingUser: typeof users.$inferSelect | undefined = email ? await db.select().from(users).where(eq(users.email, email)).limit(1).then(r => r[0]) : undefined;
+  if (!existingUser) {
+    existingUser = await getUserByName(name);
+  }
   
   if (existingUser) {
     // Update existing user
@@ -509,6 +514,7 @@ export async function createOrUpdateAdminUser(name: string, password: string) {
       .set({
         passwordHash,
         role: "admin",
+        email: adminEmail,
         updatedAt: new Date(),
       })
       .where(eq(users.id, existingUser.id));
@@ -518,6 +524,7 @@ export async function createOrUpdateAdminUser(name: string, password: string) {
     const result = await db.insert(users).values({
       openId,
       name,
+      email: adminEmail,
       passwordHash,
       role: "admin",
       loginMethod: "password",
@@ -526,7 +533,7 @@ export async function createOrUpdateAdminUser(name: string, password: string) {
       lastSignedIn: new Date(),
     });
     
-    return await getUserByName(name);
+    return await db.select().from(users).where(eq(users.email, adminEmail)).limit(1).then(r => r[0]);
   }
 }
 

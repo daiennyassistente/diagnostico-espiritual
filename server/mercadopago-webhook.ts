@@ -6,7 +6,12 @@ import { sendDevotionalConfirmationEmail } from "./email-service";
 
 export async function handleMercadoPagoWebhook(req: Request, res: Response) {
   try {
-    const { action, data } = req.body;
+    // Parse JSON from raw body if needed
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+    const { action, data } = body;
 
     console.log(`[Mercado Pago Webhook] Received event: ${action}`);
 
@@ -78,6 +83,9 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
           }
 
           if (leadId) {
+            // Gerar token de download
+            const downloadToken = Buffer.from(`${leadId}-${paymentId}-${Date.now()}`).toString('base64');
+
             // Inserir novo pagamento
             await db.insert(payments).values({
               leadId: leadId,
@@ -85,13 +93,14 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
               amount: Math.round(amount),
               status: "succeeded",
               productName: "Devocional: 7 Dias para se Aproximar de Deus",
+              downloadToken: downloadToken,
             })
 
-            console.log(`[Mercado Pago Webhook] Payment recorded for lead ${leadId}`);
+            console.log(`[Mercado Pago Webhook] Payment recorded for lead ${leadId} with token ${downloadToken}`);
 
             // Enviar email com PDF devocional
             try {
-              const downloadLink = `${process.env.FRONTEND_URL || "https://espiritualquiz-sx87ncqt.manus.space"}/checkout-success`;
+              const downloadLink = `${process.env.FRONTEND_URL || "https://espiritualquiz-sx87ncqt.manus.space"}/checkout-success?token=${downloadToken}`;
 
               const emailSent = await sendDevotionalConfirmationEmail(
                 leadEmail,

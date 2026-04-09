@@ -66,6 +66,7 @@ export const payments = mysqlTable("payments", {
   currency: varchar("currency", { length: 10 }).default("brl").notNull(),
   status: mysqlEnum("status", ["pending", "succeeded", "failed", "canceled", "approved"]).default("pending").notNull(),
   productName: text("productName").notNull(),
+  downloadToken: varchar("downloadToken", { length: 255 }), // Token para download do PDF
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

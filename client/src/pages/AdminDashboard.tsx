@@ -155,10 +155,44 @@ function MetricCard({
   );
 }
 
+function ActionButton({
+  icon,
+  title,
+  bgColor,
+  textColor,
+  hoverColor,
+  onClick,
+  isLoading,
+}: {
+  icon: string;
+  title: string;
+  bgColor: string;
+  textColor: string;
+  hoverColor: string;
+  onClick: () => void;
+  isLoading?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={isLoading}
+      className={`inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg ${bgColor} ${textColor} ${hoverColor} transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+      title={title}
+    >
+      {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : icon}
+    </button>
+  );
+}
+
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+
+  // Mutações para ações dos botões
+  const resendEmailMutation = trpc.admin.resendEmail.useMutation();
+  const generateLinkMutation = trpc.admin.generateDownloadLink.useMutation();
+  const unlockAccessMutation = trpc.admin.unlockAccess.useMutation();
 
   const snapshotQuery = trpc.admin.snapshot.useQuery(undefined, {
     enabled: user?.role === "admin",
@@ -305,38 +339,39 @@ export default function AdminDashboard() {
                                   💬
                                 </a>
                               )}
-                              <button
-                                onClick={() => {
-                                  const resendMutation = trpc.admin.resendEmail.useMutation();
-                                  resendMutation.mutate({ email: emailStr, type: 'result' });
-                                }}
-                                className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                              <ActionButton
+                                icon="📧"
                                 title="Reenviar resultado"
-                              >
-                                📧
-                              </button>
-                              <button
+                                bgColor="bg-blue-100"
+                                textColor="text-blue-700"
+                                hoverColor="hover:bg-blue-200"
                                 onClick={() => {
-                                  const linkMutation = trpc.admin.generateDownloadLink.useQuery({ leadId: item.id, type: 'result' });
-                                  if (linkMutation.data?.downloadUrl) {
-                                    window.open(linkMutation.data.downloadUrl, '_blank');
-                                  }
+                                  resendEmailMutation.mutate({ email: emailStr, type: 'result' });
                                 }}
-                                className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
+                                isLoading={resendEmailMutation.isPending}
+                              />
+                              <ActionButton
+                                icon="🔗"
                                 title="Link para resultado + guia"
-                              >
-                                🔗
-                              </button>
-                              <button
+                                bgColor="bg-amber-100"
+                                textColor="text-amber-700"
+                                hoverColor="hover:bg-amber-200"
                                 onClick={() => {
-                                  const unlockMutation = trpc.admin.unlockAccess.useMutation();
-                                  unlockMutation.mutate({ leadId: item.id });
+                                  generateLinkMutation.mutate({ leadId: item.id, type: 'result' });
                                 }}
-                                className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+                                isLoading={generateLinkMutation.isPending}
+                              />
+                              <ActionButton
+                                icon="🔓"
                                 title="Liberar acesso"
-                              >
-                                🔓
-                              </button>
+                                bgColor="bg-purple-100"
+                                textColor="text-purple-700"
+                                hoverColor="hover:bg-purple-200"
+                                onClick={() => {
+                                  unlockAccessMutation.mutate({ leadId: item.id });
+                                }}
+                                isLoading={unlockAccessMutation.isPending}
+                              />
                             </div>
                           </td>
                         </tr>
