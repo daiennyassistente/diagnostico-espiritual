@@ -171,30 +171,6 @@ export default function CheckoutSuccess() {
           </ul>
         </div>
 
-        {/* Próximos passos */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-foreground mb-4">
-            ⏭️ Próximos Passos:
-          </h2>
-          <ol className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="font-bold text-accent">1.</span>
-              <p className="text-foreground">Baixe seu devocional em PDF usando o botão abaixo</p>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="font-bold text-accent">2.</span>
-              <p className="text-foreground">Comece hoje mesmo com o Dia 1 — não tenha pressa</p>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="font-bold text-accent">3.</span>
-              <p className="text-foreground">Dedique 10-15 minutos cada dia para ler e refletir</p>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="font-bold text-accent">4.</span>
-              <p className="text-foreground">Permita que Deus trabalhe em você durante estes 7 dias</p>
-            </li>
-          </ol>
-        </div>
 
         {/* Botões de ação */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">

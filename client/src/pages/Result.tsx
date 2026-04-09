@@ -453,22 +453,6 @@ export default function Result() {
           </div>
         </div>
 
-        {/* 🎯 PRÓXIMAS AÇÕES - Recomendações Práticas */}
-        <div className="mb-8 p-6 bg-blue-50/30 rounded-lg border border-blue-200/50">
-          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span className="text-2xl">🎯</span> Seus Próximos Passos
-          </h3>
-          <div className="space-y-3">
-            {result.recommendations.map((rec, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <span className="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0">
-                  {index + 1}
-                </span>
-                <p className="text-foreground">{rec}</p>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Botões de ação secundários */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -611,17 +595,18 @@ export default function Result() {
             <Button
               onClick={() => handleBuyGuide('mercadopago')}
               disabled={isBuyingGuide}
-              className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 text-lg"
+              className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-3 md:py-6 text-sm md:text-lg rounded-lg transition-all duration-200 h-auto"
             >
               {isBuyingGuide && paymentMethod === 'mercadopago' ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="w-4 md:w-5 h-4 md:h-5 mr-2 animate-spin" />
                   Processando...
                 </>
               ) : (
                 <>
-                  <Heart className="w-5 h-5 mr-2" />
-                  Quero me reconectar com Deus
+                  <Heart className="w-4 md:w-5 h-4 md:h-5 mr-2" />
+                  <span className="hidden sm:inline">Quero me reconectar com Deus</span>
+                  <span className="sm:hidden">Reconectar com Deus</span>
                 </>
               )}
             </Button>
