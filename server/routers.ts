@@ -266,6 +266,40 @@ export const appRouter = router({
   }),
 
   admin: router({
+    // Admin Login
+    login: publicProcedure
+      .input(z.object({ username: z.string(), password: z.string() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { getAdminByUsername } = await import('./db');
+          
+          const admin = await getAdminByUsername(input.username);
+
+          if (!admin) {
+            return { success: false, message: "Usuário ou senha incorretos" };
+          }
+
+          // Compare password
+          const passwordMatch = input.password === admin.passwordHash;
+
+          if (!passwordMatch) {
+            return { success: false, message: "Usuário ou senha incorretos" };
+          }
+
+          // Generate a simple token
+          const token = Buffer.from(`${admin.id}:${Date.now()}`).toString('base64');
+          
+          return { 
+            success: true, 
+            token,
+            admin: { id: admin.id, username: admin.username }
+          };
+        } catch (error) {
+          console.error("Erro ao fazer login do admin:", error);
+          return { success: false, message: "Erro ao fazer login" };
+        }
+      }),
+
     // Quiz Questions Management
     getQuestions: adminProcedure.query(async () => {
       const { getAllQuizQuestions } = await import('./db');

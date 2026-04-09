@@ -104,3 +104,15 @@ export const quizQuestions = mysqlTable("quiz_questions", {
 
 export type QuizQuestion = typeof quizQuestions.$inferSelect;
 export type InsertQuizQuestion = typeof quizQuestions.$inferInsert;
+
+export const admins = mysqlTable("admins", {
+  id: int("id").autoincrement().primaryKey(),
+  username: varchar("username", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Admin = typeof admins.$inferSelect;
+export type InsertAdmin = typeof admins.$inferInsert;

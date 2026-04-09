@@ -6,24 +6,39 @@ import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 
 export function AdminLogin() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
 
-  const loginMutation = trpc.auth.loginWithPassword.useMutation({
-    onSuccess: () => {
-      setLocation("/admin");
+  const loginMutation = trpc.admin.login.useMutation({
+    onSuccess: (data) => {
+      if (data.success && data.token) {
+        localStorage.setItem("adminToken", data.token);
+        setLocation("/admin-dashboard");
+      } else {
+        setError(data.message || "Erro ao fazer login");
+      }
     },
     onError: (err) => {
-      setError(err.message || "Erro ao fazer login");
+      setError("Usuário ou senha incorretos");
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    loginMutation.mutate({ email, password });
+    
+    if (!username || !password) {
+      setError("Por favor, preencha todos os campos");
+      return;
+    }
+    
+    setIsLoading(true);
+    loginMutation.mutate({ username, password }, {
+      onSettled: () => setIsLoading(false),
+    });
   };
 
   return (
@@ -40,14 +55,14 @@ export function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                E-mail
+                Usuário
               </label>
               <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Digite seu e-mail"
-                disabled={loginMutation.isPending}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Digite seu usuário"
+                disabled={isLoading}
                 className="w-full"
               />
             </div>
@@ -61,7 +76,7 @@ export function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Digite sua senha"
-                disabled={loginMutation.isPending}
+                disabled={isLoading}
                 className="w-full"
               />
             </div>
@@ -74,7 +89,7 @@ export function AdminLogin() {
 
             <Button
               type="submit"
-              disabled={loginMutation.isPending || !email || !password}
+              disabled={isLoading || !username || !password}
               className="w-full bg-amber-900 hover:bg-amber-800"
             >
               {loginMutation.isPending ? "Entrando..." : "Entrar"}

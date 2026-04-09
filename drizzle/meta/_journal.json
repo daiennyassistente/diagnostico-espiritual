@@ -64,6 +64,13 @@
       "when": 1775745861266,
       "tag": "0008_crazy_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1775756345236,
+      "tag": "0009_red_nightcrawler",
+      "breakpoints": true
     }
   ]
 }

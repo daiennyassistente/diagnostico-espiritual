@@ -12,6 +12,7 @@ import {
   payments,
   quizResponses,
   users,
+  admins,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -805,4 +806,20 @@ export async function getDiagnosticByLeadId(leadId: number) {
     .limit(1);
 
   return result.length > 0 ? result[0] : null;
+}
+
+
+export async function getAdminByUsername(username: string) {
+  const db = await getDb();
+  if (!db) {
+    return null;
+  }
+
+  try {
+    const result = await db.select().from(admins).where(eq(admins.username, username));
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("Error getting admin by username:", error);
+    return null;
+  }
 }

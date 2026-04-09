@@ -492,3 +492,26 @@
   - [x] Texto responsivo (hidden sm:inline)
 - [x] Testar todas as mudanças
 - [x] Salvar checkpoint final
+
+
+## Login da Admin e Correcao do PIX (2026-04-09)
+- [x] Criar tabela de admin no banco de dados (username, password_hash)
+- [x] Inserir usuario daienny com senha vitoria1023
+- [x] Criar pagina de login da admin (/admin-login)
+  - [x] Campo de usuario
+  - [x] Campo de senha
+  - [x] Botao de login
+  - [x] Validacao de credenciais
+- [x] Criar procedimento tRPC para autenticacao da admin
+  - [x] admin.login (username, password)
+  - [x] Retornar token de sessao
+- [x] Integrar login com sistema de sessao
+  - [x] Salvar token no localStorage
+  - [x] Proteger rotas da admin
+- [x] Corrigir botao de gerar PIX
+  - [x] Verificar integracao com Mercado Pago
+  - [x] Testar geracao de link PIX
+  - [x] Corrigir erro de navigator no servidor
+  - [x] Remover logica que nao funciona no servidor Node.js
+- [x] Testar fluxo completo de login e PIX
+- [ ] Salvar checkpoint final

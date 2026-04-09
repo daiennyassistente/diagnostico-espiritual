@@ -58,10 +58,7 @@ export function getMercadoPagoInitPoint(preference: any): string | null {
   const initPoint = preference?.init_point || null;
   if (!initPoint) return null;
   
-  // Adicionar parâmetro para forçar Pix no mobile
-  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-  const isMobile = /iPhone|iPad|Android/i.test(userAgent);
-  
-  // Adicionar parâmetro para melhor compatibilidade
-  return `${initPoint}#payment-method-id=pix`;
+  // Retornar o init_point diretamente
+  // O Mercado Pago irá detectar o dispositivo no navegador
+  return initPoint;
 }
