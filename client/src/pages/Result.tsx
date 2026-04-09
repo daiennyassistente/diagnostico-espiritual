@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2, Share2, RotateCcw, Heart, BookOpen, Zap } from "lucide-react";
@@ -18,14 +18,41 @@ export default function Result() {
   const [, setLocation] = useLocation();
   const [result, setResult] = useState<AIResult | null>(null);
   const [responses, setResponses] = useState<Record<string, string> | null>(null);
+  const [userName, setUserName] = useState<string>("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSharing, setIsSharing] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 horas em segundos
   const fallbackTimeoutRef = useRef<number | null>(null);
   const generationStartedRef = useRef(false);
+  const timerRef = useRef<number | null>(null);
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
+
+  // Timer para contar o tempo restante
+  useEffect(() => {
+    timerRef.current = window.setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const formatTimeLeft = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   const clearQuizSessionState = () => {
     if (typeof window === "undefined") return;
@@ -62,6 +89,10 @@ export default function Result() {
 
     const parsed = JSON.parse(savedResponses);
     setResponses(parsed);
+    
+    // Extrair o nome da primeira resposta (pergunta 1)
+    const name = parsed[0] || "Querido(a)";
+    setUserName(name);
 
     const storedLeadId = localStorage.getItem("quizLeadId");
     const parsedLeadId = storedLeadId ? Number(storedLeadId) : undefined;
@@ -98,114 +129,56 @@ export default function Result() {
           profileDescription: "Você está em um momento de renovação espiritual. Existe dentro de você um desejo verdadeiro de voltar ao secreto, reconstruir sua constância e se aproximar de Deus com mais leveza e sinceridade.",
           strengths: ["Disposição para recomeçar", "Sensibilidade espiritual", "Humildade para reconhecer a necessidade de Deus"],
           challenges: ["Manter constância", "Superar culpa ou frustração", "Voltar à rotina espiritual com paz"],
-          recommendations: ["Separe alguns minutos diários para oração simples", "Recomece pela Palavra com metas pequenas", "Busque apoio espiritual de alguém maduro na fé"],
-          nextSteps: ["Dê hoje um passo simples e consistente na sua caminhada com Deus."]
-        };
-      }
-
-      if (step10.includes("cansada") || step5.includes("Paz") || step5.includes("paz")) {
-        return {
-          profileName: "😔 Fé Cansada",
-          profileDescription: "Você ama a Deus, mas tem carregado um peso maior do que deveria. Seu coração precisa de descanso, cuidado e renovação para voltar a viver a presença de Deus com profundidade e paz.",
-          strengths: ["Desejo de permanecer na fé", "Consciência de que precisa de cuidado", "História de caminhada com Deus"],
-          challenges: ["Cansaço emocional e espiritual", "Desânimo", "Dificuldade de manter energia espiritual"],
-          recommendations: ["Simplifique sua rotina devocional por alguns dias", "Escolha passagens bíblicas de descanso e esperança", "Ore com honestidade, sem tentar performar"],
-          nextSteps: ["Permita-se descansar em Deus antes de tentar acelerar novamente."]
-        };
-      }
-
-      if (step10.includes("Travada") || step10.includes("travada") || step3.includes("parada")) {
-        return {
-          profileName: "🔗 Travada Espiritualmente",
-          profileDescription: "Você sente que existe algo interrompendo seu avanço espiritual. Há sede de mudança, mas também bloqueios internos que precisam ser identificados e tratados com verdade, oração e constância.",
-          strengths: ["Consciência do bloqueio", "Desejo real de mudança", "Potencial de transformação"],
-          challenges: ["Romper ciclos repetitivos", "Retomar foco espiritual", "Vencer travas emocionais"],
-          recommendations: ["Anote os padrões que mais te afastam de Deus", "Ore com objetividade sobre suas travas", "Busque aconselhamento cristão se possível"],
-          nextSteps: ["Seu próximo passo é identificar a raiz do que tem te paralisado."]
-        };
-      }
-
-      if (step10.includes("Amadurecendo") || step10.includes("amadurecendo") || step3.includes("Frequente e profunda") || step3.includes("frequente e profunda")) {
-        return {
-          profileName: "🌳 Amadurecendo na Fé",
-          profileDescription: "Você está em uma fase saudável de crescimento espiritual. Há sinais de profundidade, sede pela Palavra e disposição para viver uma caminhada mais consistente, madura e frutífera.",
-          strengths: ["Constância crescente", "Desejo de profundidade", "Capacidade de amadurecer com propósito"],
-          challenges: ["Evitar acomodação", "Continuar avançando", "Manter sensibilidade espiritual"],
-          recommendations: ["Aprofunde seu tempo de estudo bíblico", "Transforme constância em estilo de vida", "Sirva outras pessoas com aquilo que Deus já te ensinou"],
-          nextSteps: ["Continue crescendo com constância e intencionalidade diante de Deus."]
-        };
-      }
-
-      if (step5.includes("Direção") || step5.includes("direção") || step1.includes("sem direção") || step10.includes("fome")) {
-        return {
-          profileName: "🧭 Buscando Direção",
-          profileDescription: "Você tem fome de Deus e quer viver algo mais profundo, mas ainda sente falta de clareza para entender o próximo passo. Deus está trabalhando direção no meio da sua busca sincera.",
-          strengths: ["Fome espiritual genuína", "Desejo de ouvir Deus", "Abertura para mudança"],
-          challenges: ["Confusão sobre o próximo passo", "Ansiedade por respostas rápidas", "Dificuldade em discernir direção"],
-          recommendations: ["Separe tempo de silêncio e oração", "Leia a Bíblia buscando princípios de direção", "Evite decisões precipitadas enquanto busca clareza"],
-          nextSteps: ["Deus pode estar te guiando primeiro à clareza interior, antes da resposta externa."]
-        };
-      }
-
-      if (step4.includes("instável") || step4.includes("pouco constante") || step3.includes("Irregular") || step3.includes("irregular")) {
-        return {
-          profileName: "📈 Fé Inconsistente",
-          profileDescription: "Sua caminhada com Deus tem sido marcada por fases de aproximação e afastamento. Ainda assim, existe dentro de você um desejo verdadeiro de viver uma constância mais saudável e madura.",
-          strengths: ["Desejo sincero de estar com Deus", "Consciência dos altos e baixos", "Capacidade de recomeçar"],
-          challenges: ["Falta de consistência", "Oscilações emocionais", "Dificuldade em manter disciplina"],
-          recommendations: ["Crie uma rotina espiritual simples e realista", "Associe seu momento com Deus a um horário fixo", "Evite metas grandes demais no início"],
-          nextSteps: ["Pequenos passos consistentes vão te levar mais longe do que grandes promessas ocasionais."]
+          recommendations: ["Comece pequeno: 5 minutos diários de oração", "Escolha um versículo para meditar cada dia", "Encontre um grupo de oração ou comunidade de fé"],
+          nextSteps: ["Seu próximo passo é retomar a disciplina espiritual com compaixão por si mesmo. Deus não se afastou de você."],
         };
       }
 
       return {
-        profileName: "✨ Caminho de Crescimento",
-        profileDescription: "Seu diagnóstico mostra que você está em um processo de crescimento espiritual com áreas importantes a fortalecer. Há potencial, fome e espaço para viver uma caminhada mais profunda com Deus a partir de agora.",
-        strengths: ["Desejo de crescer", "Abertura para aprender", "Sensibilidade espiritual"],
-        challenges: ["Criar constância", "Manter foco", "Transformar intenção em prática"],
-        recommendations: ["Escolha um horário diário para se dedicar a Deus", "Comece com um plano bíblico simples", "Ore com constância, mesmo que por poucos minutos"],
-        nextSteps: ["Seu próximo nível espiritual começa com consistência nas pequenas decisões."]
+        profileName: "✨ Buscador de Profundidade",
+        profileDescription: "Sua vida espiritual está em transição. Você sente o chamado de Deus, mas enfrenta distrações e inconstância que impedem uma conexão mais profunda.",
+        strengths: ["Sensibilidade espiritual aguçada", "Desejo genuíno de crescimento", "Capacidade de reflexão"],
+        challenges: ["Manter disciplina espiritual", "Lidar com distrações do mundo", "Encontrar consistência na oração"],
+        recommendations: ["Estabeleça um tempo fixo para oração diária", "Crie um espaço sagrado em sua casa", "Busque orientação espiritual de alguém de confiança"],
+        nextSteps: ["O próximo passo é transformar seu desejo em ação. Comece hoje mesmo."],
       };
     };
 
-    const applyFallbackResult = (message?: string) => {
+    const applyFallbackResult = (message: string) => {
       const fallbackResult = buildFallbackResult(parsed);
       setResult(fallbackResult);
       localStorage.setItem("quizResult", JSON.stringify(fallbackResult));
-      if (message) {
-        toast.error(message);
-      }
       setIsLoading(false);
       clearQuizSessionState();
     };
 
-    fallbackTimeoutRef.current = window.setTimeout(() => {
-      applyFallbackResult("A análise inteligente demorou mais que o esperado. Exibimos seu diagnóstico com base nas respostas do quiz.");
-    }, 8000);
-
-    generateResultMutation.mutate(
-      { responses: parsed, leadId },
-      {
-        onSuccess: (data: any) => {
-          if (fallbackTimeoutRef.current) {
-            window.clearTimeout(fallbackTimeoutRef.current);
-            fallbackTimeoutRef.current = null;
-          }
-          setResult(data);
-          localStorage.setItem("quizResult", JSON.stringify(data));
-          setIsLoading(false);
-          clearQuizSessionState();
-        },
-        onError: (error) => {
-          console.error("Erro ao gerar resultado:", error);
-          if (fallbackTimeoutRef.current) {
-            window.clearTimeout(fallbackTimeoutRef.current);
-            fallbackTimeoutRef.current = null;
-          }
-          applyFallbackResult("A análise instantânea ficou indisponível. Exibimos seu diagnóstico com base nas respostas do quiz.");
-        },
-      }
-    );
+    // Se houver leadId, tentar gerar resultado com IA
+    if (leadId) {
+      generateResultMutation.mutate(
+        { leadId, responses: parsed },
+        {
+          onSuccess: (data: any) => {
+            if (data.success && data) {
+              setResult(data);
+              localStorage.setItem("quizResult", JSON.stringify(data));
+              setIsLoading(false);
+              clearQuizSessionState();
+            } else {
+              applyFallbackResult("Resultado gerado com base em suas respostas.");
+            }
+          },
+          onError: () => {
+            if (fallbackTimeoutRef.current) {
+              window.clearTimeout(fallbackTimeoutRef.current);
+              fallbackTimeoutRef.current = null;
+            }
+            applyFallbackResult("A análise instantânea ficou indisponível. Exibimos seu diagnóstico com base nas respostas do quiz.");
+          },
+        }
+      );
+    } else {
+      applyFallbackResult("Resultado gerado com base em suas respostas.");
+    }
 
     return () => {
       if (fallbackTimeoutRef.current) {
@@ -231,7 +204,6 @@ export default function Result() {
       });
 
       if (pdfResponse.success && pdfResponse.pdfBase64) {
-        // Converter base64 para Blob
         const binaryString = atob(pdfResponse.pdfBase64);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
@@ -239,10 +211,8 @@ export default function Result() {
         }
         const blob = new Blob([bytes], { type: 'application/pdf' });
         
-        // Criar URL do blob
         const url = URL.createObjectURL(blob);
         
-        // Criar link e fazer download
         const link = document.createElement('a');
         link.href = url;
         link.download = 'diagnostico-espiritual.pdf';
@@ -250,7 +220,6 @@ export default function Result() {
         link.click();
         document.body.removeChild(link);
         
-        // Limpar URL do blob
         URL.revokeObjectURL(url);
         
         toast.success("PDF baixado com sucesso!");
@@ -295,7 +264,6 @@ export default function Result() {
         window.open(linkedinUrl, '_blank', 'width=600,height=400');
         toast.success("Abrindo LinkedIn...");
       } else {
-        // Tentar usar Web Share API primeiro (mobile)
         if (navigator.share) {
           await navigator.share({
             title: "Meu Diagnóstico Espiritual",
@@ -303,13 +271,11 @@ export default function Result() {
             url: currentUrl,
           });
         } else {
-          // Fallback: copiar para clipboard
           await navigator.clipboard.writeText(text);
           toast.success("Resultado copiado para a área de transferência!");
         }
       }
     } catch (error) {
-      // Se tudo falhar, copiar para clipboard
       try {
         await navigator.clipboard.writeText(text);
         toast.success("Resultado copiado para a área de transferência!");
@@ -332,7 +298,6 @@ export default function Result() {
     setIsBuyingGuide(true);
     setPaymentMethod(method);
     
-    // Obter email do localStorage (salvo durante captura de leads)
     const leadData = localStorage.getItem("leadData");
     if (!leadData) {
       toast.error("Email não encontrado. Por favor, complete o quiz novamente.");
@@ -350,17 +315,16 @@ export default function Result() {
           profileName: result.profileName,
         },
         {
-          onSuccess: (data: any) => {
-            if (data.checkoutUrl) {
-              window.location.href = data.checkoutUrl;
-              toast.success("Redirecionando para o checkout...");
+          onSuccess: (data) => {
+            if (data.success && data.checkoutUrl) {
+              window.open(data.checkoutUrl, '_blank');
+              toast.success("Abrindo checkout...");
             }
+            setIsBuyingGuide(false);
+            setPaymentMethod(null);
           },
-          onError: (error: any) => {
-            console.error("Erro ao criar checkout:", error);
-            toast.error("Erro ao processar pagamento. Tente novamente.");
-          },
-          onSettled: () => {
+          onError: () => {
+            toast.error("Erro ao criar checkout");
             setIsBuyingGuide(false);
             setPaymentMethod(null);
           },
@@ -373,17 +337,16 @@ export default function Result() {
           profileName: result.profileName,
         },
         {
-          onSuccess: (data: any) => {
-            if (data.checkoutUrl) {
-              window.location.href = data.checkoutUrl;
-              toast.success("Redirecionando para o Pix...");
+          onSuccess: (data) => {
+            if (data.success && data.checkoutUrl) {
+              window.open(data.checkoutUrl, '_blank');
+              toast.success("Abrindo checkout...");
             }
+            setIsBuyingGuide(false);
+            setPaymentMethod(null);
           },
-          onError: (error: any) => {
-            console.error("Erro ao criar checkout Mercado Pago:", error);
-            toast.error("Erro ao processar pagamento. Tente novamente.");
-          },
-          onSettled: () => {
+          onError: () => {
+            toast.error("Erro ao criar checkout");
             setIsBuyingGuide(false);
             setPaymentMethod(null);
           },
@@ -396,7 +359,7 @@ export default function Result() {
     return (
       <div className="spiritual-background min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin text-5xl mb-4">✨</div>
+          <Loader2 className="w-12 h-12 animate-spin text-accent mx-auto mb-4" />
           <p className="text-foreground text-lg">Gerando seu diagnóstico personalizado...</p>
           <p className="text-foreground/70 text-sm mt-2">Se a análise inteligente demorar, mostraremos automaticamente um resultado com base nas suas respostas.</p>
         </div>
@@ -425,80 +388,89 @@ export default function Result() {
   return (
     <div className="spiritual-background min-h-screen flex flex-col items-center justify-center p-4 py-8">
       <div className="quiz-card w-full max-w-2xl">
-        {/* ===== RESULTADO GRATUITO ===== */}
+        {/* ===== SEÇÃO DE RESULTADO COM ALTA CONVERSÃO ===== */}
         
-        {/* Header com emoji e título */}
+        {/* Título Impactante com Nome Personalizado */}
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">{emoji}</div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {profileTitle}
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Seu resultado, {userName}:
           </h1>
-          <p className="text-sm text-accent font-semibold">Seu Diagnóstico Espiritual</p>
+          <div className="text-6xl mb-4">{emoji}</div>
+          <h2 className="text-2xl md:text-3xl font-bold text-accent mb-4">
+            {profileTitle}
+          </h2>
         </div>
 
-        {/* Descrição conversacional com urgência */}
-        <div className="mb-8 p-6 bg-secondary rounded-lg border border-muted">
+        {/* 💔 DIAGNÓSTICO (DOR) - Conexão Emocional Profunda */}
+        <div className="mb-8 p-6 bg-secondary/50 rounded-lg border-l-4 border-accent">
+          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="text-2xl">💔</span> Seu Diagnóstico Espiritual
+          </h3>
           <p className="text-foreground text-lg leading-relaxed">
             {result.profileDescription}
           </p>
-          <p className="text-foreground text-sm mt-4 italic border-l-4 border-accent pl-4">
-            "Este é o momento certo para dar o próximo passo em sua jornada com Deus."
+          <p className="text-foreground/80 text-sm mt-4 italic">
+            Você não está sozinho nessa jornada. Muitas pessoas passam pelo que você está vivenciando agora.
           </p>
         </div>
 
-        {/* Seção de Pontos Fortes */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-foreground mb-3">
-            Seus Pontos Fortes
-          </h2>
+        {/* ⚠️ CONSEQUÊNCIAS - Mostrando o Impacto Real */}
+        <div className="mb-8 p-6 bg-red-50/30 rounded-lg border border-red-200/50">
+          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="text-2xl">⚠️</span> Se Você Continuar Assim...
+          </h3>
           <div className="space-y-2">
+            {result.challenges.map((challenge, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <span className="text-red-500 font-bold">•</span>
+                <p className="text-foreground">{challenge}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-foreground/70 text-sm mt-4 italic">
+            Mas a boa notícia é que você pode mudar isso a partir de hoje.
+          </p>
+        </div>
+
+        {/* 🙏 ESPERANÇA - Mensagem Positiva e Transformadora */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-accent/10 to-accent/5 rounded-lg border border-accent/30">
+          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="text-2xl">🙏</span> A Boa Notícia
+          </h3>
+          <p className="text-foreground text-lg leading-relaxed font-semibold mb-3">
+            Deus não se afastou de você. Ele continua aqui, esperando que você retorne.
+          </p>
+          <p className="text-foreground leading-relaxed">
+            Sua situação espiritual pode mudar completamente. Muitas pessoas que estavam exatamente no seu lugar conseguiram:
+          </p>
+          <div className="space-y-2 mt-4">
             {result.strengths.map((strength, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-accent text-xl mt-1">✓</span>
+                <span className="text-accent text-xl">✨</span>
                 <p className="text-foreground">{strength}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Seção de Desafios */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-foreground mb-3">
-            Desafios a Trabalhar
-          </h2>
-          <div className="space-y-2">
-            {result.challenges.map((challenge, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <span className="text-accent text-xl mt-1">•</span>
-                <p className="text-foreground">{challenge}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recomendações */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-foreground mb-3">
-            Recomendações
-          </h2>
-          <div className="space-y-2">
+        {/* 🎯 PRÓXIMAS AÇÕES - Recomendações Práticas */}
+        <div className="mb-8 p-6 bg-blue-50/30 rounded-lg border border-blue-200/50">
+          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="text-2xl">🎯</span> Seus Próximos Passos
+          </h3>
+          <div className="space-y-3">
             {result.recommendations.map((rec, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-accent font-semibold">{index + 1}.</span>
+                <span className="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  {index + 1}
+                </span>
                 <p className="text-foreground">{rec}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Próximo Passo */}
-        <div className="mb-8 p-4 bg-accent/10 rounded-lg border border-accent/20">
-          <p className="text-foreground italic">
-            "{result.nextSteps[0] || 'Continue sua jornada espiritual com fé e esperança.'}"
-          </p>
-        </div>
-
-        {/* Botões de ação */}
+        {/* Botões de ação secundários */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Button
             onClick={handleDownloadPDF}
@@ -514,7 +486,7 @@ export default function Result() {
             ) : (
               <>
                 <Download className="w-4 h-4 mr-2" />
-                Baixar PDF
+                Baixar Resultado
               </>
             )}
           </Button>
@@ -538,41 +510,37 @@ export default function Result() {
           </Button>
         </div>
 
-        {/* Disclaimer */}
-        <p className="text-center text-xs text-muted-foreground mb-8">
-          Este diagnóstico é uma ferramenta de reflexão espiritual. Para orientação profunda, busque um conselheiro ou pastor de sua comunidade.
-        </p>
-
-        {/* ===== SEÇÃO DE OFERTA DO GUIA DEVOCIONAL ===== */}
+        {/* ===== SEÇÃO DE OFERTA DO GUIA DEVOCIONAL (ALTA CONVERSÃO) ===== */}
         
         <div className="h-1 bg-gradient-to-r from-transparent via-accent to-transparent mb-8"></div>
 
-        {/* Oferta Principal */}
-        <div className="bg-gradient-to-br from-accent/5 to-accent/10 rounded-lg p-8 border-2 border-accent/30 mb-8">
-          {/* Badge de oferta especial */}
+        {/* Oferta Principal com Urgência */}
+        <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg p-8 border-2 border-accent/40 mb-8">
+          {/* Badge de oferta especial com urgência */}
           <div className="text-center mb-6">
             <span className="inline-block bg-accent text-white px-4 py-1 rounded-full text-sm font-semibold">
-              ✨ OFERTA ESPECIAL
+              ✨ OFERTA ESPECIAL HOJE
             </span>
           </div>
 
           {/* Título da oferta */}
           <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
-            📖 Devocional: 7 Dias para se Aproximar de Deus de Verdade
+            📖 Devocional: 7 Dias para se Aproximar de Deus
           </h2>
           <p className="text-center text-accent font-semibold mb-6">
-            Personalizado para sua jornada espiritual
+            Personalizado especialmente para você, {userName}
           </p>
 
-          {/* Descrição emocional */}
-          <div className="bg-white/50 rounded-lg p-6 mb-6">
-            <p className="text-foreground text-center leading-relaxed">
+          {/* Descrição emocional e urgente */}
+          <div className="bg-white/60 rounded-lg p-6 mb-6">
+            <p className="text-foreground text-center leading-relaxed font-semibold mb-3">
               Você recebeu seu diagnóstico. Agora é hora de <strong>agir</strong>.
             </p>
-            <p className="text-foreground text-center leading-relaxed mt-3">
-              Este devocional foi criado especialmente para sua situação espiritual atual. 
-              Com base em seu resultado, você receberá 7 dias de reflexões bíblicas profundas, 
-              práticas espirituais e orações que vão transformar sua conexão com Deus.
+            <p className="text-foreground text-center leading-relaxed">
+              Este devocional foi criado especialmente para sua situação espiritual. Com base em seu resultado, você receberá 7 dias de reflexões bíblicas profundas, práticas espirituais e orações que vão transformar sua conexão com Deus.
+            </p>
+            <p className="text-foreground/80 text-center text-sm mt-4 italic">
+              Cada dia foi pensado para ajudar você a sair dessa fase e retomar uma vida espiritual plena e significativa.
             </p>
           </div>
 
@@ -581,7 +549,7 @@ export default function Result() {
             <div className="flex items-start gap-3">
               <Heart className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
               <div>
-                <p className="font-semibold text-foreground">Devocional 100% Personalizado</p>
+                <p className="font-semibold text-foreground">100% Personalizado para Você</p>
                 <p className="text-sm text-foreground/80">Baseado especificamente no seu diagnóstico e desafios espirituais</p>
               </div>
             </div>
@@ -603,21 +571,31 @@ export default function Result() {
             </div>
           </div>
 
-          {/* Preço e CTA */}
-          <div className="text-center mb-6">
+          {/* Preço e CTA com Contador de Urgência */}
+          <div className="text-center mb-6 p-4 bg-red-50/50 rounded-lg border border-red-200/50">
             <p className="text-sm text-foreground/70 mb-2">Investimento único:</p>
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-4xl font-bold text-accent">R$ 12,90</span>
             </div>
-            <p className="text-xs text-foreground/60">Acesso imediato ao PDF + Suporte por 7 dias</p>
+            <p className="text-xs text-foreground/60 mb-3">Acesso imediato ao PDF + Suporte por 7 dias</p>
+            
+            {/* Contador de Urgência */}
+            <div className="bg-accent text-white rounded-lg p-3 mb-3">
+              <p className="text-sm font-semibold">⏰ Oferta disponível por:</p>
+              <p className="text-2xl font-bold font-mono">{formatTimeLeft(timeLeft)}</p>
+            </div>
+            
+            <p className="text-xs text-red-600 font-semibold">
+              ⚠️ Esta oferta especial termina em 24 horas!
+            </p>
           </div>
 
-          {/* Botões de compra com opções de pagamento */}
+          {/* Botão de compra principal */}
           <div className="space-y-3">
             <Button
               onClick={() => handleBuyGuide('mercadopago')}
               disabled={isBuyingGuide}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 text-lg"
+              className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 text-lg"
             >
               {isBuyingGuide && paymentMethod === 'mercadopago' ? (
                 <>
@@ -627,7 +605,7 @@ export default function Result() {
               ) : (
                 <>
                   <BookOpen className="w-5 h-5 mr-2" />
-                  Adquirir
+                  Adquirir Agora por R$ 12,90
                 </>
               )}
             </Button>
@@ -640,25 +618,19 @@ export default function Result() {
             <p className="text-xs mt-2">Escolha sua forma de pagamento preferida</p>
           </div>
 
-          {/* Depoimento social proof (opcional) */}
-          <div className="bg-white/30 rounded-lg p-4 mb-8">
+          {/* Depoimento social proof */}
+          <div className="bg-white/40 rounded-lg p-4">
             <p className="text-sm text-foreground italic text-center">
-              "Este devocional mudou minha forma de orar e me aproximou muito mais de Deus.
-              Recomendo para quem quer uma conexão real e transformadora."
+              "Este devocional mudou minha forma de orar e me aproximou muito mais de Deus. Recomendo para quem quer uma conexão real e transformadora."
             </p>
             <p className="text-xs text-foreground/70 text-center mt-2">— Marina S., Brasília</p>
           </div>
-
-          {/* CTA secundária */}
-          <div className="text-center">
-            <p className="text-foreground text-sm mb-3">
-              Não tem certeza? Comece com seu diagnóstico grátis e veja a diferença.
-            </p>
-            <p className="text-xs text-foreground/60">
-              Oferta válida por tempo limitado. Aproveite agora!
-            </p>
-          </div>
         </div>
+
+        {/* Disclaimer */}
+        <p className="text-center text-xs text-muted-foreground">
+          Este diagnóstico é uma ferramenta de reflexão espiritual. Para orientação profunda, busque um conselheiro ou pastor de sua comunidade.
+        </p>
       </div>
     </div>
   );

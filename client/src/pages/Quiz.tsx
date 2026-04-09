@@ -317,7 +317,9 @@ export default function Quiz() {
   };
 
   const handleNext = () => {
-    if (!responses[currentStep - 1]) {
+    // Pergunta 12 (desabafo) é opcional, todas as outras são obrigatórias
+    const isLastQuestion = currentStep === QUIZ_STEPS.length;
+    if (!isLastQuestion && !responses[currentStep - 1]) {
       toast.error('Por favor, selecione uma opção para continuar');
       return;
     }
@@ -394,7 +396,7 @@ export default function Quiz() {
       const leadResult = await submitLeadMutation.mutateAsync({
         whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         email: leadData.email,
-        name: responses[0], // Nome da primeira pergunta
+        name: responses[0], // Nome da primeira pergunta (índice 0)
       });
 
       if (leadResult.success && leadResult.leadId) {
@@ -411,7 +413,7 @@ export default function Quiz() {
           step9: responses[8],
           step10: responses[9],
           step11: responses[10],
-          step12: responses[11], // Desabafo
+          step12: responses[11] || '', // Desabafo (opcional)
         };
 
         await submitResponsesMutation.mutateAsync(responsesData);

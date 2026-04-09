@@ -107,23 +107,26 @@ export async function createLead(lead: InsertLead) {
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(leads).values(lead);
+  try {
+    const result = await db.insert(leads).values(lead);
 
-  if (Array.isArray(result) && result.length > 0) {
-    const header = result[0] as any;
-    if (header && header.insertId) {
-      return { id: Number(header.insertId) };
-    }
-  }
-
-  if (result && typeof result === "object") {
-    const insertId = (result as any).insertId;
+    // Drizzle-orm retorna um objeto com insertId
+    const insertId = (result as any).insertId || (result as any)[0]?.insertId;
     if (insertId) {
       return { id: Number(insertId) };
     }
-  }
 
-  throw new Error("Failed to retrieve inserted lead ID from insert result");
+    // Se não conseguir o insertId, tenta buscar o lead mais recente
+    const latestLead = await db.select().from(leads).orderBy(desc(leads.id)).limit(1);
+    if (latestLead && latestLead.length > 0) {
+      return { id: latestLead[0].id };
+    }
+
+    throw new Error("Failed to retrieve inserted lead ID");
+  } catch (error) {
+    console.error("Error creating lead:", error);
+    throw error;
+  }
 }
 
 export async function createQuizResponse(response: InsertQuizResponse) {

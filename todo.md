@@ -422,3 +422,13 @@
 - [ ] Integrar resposta do desabafo no resultado/devocional se aplicável
 - [ ] Testar novo fluxo completo com nome e desabafo
 - [ ] Validar novo PDF com layout elegante
+
+
+## Redesenho da Página de Resultado (Alta Conversão)
+- [x] Redesenhar página de resultado com título personalizado (com nome)
+- [x] Implementar seção de Diagnóstico (Dor) com conexão emocional
+- [x] Implementar seção de Consequências
+- [x] Implementar seção de Esperança
+- [x] Implementar seção de Pitch do devocional
+- [x] Implementar CTA com contador "Oferta disponível hoje por R$ 12,90"
+- [x] Testar fluxo completo de resultado com novo design
