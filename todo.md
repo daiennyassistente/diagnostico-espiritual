@@ -432,3 +432,21 @@
 - [x] Implementar seção de Pitch do devocional
 - [x] Implementar CTA com contador "Oferta disponível hoje por R$ 12,90"
 - [x] Testar fluxo completo de resultado com novo design
+
+
+## Bugs Reportados
+- [ ] Erro ao carregar o diagnóstico na página de resultado
+
+
+## Correção Crítica - Migrações do Banco de Dados (2026-04-09)
+- [x] Aplicar migrações SQL manualmente ao banco de dados MySQL:
+  - ALTER TABLE `leads` ADD `name` varchar(255);
+  - ALTER TABLE `quiz_responses` ADD `step11` text;
+  - ALTER TABLE `quiz_responses` ADD `step12` text;
+- [x] Verificar se as colunas foram criadas corretamente
+- [x] Testar fluxo completo do quiz (nome, respostas, desabafo)
+- [x] Validar se o erro "Erro ao enviar dados" foi resolvido
+- [x] Criar testes vitest para validar o fluxo completo
+- [x] Corrigir função createQuizResponse para retornar ID inserido
+- [x] Todos os testes passando (4/4)
+- [ ] Salvar checkpoint final após validação

@@ -135,8 +135,26 @@ export async function createQuizResponse(response: InsertQuizResponse) {
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(quizResponses).values(response);
-  return result;
+  try {
+    const result = await db.insert(quizResponses).values(response);
+
+    // Drizzle-orm retorna um objeto com insertId
+    const insertId = (result as any).insertId || (result as any)[0]?.insertId;
+    if (insertId) {
+      return { id: Number(insertId) };
+    }
+
+    // Se não conseguir o insertId, tenta buscar a resposta mais recente
+    const latestResponse = await db.select().from(quizResponses).orderBy(desc(quizResponses.id)).limit(1);
+    if (latestResponse && latestResponse.length > 0) {
+      return { id: latestResponse[0].id };
+    }
+
+    throw new Error("Failed to retrieve inserted quiz response ID");
+  } catch (error) {
+    console.error("Error creating quiz response:", error);
+    throw error;
+  }
 }
 
 export async function createDiagnosticHistoryEntry(entry: InsertDiagnosticHistory) {
