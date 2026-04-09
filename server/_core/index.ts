@@ -55,9 +55,58 @@ async function startServer() {
     handleMercadoPagoWebhook
   );
 
+  // Download PDF route
+  app.get("/api/download", async (req, res) => {
+    try {
+      const { token } = req.query;
+      if (!token || typeof token !== "string") {
+        return res.status(400).json({ error: "Token inválido" });
+      }
+
+      // Importar funções necessárias
+      const { generateDevotionalPDF } = await import("../devotional-generator");
+      const { getPaymentByToken, getDiagnosticByLeadId } = await import("../db");
+
+      // Buscar pagamento pelo token
+      const payment = await getPaymentByToken(token);
+
+      if (!payment) {
+        return res.status(404).json({ error: "Token não encontrado" });
+      }
+
+      // Buscar diagnóstico do lead
+      const diagnostic = await getDiagnosticByLeadId(payment.leadId);
+
+      if (!diagnostic) {
+        return res.status(404).json({ error: "Diagnóstico não encontrado" });
+      }
+
+      // Gerar PDF
+      const pdfBuffer = await generateDevotionalPDF({
+        profileName: diagnostic.profileName,
+        profileDescription: diagnostic.profileDescription,
+        challenges: JSON.parse(diagnostic.challenges),
+        recommendations: JSON.parse(diagnostic.recommendations),
+      });
+
+      // Enviar PDF
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="Devocional-${diagnostic.profileName.replace(/\s+/g, "-")}.pdf"`
+      );
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("[Download] Erro ao gerar PDF:", error);
+      res.status(500).json({ error: "Erro ao gerar PDF" });
+    }
+  });
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  // Serve static files from public directory
+  app.use(express.static("public"));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API

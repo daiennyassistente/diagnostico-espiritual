@@ -754,3 +754,34 @@ export async function deleteQuizQuestion(id: number) {
   await db.delete(quizQuestions).where(eq(quizQuestions.id, id));
   return { success: true };
 }
+
+
+export async function getPaymentByToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.downloadToken, token))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getDiagnosticByLeadId(leadId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, leadId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
