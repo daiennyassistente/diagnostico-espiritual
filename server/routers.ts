@@ -603,22 +603,46 @@ export const appRouter = router({
           .map(([key, value]) => `${key}: ${value}`)
           .join("\n");
 
-        const prompt = `Você é um especialista em diagnóstico espiritual. Analise as seguintes respostas de um quiz espiritual e gere um diagnóstico personalizado resumido em português, em estilo conversacional e amigável.
+        const prompt = `VOCÊ É UM ESPECIALISTA EM DIAGNÓSTICO ESPIRITUAL COM PROFUNDA EMPATIA E CAPACIDADE DE IDENTIFICAR PADRÕES ÚNICOS.
 
-Respostas do usuário:
+Sua missão é criar um diagnóstico que deixe a pessoa ENCANTADA pela precisão e profundidade da análise.
+
+RESPOSTAS DO USUÁRIO (ANALISE CADA UMA COM PROFUNDIDADE):
 ${responsesText}
+
+INSTRUÇÕES CRÍTICAS:
+
+1. IDENTIFIQUE PADRÕES ÚNICOS: Procure por padrões recorrentes, contradições significativas, desejos profundos e bloqueios específicos. NÃO gere um perfil genérico.
+
+2. CRIE CONEXÃO EMOCIONAL REAL: O diagnóstico deve fazer a pessoa se sentir verdadeiramente compreendida. Use insights que apenas alguém que realmente analisou suas respostas poderia gerar.
+
+3. SEJA ESPECÍFICO E PRECISO: Cada elemento deve refletir especificamente as respostas dadas, não conceitos genéricos.
+
+4. PROFUNDIDADE ESPIRITUAL: Vá além da superfície. Identifique:
+   - O tipo de busca espiritual específica desta pessoa
+   - Seus medos e anseios mais profundos
+   - Seus pontos fortes únicos
+   - Seus bloqueios específicos
+   - O caminho personalizado que ela precisa seguir
+
+5. ENCANTAMENTO: O usuário deve ficar impressionado com a precisão.
 
 Gere uma resposta JSON com a seguinte estrutura:
 {
-  "profileName": "Nome do perfil espiritual com emoji (ex: 🌳 Amadurecendo na Fé)",
-  "profileDescription": "Um parágrafo conversacional (3-4 frases) que descreve o perfil de forma amigável e encorajadora",
-  "strengths": ["força 1", "força 2"],
-  "challenges": ["desafio 1", "desafio 2"],
-  "recommendations": ["recomendação 1", "recomendação 2"],
-  "nextSteps": ["próximo passo 1"]
+  "profileName": "Um nome de perfil ÚNICO e específico (com emoji) que reflete exatamente o padrão identificado. NÃO use nomes genéricos como 'Buscador Sedento'. Exemplos: 🕊️ Alma Buscando Paz em Meio à Tempestade, 🔥 Coração Ardente Buscando Direção, 🌱 Semente Pronta para Germinar",
+  "profileDescription": "Um parágrafo profundo (4-5 frases) que descreve o perfil de forma precisa, emocional e encantadora. Deve fazer a pessoa se sentir completamente compreendida. Use insights específicos das respostas. Seja transformador.",
+  "strengths": ["força 1 específica baseada nas respostas", "força 2 específica baseada nas respostas", "força 3 específica baseada nas respostas"],
+  "challenges": ["desafio 1 específico identificado nas respostas", "desafio 2 específico identificado nas respostas", "desafio 3 específico identificado nas respostas"],
+  "recommendations": ["recomendação 1 personalizada para este perfil específico", "recomendação 2 personalizada para este perfil específico", "recomendação 3 personalizada para este perfil específico"],
+  "nextSteps": ["próximo passo 1 específico para a jornada desta pessoa"]
 }
 
-Seja conciso, conversacional e encorajador. Use tom amigável como se estivesse conversando com um amigo.`;
+REGRAS IMPORTANTES:
+- NUNCA use nomes genéricos como 'Buscador Sedento', 'Alma Madura', 'Peregrino', etc.
+- SEMPRE crie nomes únicos que refletem o padrão específico encontrado
+- SEMPRE use insights específicos das respostas, não conceitos genéricos
+- SEMPRE deixe a pessoa encantada com a profundidade e precisão
+- Use tom profundo, empático, encorajador e transformador`;
 
         try {
           const response = await invokeLLM({
