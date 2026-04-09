@@ -15,6 +15,11 @@ interface QuizStep {
 const QUIZ_STEPS: QuizStep[] = [
   {
     id: 1,
+    question: 'Qual é o seu nome?',
+    options: [], // Campo de texto livre
+  },
+  {
+    id: 2,
     question: 'Como você se sente espiritualmente hoje?',
     options: [
       'Próxima de Deus, mas inconstante',
@@ -25,7 +30,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 2,
+    id: 3,
     question: 'O que mais tem dificultado sua constância com Deus?',
     options: [
       'Distrações',
@@ -37,7 +42,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     question: 'Como está sua rotina com a Palavra?',
     options: [
       'Frequente e profunda',
@@ -48,7 +53,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 4,
+    id: 5,
     question: 'Como você descreveria sua vida de oração hoje?',
     options: [
       'Sincera, mas instável',
@@ -59,7 +64,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 5,
+    id: 6,
     question: 'O que você mais sente falta hoje na sua vida com Deus?',
     options: [
       'Intimidade',
@@ -71,7 +76,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 6,
+    id: 7,
     question: 'O que você sente que mais tem sido tratado em você nessa fase?',
     options: [
       'Disciplina',
@@ -84,7 +89,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 7,
+    id: 8,
     question: 'O que você mais deseja viver com Deus agora?',
     options: [
       'Voltar ao secreto',
@@ -95,7 +100,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 8,
+    id: 9,
     question: 'Quanto tempo por dia você consegue dedicar com intencionalidade?',
     options: [
       '5 minutos',
@@ -105,7 +110,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 9,
+    id: 10,
     question: 'Qual é sua maior dificuldade?',
     options: [
       'Emocional',
@@ -116,7 +121,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 10,
+    id: 11,
     question: 'Como você se descreve espiritualmente neste momento?',
     options: [
       'Com fome de Deus',
@@ -126,6 +131,11 @@ const QUIZ_STEPS: QuizStep[] = [
       'Amadurecendo',
       'Precisando recomeçar',
     ],
+  },
+  {
+    id: 12,
+    question: 'Algo que você queira acrescentar ou desabafar?',
+    options: [], // Campo de texto livre
   },
 ];
 
@@ -384,12 +394,13 @@ export default function Quiz() {
       const leadResult = await submitLeadMutation.mutateAsync({
         whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         email: leadData.email,
+        name: responses[0], // Nome da primeira pergunta
       });
 
       if (leadResult.success && leadResult.leadId) {
         const responsesData = {
           leadId: leadResult.leadId,
-          step1: responses[0],
+          step1: responses[0], // Nome
           step2: responses[1],
           step3: responses[2],
           step4: responses[3],
@@ -399,6 +410,8 @@ export default function Quiz() {
           step8: responses[7],
           step9: responses[8],
           step10: responses[9],
+          step11: responses[10],
+          step12: responses[11], // Desabafo
         };
 
         await submitResponsesMutation.mutateAsync(responsesData);
@@ -612,20 +625,35 @@ export default function Quiz() {
               {step.question}
             </h2>
 
-            {/* Options */}
-            <div className="space-y-3">
-              {step.options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSelectOption(option)}
-                  className={`quiz-button ${
-                    responses[currentStep - 1] === option ? 'selected' : ''
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+            {/* Options or Text Input */}
+            {step.options.length > 0 ? (
+              <div className="space-y-3">
+                {step.options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSelectOption(option)}
+                    className={`quiz-button ${
+                      responses[currentStep - 1] === option ? 'selected' : ''
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <textarea
+                placeholder={currentStep === 1 ? 'Digite seu nome aqui...' : 'Escreva aqui o que você queira acrescentar ou desabafar...'}
+                value={responses[currentStep - 1] || ''}
+                onChange={(e) => {
+                  setResponses((prev) => ({
+                    ...prev,
+                    [currentStep - 1]: e.target.value,
+                  }));
+                  setHasStarted(true);
+                }}
+                className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 w-full min-h-[100px] resize-none"
+              />
+            )}
           </div>
 
           {/* Navigation */}

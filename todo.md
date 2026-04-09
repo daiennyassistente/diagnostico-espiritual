@@ -407,3 +407,18 @@
 - [x] Webhook do Mercado Pago pode não estar disparando corretamente - CORRIGIDO (webhook criado e registrado)
 
 - [ ] Configurar webhook no painel do Mercado Pago (URL: https://espiritualquiz-sx87ncqt.manus.space/api/mercadopago/webhook)
+
+
+## Redesign do PDF e Personalização (v2.0)
+- [ ] Atualizar schema do quiz para coletar nome na primeira pergunta
+- [ ] Adicionar pergunta "Algo que você queira acrescentar ou desabafar?" no final do quiz
+- [ ] Redesenhar gerador de PDF com novo layout (baseado no modelo enviado)
+- [ ] Implementar espaço para data no topo de cada página
+- [ ] Implementar espaço para anotações após o texto
+- [ ] Criar 1 dia por página no devocional (7 páginas total)
+- [ ] Reescrever textos do resultado para serem profundos e emocionais
+- [ ] Reescrever textos do devocional para serem profundos e emocionais
+- [ ] Personalizar todos os textos com o nome da pessoa
+- [ ] Integrar resposta do desabafo no resultado/devocional se aplicável
+- [ ] Testar novo fluxo completo com nome e desabafo
+- [ ] Validar novo PDF com layout elegante

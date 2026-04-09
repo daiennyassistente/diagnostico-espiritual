@@ -29,16 +29,18 @@ export type InsertUser = typeof users.$inferInsert;
 export const quizResponses = mysqlTable("quiz_responses", {
   id: int("id").autoincrement().primaryKey(),
   leadId: int("leadId").notNull(),
-  step1: text("step1"), // Como você se sente espiritualmente hoje?
-  step2: text("step2"), // O que mais tem dificultado sua constância com Deus?
-  step3: text("step3"), // Como está sua rotina com a Palavra?
-  step4: text("step4"), // Como você descreveria sua vida de oração hoje?
-  step5: text("step5"), // O que você mais sente falta hoje na sua vida com Deus?
-  step6: text("step6"), // O que você sente que mais tem sido tratado em você nessa fase?
-  step7: text("step7"), // O que você mais deseja viver com Deus agora?
-  step8: text("step8"), // Quanto tempo por dia você consegue separar com intencionalidade?
-  step9: text("step9"), // Você sente que sua dificuldade maior é mais…
-  step10: text("step10"), // Hoje, no fundo, você sente que está…
+  step1: text("step1"), // Qual é o seu nome?
+  step2: text("step2"), // Como você se sente espiritualmente hoje?
+  step3: text("step3"), // O que mais tem dificultado sua constância com Deus?
+  step4: text("step4"), // Como está sua rotina com a Palavra?
+  step5: text("step5"), // Como você descreveria sua vida de oração hoje?
+  step6: text("step6"), // O que você mais sente falta hoje na sua vida com Deus?
+  step7: text("step7"), // O que você sente que mais tem sido tratado em você nessa fase?
+  step8: text("step8"), // O que você mais deseja viver com Deus agora?
+  step9: text("step9"), // Quanto tempo por dia você consegue separar com intencionalidade?
+  step10: text("step10"), // Você sente que sua dificuldade maior é mais…
+  step11: text("step11"), // Hoje, no fundo, você sente que está…
+  step12: text("step12"), // Algo que você queira acrescentar ou desabafar?
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -48,6 +50,7 @@ export type InsertQuizResponse = typeof quizResponses.$inferInsert;
 
 export const leads = mysqlTable("leads", {
   id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }), // Nome da pessoa coletado na primeira pergunta
   whatsapp: varchar("whatsapp", { length: 20 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

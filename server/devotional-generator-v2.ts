@@ -1,6 +1,6 @@
 import { invokeLLM } from "./_core/llm";
-import { createPDFStream, PDFInput, PDFDay } from "./pdf-designer";
-import type { PDFDay as PDFDayType } from "./pdf-designer";
+import { generatePDFStream, PDFInput, PDFDay } from "./pdf-designer-v3";
+import type { PDFDay as PDFDayType } from "./pdf-designer-v3";
 
 interface DevotionalRequest {
   profileName: string;
@@ -41,7 +41,7 @@ async function generateDevotionalPDF(request: DevotionalRequest): Promise<Buffer
       generatedDate: new Date(),
     };
 
-    const pdfBuffer = await createPDFStream(pdfInput);
+    const pdfBuffer = await generatePDFStream(pdfInput);
     return pdfBuffer;
   } catch (error) {
     console.error("Erro ao gerar devocional:", error);
@@ -54,9 +54,9 @@ async function generateDevotionalPDF(request: DevotionalRequest): Promise<Buffer
  * Retorna apenas os textos - o design é responsabilidade do pdf-designer.ts
  */
 async function generateDevotionalContent(request: DevotionalRequest): Promise<PDFDay[]> {
-  const prompt = `Você é um especialista em devocionais cristãos. Crie um devocional de 7 dias personalizado para alguém com o seguinte perfil espiritual:
+  const prompt = `Você é um especialista em devocionais cristãos profundos e emocionais. Crie um devocional de 7 dias ALTAMENTE PERSONALIZADO para ${request.userName || "uma pessoa"} com o seguinte perfil espiritual:
 
-Perfil: ${request.profileName}
+Perfil Espiritual: ${request.profileName}
 Descrição: ${request.profileDescription}
 
 Desafios identificados:
@@ -66,24 +66,37 @@ Recomendações:
 ${request.recommendations.map((r) => `- ${r}`).join("\n")}
 
 Crie um devocional de 7 dias que seja:
-1. Profundamente bíblico e baseado em versículos reais
-2. Personalizado para os desafios e necessidades dessa pessoa
-3. Inspirador, esperançoso e prático
-4. Com reflexões que conectem a Bíblia à vida real
-5. Com orações autênticas e aplicações práticas
+1. PROFUNDAMENTE EMOCIONAL E SENTIMENTAL - Que toque o coração e a alma
+2. ALTAMENTE PERSONALIZADO - Use o nome "${request.userName || "você"}" ao se dirigir à pessoa
+3. BIBLICAMENTE SÓLIDO - Baseado em versículos reais e contexto bíblico
+4. CONECTADO COM OS DESAFIOS REAIS - Aborde especificamente os desafios mencionados
+5. ESPERANÇOSO E TRANSFORMADOR - Ofereça esperança genuína e caminhos práticos
+6. COM LINGUAGEM POÉTICA E PROFUNDA - Use metáforas, analogias e linguagem que toque a alma
+
+Cada reflexão deve:
+- Começar com empatia genuína sobre o que a pessoa está vivendo
+- Conectar a verdade bíblica com a realidade emocional
+- Usar linguagem que crie identificação e conexão
+- Terminar com esperança e direção clara
+
+Cada oração deve:
+- Ser autêntica e vulnerável
+- Usar o nome da pessoa (${request.userName || "você"})
+- Expressar emoções reais e pedidos genuínos
+- Conectar o coração da pessoa com o coração de Deus
 
 Para cada dia, forneça em formato JSON:
 {
   "day": número de 1 a 7,
-  "title": "Título do dia (máx 50 caracteres)",
+  "title": "Título do dia (máx 50 caracteres) - seja poético e inspirador",
   "verse": "Versículo completo da Bíblia",
   "verseReference": "Livro Capítulo:Versículo",
-  "reflection": "Reflexão profunda (200-300 palavras)",
-  "prayer": "Oração autêntica (100-150 palavras)",
-  "application": "Aplicação prática para o dia (50-100 palavras)"
+  "reflection": "Reflexão profunda e emocional (250-350 palavras) - deve tocar o coração",
+  "prayer": "Oração autêntica e vulnerável (150-200 palavras) - use o nome da pessoa",
+  "application": "Aplicação prática para o dia (80-120 palavras) - seja específico e viável"
 }
 
-Retorne um array JSON com 7 objetos, um para cada dia. Certifique-se de que cada versículo é real e está correto.`;
+Retorne um array JSON com 7 objetos, um para cada dia. Cada dia deve ser uma jornada emocional e espiritual que leve ${request.userName || "a pessoa"} mais perto de Deus. Certifique-se de que cada versículo é real e está correto.`;
 
   try {
     const response = await invokeLLM({

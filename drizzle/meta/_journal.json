@@ -57,6 +57,13 @@
       "when": 1775696694160,
       "tag": "0007_lame_big_bertha",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1775745861266,
+      "tag": "0008_crazy_korath",
+      "breakpoints": true
     }
   ]
 }

@@ -354,12 +354,14 @@ export const appRouter = router({
         z.object({
           whatsapp: z.string().min(10, "WhatsApp deve ter pelo menos 10 dígitos"),
           email: z.string().email("E-mail inválido"),
+          name: z.string().optional(), // Nome da primeira pergunta
         }),
       )
       .mutation(async ({ input }) => {
         const result = await createLead({
           whatsapp: input.whatsapp,
           email: input.email,
+          name: input.name,
         });
         return { success: true, leadId: result.id };
       }),
@@ -378,6 +380,8 @@ export const appRouter = router({
           step8: z.string().optional(),
           step9: z.string().optional(),
           step10: z.string().optional(),
+          step11: z.string().optional(),
+          step12: z.string().optional(), // Desabafo
         }),
       )
       .mutation(async ({ input }) => {
@@ -393,6 +397,8 @@ export const appRouter = router({
           step8: input.step8,
           step9: input.step9,
           step10: input.step10,
+          step11: input.step11,
+          step12: input.step12,
         });
         return { success: true };
       }),
