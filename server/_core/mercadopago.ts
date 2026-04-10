@@ -58,11 +58,13 @@ export function getMercadoPagoInitPoint(preference: any): string | null {
   const initPoint = preference?.init_point || null;
   if (!initPoint) return null;
   
-  // Extrair preference ID e construir URL para abrir direto na página de pagamento
+  // Usar wallet_purchase para abrir direto na página de pagamento
   // Isso pula a página de resumo e vai direto para escolha de método
-  const preferenceId = initPoint.split('preference-id=')[1]?.split('&')[0];
-  if (preferenceId) {
-    return `https://www.mercadopago.com.br/checkout/v1/redirect?preference-id=${preferenceId}`;
+  const walletPurchase = preference?.wallet_purchase || null;
+  if (walletPurchase) {
+    return walletPurchase;
   }
+  
+  // Fallback para init_point se wallet_purchase não existir
   return initPoint;
 }
