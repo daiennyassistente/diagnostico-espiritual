@@ -141,7 +141,7 @@ export default function Admin() {
           <div className="space-y-6">
             <div className="flex gap-4">
               <Input
-                placeholder="Buscar por e-mail ou WhatsApp..."
+                placeholder="Buscar por e-mail, telefone ou WhatsApp..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-md"
@@ -162,6 +162,7 @@ export default function Admin() {
                   <thead className="border-b border-border">
                     <tr>
                       <th className="text-left py-3 px-4 font-semibold">Email</th>
+                      <th className="text-left py-3 px-4 font-semibold">Telefone</th>
                       <th className="text-left py-3 px-4 font-semibold">WhatsApp</th>
                       <th className="text-left py-3 px-4 font-semibold">Data</th>
                     </tr>
@@ -171,8 +172,8 @@ export default function Admin() {
                       <tr key={response.id} className="border-b border-border hover:bg-muted/50">
                         <td className="py-3 px-4">{response.email}</td>
                         <td className="py-3 px-4">{response.whatsapp}</td>
-                        <td className="py-3 px-4">{new Date(response.createdAt).toLocaleDateString('pt-BR')}</td>
-                      </tr>
+                        <td className="py-3 px-4">{response.whatsapp}</td>
+                        <td className="py-3 px-4 text-muted-foreground">{new Date(response.createdAt).toLocaleDateString('pt-BR')}</td> </tr>
                     ))}
                   </tbody>
                 </table>

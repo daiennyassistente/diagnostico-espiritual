@@ -218,9 +218,11 @@ export function AdminDashboard() {
     return users.filter((user) => {
       const nameStr = typeof user.name === 'string' ? user.name : String(user.name || '');
       const emailStr = typeof user.email === 'string' ? user.email : String(user.email || '');
+      const whatsappStr = typeof user.whatsapp === 'string' ? user.whatsapp : String(user.whatsapp || '');
       return (
         nameStr.toLowerCase().includes(query) ||
-        emailStr.toLowerCase().includes(query)
+        emailStr.toLowerCase().includes(query) ||
+        whatsappStr.toLowerCase().includes(query)
       );
     });
   }, [users, searchQuery]);
@@ -260,7 +262,7 @@ export function AdminDashboard() {
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Buscar por nome ou email..."
+              placeholder="Buscar por nome, email ou telefone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
@@ -304,6 +306,7 @@ export function AdminDashboard() {
                     <tr>
                       <th className="px-5 py-4 font-semibold text-foreground">Nome</th>
                       <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Telefone</th>
                       <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Tipo</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data da resposta</th>
@@ -320,6 +323,7 @@ export function AdminDashboard() {
                         <tr key={item.id} className="border-t border-border/50 align-top">
                           <td className="px-5 py-4 text-foreground">{nameStr || "Sem nome"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{emailStr || "-"}</td>
+                          <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4">
                             <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${roleBadgeClass(roleStr)}`}>
@@ -433,6 +437,7 @@ export function AdminDashboard() {
                   <thead className="bg-secondary/70 text-left">
                     <tr>
                       <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Telefone</th>
                       <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Valor</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Produto</th>
@@ -445,6 +450,7 @@ export function AdminDashboard() {
                     {approvedBuyers.map((buyer) => (
                       <tr key={buyer.id} className="border-t border-border/50 align-top">
                         <td className="px-5 py-4 text-foreground">{buyer.email || "-"}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{buyer.whatsapp || "-"}</td>
                         <td className="px-5 py-4 text-muted-foreground">{buyer.whatsapp || "-"}</td>
                         <td className="px-5 py-4 font-semibold text-foreground">{formatCurrency(buyer.amount || 0)}</td>
                         <td className="px-5 py-4 text-muted-foreground">{buyer.productName || "-"}</td>
