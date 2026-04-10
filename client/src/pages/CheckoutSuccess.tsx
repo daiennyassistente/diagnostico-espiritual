@@ -16,6 +16,10 @@ export default function CheckoutSuccess() {
   const generateDevotionalMutation = trpc.pdf.generateDevocionalPDF.useMutation();
 
   useEffect(() => {
+    // Extrair leadId do URL
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get('leadId');
+
     // Recuperar dados do resultado e respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
     const savedResult = localStorage.getItem("quizResult");
@@ -26,6 +30,18 @@ export default function CheckoutSuccess() {
       setResponses(parsedResponses);
       setResult(parsedResult);
       setIsLoading(false);
+    } else if (leadId) {
+      // Se houver leadId, mostrar mensagem de sucesso genérica
+      setIsLoading(false);
+      setResult({
+        profileName: "Seu Perfil Espiritual",
+        profileDescription: "Seu diagnóstico foi processado com sucesso.",
+        challenges: [],
+        recommendations: [],
+        strengths: [],
+        nextSteps: []
+      });
+      setResponses({});
     } else {
       // Se não houver dados, redirecionar para o quiz
       toast.error("Dados não encontrados. Redirecionando para o quiz...");

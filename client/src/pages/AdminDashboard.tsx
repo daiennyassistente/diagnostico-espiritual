@@ -358,7 +358,7 @@ export function AdminDashboard() {
                                 hoverColor="hover:bg-amber-200"
                                 onClick={() => {
                                   console.log('Redirecting to checkout-success');
-                                  window.location.href = '/checkout-success';
+                                  window.location.href = `/checkout-success?leadId=${user?.id}`;
                                 }}
                                 isLoading={false}
                               />
@@ -369,7 +369,7 @@ export function AdminDashboard() {
                                 textColor="text-purple-700"
                                 hoverColor="hover:bg-purple-200"
                                 onClick={() => {
-                                  unlockAccessMutation.mutate({ leadId: item.id });
+                                  window.location.href = `/checkout-success?leadId=${item.id}`;
                                 }}
                                 isLoading={unlockAccessMutation.isPending}
                               />
