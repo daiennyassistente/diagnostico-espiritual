@@ -599,3 +599,6 @@
 ## Redirecionamento Direto para Pagamento
 - [x] Modificar botão "Quero me reconectar com Deus" para redirecionar diretamente para Mercado Pago (sem abrir em nova aba)
 - [x] Testar fluxo completo: Quiz → Resultado → Clique em botão → Página de Pagamento Mercado Pago
+
+## Ajuste de Texto - Etapa 2
+- [x] Remover ", mas inconstante" da opção "Próxima de Deus, mas inconstante" na etapa 2

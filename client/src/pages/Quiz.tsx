@@ -22,7 +22,7 @@ const QUIZ_STEPS: QuizStep[] = [
     id: 2,
     question: 'Como você se sente espiritualmente hoje?',
     options: [
-      'Próxima de Deus, mas inconstante',
+      'Próxima de Deus',
       'Distante e querendo voltar',
       'Com sede, mas sem direção',
       'Cansada espiritualmente',
