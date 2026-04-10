@@ -602,3 +602,9 @@
 
 ## Ajuste de Texto - Etapa 2
 - [x] Remover ", mas inconstante" da opção "Próxima de Deus, mas inconstante" na etapa 2
+
+## Atualização do Backend - Mudança de Opção na Etapa 2
+- [x] Atualizar testes que usam "Próxima de Deus, mas inconstante" para "Próxima de Deus"
+- [x] Verificar se a lógica de resolução de perfil funciona corretamente com a nova opção
+- [x] Testar geração de resultado com a nova opção "Próxima de Deus"
+- [x] Testar geração de devocional com a nova opção "Próxima de Deus"
