@@ -357,11 +357,16 @@ export default function Result() {
     <div className="spiritual-background min-h-screen py-12 px-4">
       <div className="max-w-3xl mx-auto space-y-8">
         
+        {/* AVISO NO TOPO */}
+        <div className="text-center">
+          <p className="text-xs" style={{color: '#9CA3AF'}}>Não esqueça de rolar até o final da página</p>
+        </div>
+        
         {/* ===== SEÇÃO DE RESULTADO ===== */}
         <div className="space-y-6">
           {/* TÍTULO - DIRETO E CLARO */}
-          <div className="text-center space-y-3">
-            <h1 className="text-4xl md:text-5xl font-black leading-tight" style={{color: '#1E3A8A'}}>
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl md:text-3xl font-black" style={{color: '#1E3A8A', lineHeight: '1.2'}}>
               {result.profileName}
             </h1>
             <p className="text-lg" style={{color: '#6B7280'}}>
