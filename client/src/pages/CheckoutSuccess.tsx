@@ -46,7 +46,10 @@ export default function CheckoutSuccess() {
         profileDescription: result.profileDescription,
         challenges: result.challenges,
         recommendations: result.recommendations,
+        strengths: result.strengths,
+        nextSteps: result.nextSteps,
         responses: responses,
+        userName: responses["0"] || responses["step1"] || "",
       },
       {
         onSuccess: (data) => {
