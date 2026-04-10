@@ -1,9 +1,10 @@
 import Stripe from "stripe";
 import { Request, Response } from "express";
 import { getDb } from "./db";
-import { payments, leads } from "../drizzle/schema";
+import { payments, leads, diagnosticHistory } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { sendDevotionalConfirmationEmail } from "./email-service";
+import { generateDevocionalPDF } from "./pdf-generator";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-04-10",
@@ -76,6 +77,38 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                 productName: "Devocional: 7 Dias para se Aproximar de Deus",
               });
               console.log(`[Webhook] Payment recorded for lead ${leadId}`);
+              
+              // Gerar devocional automaticamente
+              try {
+                const diagnostic = await db
+                  .select()
+                  .from(diagnosticHistory)
+                  .where(eq(diagnosticHistory.leadId, parseInt(leadId)))
+                  .limit(1);
+                
+                if (diagnostic.length > 0) {
+                  console.log(`[Webhook] Generating devotional PDF for lead ${leadId}`);
+                  
+                  // Preparar dados para gerar o devocional
+                  const devotionalData = {
+                    profileName: diagnostic[0].profileName,
+                    profileDescription: diagnostic[0].profileDescription,
+                    strengths: JSON.parse(diagnostic[0].strengths),
+                    challenges: JSON.parse(diagnostic[0].challenges),
+                    recommendations: JSON.parse(diagnostic[0].recommendations),
+                    nextSteps: JSON.parse(diagnostic[0].nextSteps),
+                    responses: {},
+                  };
+                  
+                  // Gerar PDF do devocional
+                  const pdfBuffer = await generateDevocionalPDF(devotionalData);
+                  console.log(`[Webhook] Devotional PDF generated successfully (${pdfBuffer.length} bytes)`);
+                } else {
+                  console.warn(`[Webhook] No diagnostic found for lead ${leadId}`);
+                }
+              } catch (pdfError: any) {
+                console.error(`[Webhook] Failed to generate devotional PDF: ${pdfError.message}`);
+              }
               
               // Enviar email com PDF devocional
               try {

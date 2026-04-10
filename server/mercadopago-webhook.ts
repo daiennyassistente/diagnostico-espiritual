@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { getDb } from "./db";
-import { payments, leads } from "../drizzle/schema";
+import { payments, leads, diagnosticHistory } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { sendDevotionalConfirmationEmail } from "./email-service";
+import { generateDevocionalPDF } from "./pdf-generator";
 
 export async function handleMercadoPagoWebhook(req: Request, res: Response) {
   try {
@@ -97,6 +98,38 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
             })
 
             console.log(`[Mercado Pago Webhook] Payment recorded for lead ${leadId} with token ${downloadToken}`);
+
+            // Gerar devocional automaticamente
+            try {
+              const diagnostic = await db
+                .select()
+                .from(diagnosticHistory)
+                .where(eq(diagnosticHistory.leadId, leadId))
+                .limit(1);
+              
+              if (diagnostic.length > 0) {
+                console.log(`[Mercado Pago Webhook] Generating devotional PDF for lead ${leadId}`);
+                
+                // Preparar dados para gerar o devocional
+                const devotionalData = {
+                  profileName: diagnostic[0].profileName,
+                  profileDescription: diagnostic[0].profileDescription,
+                  strengths: JSON.parse(diagnostic[0].strengths),
+                  challenges: JSON.parse(diagnostic[0].challenges),
+                  recommendations: JSON.parse(diagnostic[0].recommendations),
+                  nextSteps: JSON.parse(diagnostic[0].nextSteps),
+                  responses: {},
+                };
+                
+                // Gerar PDF do devocional
+                const pdfBuffer = await generateDevocionalPDF(devotionalData);
+                console.log(`[Mercado Pago Webhook] Devotional PDF generated successfully (${pdfBuffer.length} bytes)`);
+              } else {
+                console.warn(`[Mercado Pago Webhook] No diagnostic found for lead ${leadId}`);
+              }
+            } catch (pdfError: any) {
+              console.error(`[Mercado Pago Webhook] Failed to generate devotional PDF: ${pdfError.message}`);
+            }
 
             // Enviar email com PDF devocional
             try {
