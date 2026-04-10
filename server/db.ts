@@ -823,3 +823,79 @@ export async function getAdminByUsername(username: string) {
     return null;
   }
 }
+
+
+export async function getLeadWithDiagnosticByToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const payment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.downloadToken, token))
+    .limit(1);
+
+  if (!payment || payment.length === 0) {
+    return null;
+  }
+
+  const diagnostic = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, payment[0].leadId))
+    .limit(1);
+
+  if (!diagnostic || diagnostic.length === 0) {
+    return null;
+  }
+
+  const lead = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.id, payment[0].leadId))
+    .limit(1);
+
+  if (!lead || lead.length === 0) {
+    return null;
+  }
+
+  const quizResponse = await db
+    .select()
+    .from(quizResponses)
+    .where(eq(quizResponses.leadId, payment[0].leadId))
+    .limit(1);
+
+  return {
+    profileName: diagnostic[0].profileName,
+    profileDescription: diagnostic[0].profileDescription,
+    strengths: JSON.parse(diagnostic[0].strengths),
+    challenges: JSON.parse(diagnostic[0].challenges),
+    recommendations: JSON.parse(diagnostic[0].recommendations),
+    nextSteps: JSON.parse(diagnostic[0].nextSteps),
+    userResponses: quizResponse?.[0] || null,
+  };
+}
+
+export async function updatePaymentDownloadToken(leadId: number, token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const payment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.leadId, leadId))
+    .limit(1);
+
+  if (!payment || payment.length === 0) {
+    throw new Error("Payment not found for this lead");
+  }
+
+  await db
+    .update(payments)
+    .set({ downloadToken: token })
+    .where(eq(payments.id, payment[0].id));
+}

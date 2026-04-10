@@ -375,16 +375,16 @@ export const appRouter = router({
         return { success: true, message: 'Email reenviado com sucesso' };
       }),
     generateDownloadLink: adminProcedure
-      .input(z.object({ leadId: z.number(), type: z.enum(['result', 'devotional']) }))
+      .input(z.object({ leadId: z.number() }))
       .mutation(async ({ input }) => {
-        const { getLeadWithDiagnostic } = await import('./db');
+        const { getLeadWithDiagnostic, updatePaymentDownloadToken } = await import('./db');
         const leadData = await getLeadWithDiagnostic(input.leadId);
         if (!leadData) {
           throw new Error('Lead not found');
         }
-        const downloadToken = Buffer.from(`${input.leadId}-${input.type}-${Date.now()}`).toString('base64');
-        const downloadUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/download?token=${downloadToken}&type=${input.type}`;
-        return { success: true, downloadUrl };
+        const downloadToken = Buffer.from(`${input.leadId}-${Date.now()}-${Math.random().toString(36).substring(7)}`).toString('base64');
+        await updatePaymentDownloadToken(input.leadId, downloadToken);
+        return { success: true, downloadToken };
       }),
     unlockAccess: adminProcedure
       .input(z.object({ leadId: z.number() }))
@@ -714,7 +714,66 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
       }),
   }),
 
+  download: router({
+    downloadResult: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { getLeadWithDiagnosticByToken } = await import('./db');
+          const leadData = await getLeadWithDiagnosticByToken(input.token);
+          
+          if (!leadData) {
+            throw new Error('Link expirado ou inválido');
+          }
 
+          const { generateDiagnosticPDF } = await import('./pdf-generator');
+          const pdfBuffer = await generateDiagnosticPDF({
+            profileName: leadData.profileName,
+            profileDescription: leadData.profileDescription,
+            strengths: leadData.strengths,
+            challenges: leadData.challenges,
+            recommendations: leadData.recommendations,
+            nextSteps: leadData.nextSteps,
+            responses: {},
+          });
+
+          const pdfBase64 = pdfBuffer.toString('base64');
+          return { success: true, pdfBase64 };
+        } catch (error: any) {
+          console.error('Download result error:', error);
+          throw new Error('Erro ao gerar PDF do resultado');
+        }
+      }),
+
+    downloadDevotional: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { getLeadWithDiagnosticByToken } = await import('./db');
+          const leadData = await getLeadWithDiagnosticByToken(input.token);
+          
+          if (!leadData) {
+            throw new Error('Link expirado ou inválido');
+          }
+
+          const { generateDevocionalPDF } = await import('./pdf-generator');
+          const pdfBuffer = await generateDevocionalPDF({
+            profileName: leadData.profileName,
+            profileDescription: leadData.profileDescription,
+            challenges: leadData.challenges,
+            recommendations: leadData.recommendations,
+            nextSteps: leadData.nextSteps,
+            userResponses: leadData.userResponses,
+          });
+
+          const pdfBase64 = pdfBuffer.toString('base64');
+          return { success: true, pdfBase64 };
+        } catch (error: any) {
+          console.error('Download devotional error:', error);
+          throw new Error('Erro ao gerar PDF do devocional');
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -357,7 +357,7 @@ export default function AdminDashboard() {
                                 textColor="text-amber-700"
                                 hoverColor="hover:bg-amber-200"
                                 onClick={() => {
-                                  generateLinkMutation.mutate({ leadId: item.id, type: 'result' });
+                                  generateLinkMutation.mutate({ leadId: item.id });
                                 }}
                                 isLoading={generateLinkMutation.isPending}
                               />
