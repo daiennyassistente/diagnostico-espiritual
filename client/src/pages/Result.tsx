@@ -326,7 +326,7 @@ export default function Result() {
     return (
       <div className="spiritual-background min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{color: '#1E3A8A'}} />
           <p className="text-foreground text-lg">Gerando seu diagnóstico personalizado...</p>
           <p className="text-foreground/70 text-sm mt-2">Se a análise inteligente demorar, mostraremos automaticamente um resultado com base nas suas respostas.</p>
         </div>
@@ -354,26 +354,26 @@ export default function Result() {
         {/* ===== SEÇÃO DE RESULTADO ===== */}
         <div className="space-y-6">
           {/* TÍTULO - DIRETO E CLARO */}
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold text-blue-700 leading-tight">
+          <div className="text-center space-y-3">
+            <h1 className="text-4xl md:text-5xl font-black leading-tight" style={{color: '#1E3A8A'}}>
               {result.profileName}
             </h1>
           </div>
 
           {/* DIAGNÓSTICO - CURTO E IMPACTANTE */}
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-md space-y-3 border-l-4 border-blue-500">
-            <p className="text-base leading-relaxed text-slate-700">
+          <div className="rounded-xl p-6 shadow-md space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
+            <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
               {result.profileDescription}
             </p>
           </div>
 
           {/* IMPACTO */}
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-3 border-l-4 border-blue-500">
-            <h3 className="text-lg font-semibold text-blue-700">Isso está gerando:</h3>
+          <div className="rounded-xl p-6 space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
+            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Isso está gerando:</h3>
             <ul className="space-y-2">
               {result.challenges.slice(0, 3).map((challenge, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
-                  <span className="text-blue-600 font-bold">•</span>
+                <li key={idx} className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                  <span className="font-bold" style={{color: '#1E3A8A'}}>•</span>
                   <span>{challenge}</span>
                 </li>
               ))}
@@ -381,12 +381,12 @@ export default function Result() {
           </div>
 
           {/* RECOMENDAÇÕES */}
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-3 border-l-4 border-blue-500">
-            <h3 className="text-lg font-semibold text-blue-700">Próximos passos:</h3>
+          <div className="rounded-xl p-6 space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
+            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Próximos passos:</h3>
             <ul className="space-y-2">
               {result.recommendations.slice(0, 2).map((rec, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
-                  <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                <li key={idx} className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#1E3A8A'}} />
                   <span>{rec}</span>
                 </li>
               ))}
@@ -398,7 +398,10 @@ export default function Result() {
             <Button
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
-              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 text-sm"
+              className="flex items-center gap-2 text-white font-semibold px-4 py-2 text-sm"
+              style={{backgroundColor: '#D4AF37'}}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8962E'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#D4AF37'}
             >
               <Download className="w-4 h-4" />
               {isGeneratingPDF ? "Gerando..." : "Baixar"}
@@ -428,11 +431,11 @@ export default function Result() {
         {/* ===== TRANSIÇÃO FORTE PARA OFERTA ===== */}
         <div className="relative py-8">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-300"></div>
+            <div className="w-full" style={{borderTop: '2px solid #3B82F6'}}></div>
           </div>
           <div className="relative flex justify-center">
-            <div className="bg-spiritual-background px-4">
-              <p className="text-center text-sm font-semibold text-blue-700">
+            <div className="px-4" style={{backgroundColor: '#FAF7F2'}}>
+              <p className="text-center text-sm font-bold" style={{color: '#1E3A8A'}}>
                 ⚡ MAS ESPERA... ISSO PODE MUDAR HOJE
               </p>
             </div>
@@ -440,67 +443,74 @@ export default function Result() {
         </div>
 
         {/* ===== SEÇÃO DE OFERTA - MINIMALISTA E FOCADA ===== */}
-        <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-8 space-y-6 border-2 border-blue-300 shadow-lg">
+        <div className="rounded-xl p-8 space-y-6 shadow-lg" style={{backgroundColor: '#FFFFFF', border: '2px solid #3B82F6'}}>
           
           {/* PREÇO EM DESTAQUE */}
           <div className="text-center space-y-2">
-            <div className="text-4xl font-bold text-amber-600">R$ 12,90</div>
-            <p className="text-sm text-slate-600">Investimento único</p>
+            <div className="text-5xl font-black" style={{color: '#D4AF37'}}>R$ 12,90</div>
+            <p className="text-sm font-medium" style={{color: '#6B7280'}}>Investimento único</p>
           </div>
 
           {/* OFERTA - DIRETO */}
           <div className="text-center space-y-3">
-            <h2 className="text-2xl font-bold text-blue-700">
+            <h2 className="text-3xl font-black" style={{color: '#1E3A8A'}}>
               📖 Devocional: 7 Dias para se Reconectar
             </h2>
-            <p className="text-base text-slate-700">
+            <p className="text-base" style={{color: '#1F2937'}}>
               Um plano guiado para retomar sua conexão com Deus e voltar a sentir paz.
             </p>
           </div>
 
           {/* O QUE INCLUI */}
-          <div className="space-y-3 bg-white/60 rounded-lg p-4">
-            <p className="text-sm font-semibold text-blue-700">Você recebe:</p>
+          <div className="space-y-3 rounded-lg p-4" style={{backgroundColor: '#F5E6B3'}}>
+            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>Você recebe:</p>
             <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-sm text-slate-700">
-                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
                 <span>7 dias de devocional guiado</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700">
-                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
                 <span>5-10 min de oração diária</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700">
-                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
                 <span>Versículos + reflexões</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-slate-700">
-                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
                 <span>Acesso imediato</span>
               </li>
             </ul>
           </div>
 
           {/* URGÊNCIA */}
-          <div className="bg-blue-100/50 rounded-lg p-3 text-center">
-            <p className="text-sm font-semibold text-blue-900">
+          <div className="rounded-lg p-3 text-center" style={{backgroundColor: '#EFF6FF'}}>
+            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>
               ⏳ Comece hoje e sinta a diferença nos próximos dias
             </p>
           </div>
 
           {/* CTA - ÚNICO E FORTE */}
-          <Button
-            onClick={handleBuyDevocional}
-            disabled={isBuyingGuide}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-base py-4 rounded-lg shadow-md"
-          >
-            {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
-          </Button>
+          <div className="space-y-3">
+            <Button
+              onClick={handleBuyDevocional}
+              disabled={isBuyingGuide}
+              className="w-full text-white font-bold text-base py-4 rounded-lg shadow-md"
+              style={{backgroundColor: '#D4AF37'}}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8962E'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#D4AF37'}
+            >
+              {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
+            </Button>
+            <p className="text-center text-sm font-semibold" style={{color: '#D4AF37'}}>R$ 12,90 único</p>
+          </div>
         </div>
 
         {/* TIMER */}
-        <div className="text-center text-xs text-foreground/60 pb-4">
-          Seu resultado estará disponível por: {formatTimeLeft(timeLeft)}
+        <div className="text-center pb-4">
+          <p className="text-sm font-semibold" style={{color: '#1E3A8A'}}>Seu resultado estará disponível por:</p>
+          <p className="text-2xl font-black" style={{color: '#D4AF37'}}>{formatTimeLeft(timeLeft)}</p>
         </div>
       </div>
     </div>
