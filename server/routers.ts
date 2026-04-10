@@ -40,172 +40,176 @@ export interface DiagnosticResult {
   nextSteps: string[];
 }
 
+const QUIZ_QUESTION_LABELS: Record<number, string> = {
+  0: "Qual é o seu nome?",
+  1: "Como você se sente espiritualmente hoje?",
+  2: "O que mais tem dificultado sua constância com Deus?",
+  3: "Como está sua rotina com a Palavra?",
+  4: "Como você descreveria sua vida de oração hoje?",
+  5: "O que você mais sente falta hoje na sua vida com Deus?",
+  6: "O que você sente que mais tem sido tratado em você nessa fase?",
+  7: "O que você mais deseja viver com Deus agora?",
+  8: "Quanto tempo por dia você consegue dedicar com intencionalidade?",
+  9: "Qual é sua maior dificuldade?",
+  10: "Como você se descreve espiritualmente neste momento?",
+  11: "Algo que você queira acrescentar ou desabafar?",
+};
+
 const getResponseValue = (responses: Record<string, string>, zeroIndexKey: number, stepKey: string) => {
   return responses[String(zeroIndexKey)] || responses[stepKey] || "";
 };
 
+const normalizeResponse = (value: string) => value.trim().toLowerCase();
+
+const formatAnswerSnippet = (value: string, fallback: string) => {
+  const normalized = value.trim();
+  return normalized ? `"${normalized}"` : fallback;
+};
+
+const buildTimeBasedRecommendation = (availableTime: string) => {
+  const normalized = normalizeResponse(availableTime);
+
+  if (normalized.includes("5 minutos")) {
+    return "Como hoje você só consegue separar 5 minutos, comece com um salmo por dia, uma oração objetiva e um pedido sincero de direção.";
+  }
+
+  if (normalized.includes("10 minutos")) {
+    return "Use seus 10 minutos diários com intencionalidade: 5 minutos na Palavra, 3 minutos em oração honesta e 2 minutos em silêncio diante de Deus.";
+  }
+
+  if (normalized.includes("15 minutos")) {
+    return "Com 15 minutos por dia, organize um pequeno altar diário: leitura bíblica, oração prática e um registro do que Deus está tratando em você.";
+  }
+
+  if (normalized.includes("20 minutos")) {
+    return "Como você consegue dedicar 20 minutos ou mais, vale estruturar um tempo completo com leitura, oração, silêncio e aplicação prática no mesmo dia.";
+  }
+
+  return "Defina um tempo diário realista e mantenha constância mesmo nos dias mais corridos, porque o seu avanço espiritual depende mais de regularidade do que de intensidade ocasional.";
+};
+
+export const buildResponsesContext = (responses: Record<string, string>) => {
+  return Object.entries(QUIZ_QUESTION_LABELS)
+    .map(([index, question]) => {
+      const numericIndex = Number(index);
+      const answer = getResponseValue(responses, numericIndex, `step${numericIndex + 1}`) || "Não respondido";
+      return `Pergunta ${numericIndex + 1}: ${question}\nResposta: ${answer}`;
+    })
+    .join("\n\n");
+};
+
+const resolveProfileName = (responses: Record<string, string>) => {
+  const currentState = normalizeResponse(getResponseValue(responses, 1, "step2"));
+  const bibleRoutine = normalizeResponse(getResponseValue(responses, 3, "step4"));
+  const missingWithGod = normalizeResponse(getResponseValue(responses, 5, "step6"));
+  const biggestDifficulty = normalizeResponse(getResponseValue(responses, 9, "step10"));
+  const spiritualSelfDescription = normalizeResponse(getResponseValue(responses, 10, "step11"));
+
+  if (
+    spiritualSelfDescription.includes("recomeçar") ||
+    spiritualSelfDescription.includes("reconstru") ||
+    currentState.includes("querendo voltar") ||
+    currentState.includes("recomeço")
+  ) {
+    return "espiritualmente em recomeço";
+  }
+
+  if (
+    spiritualSelfDescription.includes("cansada") ||
+    biggestDifficulty.includes("emocional") ||
+    missingWithGod.includes("paz")
+  ) {
+    return "espiritualmente cansado(a)";
+  }
+
+  if (
+    spiritualSelfDescription.includes("travada") ||
+    biggestDifficulty.includes("direção") ||
+    currentState.includes("sem direção")
+  ) {
+    return "espiritualmente travado(a)";
+  }
+
+  if (
+    spiritualSelfDescription.includes("amadurecendo") ||
+    bibleRoutine.includes("frequente e profunda") ||
+    currentState.includes("próxima de deus")
+  ) {
+    return "espiritualmente amadurecendo";
+  }
+
+  if (
+    currentState.includes("inconstante") ||
+    bibleRoutine.includes("irregular") ||
+    bibleRoutine.includes("quase parada")
+  ) {
+    return "espiritualmente instável";
+  }
+
+  return "espiritualmente em crescimento";
+};
+
 export const buildFallbackDiagnosis = (responses: Record<string, string>): DiagnosticResult => {
-  const step1 = getResponseValue(responses, 0, "step1");
-  const step3 = getResponseValue(responses, 2, "step3");
-  const step4 = getResponseValue(responses, 3, "step4");
-  const step5 = getResponseValue(responses, 4, "step5");
-  const step10 = getResponseValue(responses, 9, "step10");
+  const name = getResponseValue(responses, 0, "step1").trim();
+  const currentState = getResponseValue(responses, 1, "step2").trim();
+  const mainDifficulty = getResponseValue(responses, 2, "step3").trim();
+  const bibleRoutine = getResponseValue(responses, 3, "step4").trim();
+  const prayerLife = getResponseValue(responses, 4, "step5").trim();
+  const missingWithGod = getResponseValue(responses, 5, "step6").trim();
+  const currentTreatment = getResponseValue(responses, 6, "step7").trim();
+  const desireWithGod = getResponseValue(responses, 7, "step8").trim();
+  const availableTime = getResponseValue(responses, 8, "step9").trim();
+  const biggestDifficulty = getResponseValue(responses, 9, "step10").trim();
+  const spiritualSelfDescription = getResponseValue(responses, 10, "step11").trim();
+  const additionalContext = getResponseValue(responses, 11, "step12").trim();
 
-  if (
-    step10.includes("recomeçar") ||
-    step10.includes("reconstrução") ||
-    step1.includes("voltar") ||
-    step1.includes("recomeço")
-  ) {
-    return {
-      profileName: "espiritualmente em recomeço",
-      profileDescription:
-        "Você está em um momento de renovação espiritual. Existe dentro de você um desejo verdadeiro de voltar ao secreto, reconstruir sua constância e se aproximar de Deus com mais leveza e sinceridade.",
-      strengths: [
-        "Disposição para recomeçar",
-        "Sensibilidade espiritual",
-        "Humildade para reconhecer a necessidade de Deus",
-      ],
-      challenges: [
-        "Manter constância",
-        "Superar culpa ou frustração",
-        "Voltar à rotina espiritual com paz",
-      ],
-      recommendations: [
-        "Separe alguns minutos diários para oração simples",
-        "Recomece pela Palavra com metas pequenas",
-        "Busque apoio espiritual de alguém maduro na fé",
-      ],
-      nextSteps: ["Dê hoje um passo simples e consistente na sua caminhada com Deus."],
-    };
-  }
-
-  if (step10.includes("cansada") || step5.includes("Paz") || step5.includes("paz")) {
-    return {
-      profileName: "espiritualmente cansado(a)",
-      profileDescription:
-        "Você ama a Deus, mas tem carregado um peso maior do que deveria. Seu coração precisa de descanso, cuidado e renovação para voltar a viver a presença de Deus com profundidade e paz.",
-      strengths: [
-        "Desejo de permanecer na fé",
-        "Consciência de que precisa de cuidado",
-        "História de caminhada com Deus",
-      ],
-      challenges: [
-        "Cansaço emocional e espiritual",
-        "Desânimo",
-        "Dificuldade de manter energia espiritual",
-      ],
-      recommendations: [
-        "Simplifique sua rotina devocional por alguns dias",
-        "Escolha passagens bíblicas de descanso e esperança",
-        "Ore com honestidade, sem tentar performar",
-      ],
-      nextSteps: ["Permita-se descansar em Deus antes de tentar acelerar novamente."],
-    };
-  }
-
-  if (step10.includes("Travada") || step10.includes("travada") || step3.includes("parada")) {
-    return {
-      profileName: "espiritualmente travado(a)",
-      profileDescription:
-        "Você sente que existe algo interrompendo seu avanço espiritual. Há sede de mudança, mas também bloqueios internos que precisam ser identificados e tratados com verdade, oração e constância.",
-      strengths: ["Consciência do bloqueio", "Desejo real de mudança", "Potencial de transformação"],
-      challenges: ["Romper ciclos repetitivos", "Retomar foco espiritual", "Vencer travas emocionais"],
-      recommendations: [
-        "Anote os padrões que mais te afastam de Deus",
-        "Ore com objetividade sobre suas travas",
-        "Busque aconselhamento cristão se possível",
-      ],
-      nextSteps: ["Seu próximo passo é identificar a raiz do que tem te paralisado."],
-    };
-  }
-
-  if (
-    step10.includes("Amadurecendo") ||
-    step10.includes("amadurecendo") ||
-    step3.includes("Frequente e profunda") ||
-    step3.includes("frequente e profunda")
-  ) {
-    return {
-      profileName: "espiritualmente amadurecendo",
-      profileDescription:
-        "Você está em uma fase saudável de crescimento espiritual. Há sinais de profundidade, sede pela Palavra e disposição para viver uma caminhada mais consistente, madura e frutífera.",
-      strengths: [
-        "Constância crescente",
-        "Desejo de profundidade",
-        "Capacidade de amadurecer com propósito",
-      ],
-      challenges: ["Evitar acomodação", "Continuar avançando", "Manter sensibilidade espiritual"],
-      recommendations: [
-        "Aprofunde seu tempo de estudo bíblico",
-        "Transforme constância em estilo de vida",
-        "Sirva outras pessoas com aquilo que Deus já te ensinou",
-      ],
-      nextSteps: ["Continue crescendo com constância e intencionalidade diante de Deus."],
-    };
-  }
-
-  if (step5.includes("Direção") || step5.includes("direção") || step1.includes("sem direção") || step10.includes("fome")) {
-    return {
-      profileName: "espiritualmente buscando direção",
-      profileDescription:
-        "Você tem fome de Deus e quer viver algo mais profundo, mas ainda sente falta de clareza para entender o próximo passo. Deus está trabalhando direção no meio da sua busca sincera.",
-      strengths: ["Fome espiritual genuína", "Desejo de ouvir Deus", "Abertura para mudança"],
-      challenges: [
-        "Confusão sobre o próximo passo",
-        "Ansiedade por respostas rápidas",
-        "Dificuldade em discernir direção",
-      ],
-      recommendations: [
-        "Separe tempo de silêncio e oração",
-        "Leia a Bíblia buscando princípios de direção",
-        "Evite decisões precipitadas enquanto busca clareza",
-      ],
-      nextSteps: [
-        "Deus pode estar te guiando primeiro à clareza interior, antes da resposta externa.",
-      ],
-    };
-  }
-
-  if (
-    step4.includes("instável") ||
-    step4.includes("pouco constante") ||
-    step3.includes("Irregular") ||
-    step3.includes("irregular")
-  ) {
-    return {
-      profileName: "espiritualmente instável",
-      profileDescription:
-        "Sua caminhada com Deus tem sido marcada por fases de aproximação e afastamento. Ainda assim, existe dentro de você um desejo verdadeiro de viver uma constância mais saudável e madura.",
-      strengths: [
-        "Desejo sincero de estar com Deus",
-        "Consciência dos altos e baixos",
-        "Capacidade de recomeçar",
-      ],
-      challenges: ["Falta de consistência", "Oscilações emocionais", "Dificuldade em manter disciplina"],
-      recommendations: [
-        "Crie uma rotina espiritual simples e realista",
-        "Associe seu momento com Deus a um horário fixo",
-        "Evite metas grandes demais no início",
-      ],
-      nextSteps: [
-        "Pequenos passos consistentes vão te levar mais longe do que grandes promessas ocasionais.",
-      ],
-    };
-  }
+  const firstName = name.split(/\s+/).filter(Boolean)[0] || "";
+  const intro = firstName ? `${firstName}, ` : "";
+  const profileName = resolveProfileName(responses);
+  const additionalSentence = additionalContext
+    ? ` No que você acrescentou no final, ficou ainda mais claro quando você disse ${formatAnswerSnippet(additionalContext, 'que está vivendo uma fase delicada')}.`
+    : "";
 
   return {
-    profileName: "espiritualmente em crescimento",
+    profileName,
     profileDescription:
-      "Seu diagnóstico mostra que você está em um processo de crescimento espiritual com áreas importantes a fortalecer. Há potencial, fome e espaço para viver uma caminhada mais profunda com Deus a partir de agora.",
-    strengths: ["Desejo de crescer", "Abertura para aprender", "Sensibilidade espiritual"],
-    challenges: ["Criar constância", "Manter foco", "Transformar intenção em prática"],
-    recommendations: [
-      "Escolha um horário diário para se dedicar a Deus",
-      "Comece com um plano bíblico simples",
-      "Ore com constância, mesmo que por poucos minutos",
+      `${intro}hoje você se percebe como ${formatAnswerSnippet(spiritualSelfDescription || currentState, 'alguém em busca de respostas espirituais')}. O que mais tem dificultado sua constância com Deus é ${formatAnswerSnippet(mainDifficulty, 'uma pressão interna que tem drenado sua constância')}, e isso aparece na sua rotina com a Palavra, que está ${formatAnswerSnippet(bibleRoutine, 'oscilante')}, e na sua vida de oração, hoje ${formatAnswerSnippet(prayerLife, 'fragilizada')}. Você sente falta de ${formatAnswerSnippet(missingWithGod, 'mais intimidade com Deus')} e deseja viver ${formatAnswerSnippet(desireWithGod, 'uma aproximação mais profunda com Deus')}, o que mostra que ainda existe sede real dentro de você. ${buildTimeBasedRecommendation(availableTime)}${additionalSentence}`.trim(),
+    strengths: [
+      desireWithGod
+        ? `Existe um desejo claro de viver ${normalizeResponse(desireWithGod)} com Deus.`
+        : "Existe desejo genuíno de se aproximar mais de Deus.",
+      currentTreatment
+        ? `Você tem consciência de que Deus está tratando ${normalizeResponse(currentTreatment)} nesta fase.`
+        : "Você demonstra sensibilidade para perceber o que Deus está tratando em você.",
+      spiritualSelfDescription || currentState
+        ? `Você consegue nomear sua fase espiritual com honestidade, ao se descrever como ${formatAnswerSnippet(spiritualSelfDescription || currentState, 'alguém em processo')}.`
+        : "Você tem honestidade espiritual para reconhecer sua fase atual.",
     ],
-    nextSteps: ["Seu próximo nível espiritual começa com consistência nas pequenas decisões."],
+    challenges: [
+      mainDifficulty
+        ? `Seu principal bloqueio hoje está em ${normalizeResponse(mainDifficulty)}.`
+        : "Existe um bloqueio recorrente afetando sua constância.",
+      biggestDifficulty
+        ? `A sua maior dificuldade prática tem sido ${normalizeResponse(biggestDifficulty)}.`
+        : "Há uma dificuldade prática impedindo avanço consistente.",
+      bibleRoutine || prayerLife
+        ? `Sua rotina espiritual mostra fragilidade entre Palavra (${normalizeResponse(bibleRoutine || 'oscilante')}) e oração (${normalizeResponse(prayerLife || 'instável')}).`
+        : "Sua rotina espiritual perdeu consistência entre Palavra e oração.",
+    ],
+    recommendations: [
+      buildTimeBasedRecommendation(availableTime),
+      missingWithGod
+        ? `Como você sente falta de ${normalizeResponse(missingWithGod)}, direcione seus próximos devocionais para textos bíblicos e orações que fortaleçam exatamente essa área.`
+        : "Escolha um foco espiritual claro para seus próximos devocionais e ore especificamente sobre isso.",
+      mainDifficulty || biggestDifficulty
+        ? `Crie uma resposta prática contra o que hoje mais te trava — ${normalizeResponse(mainDifficulty || biggestDifficulty)} — para que sua vida espiritual não continue sendo guiada pelo improviso.`
+        : "Transforme sua principal trava espiritual em um alvo claro de oração e ação nesta semana.",
+    ],
+    nextSteps: [
+      desireWithGod
+        ? `Seu próximo passo é separar ${availableTime || 'alguns minutos'} ainda hoje e buscar a Deus com foco em ${normalizeResponse(desireWithGod)}.`
+        : `Seu próximo passo é separar ${availableTime || 'alguns minutos'} ainda hoje e retomar sua constância com Deus de forma simples e honesta.`,
+    ],
   };
 };
 
@@ -611,50 +615,40 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { invokeLLM } = await import("./_core/llm");
 
-        const responsesText = Object.entries(input.responses)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join("\n");
+        const responsesText = buildResponsesContext(input.responses);
 
-        const prompt = `VOCÊ É UM ESPECIALISTA EM DIAGNÓSTICO ESPIRITUAL COM PROFUNDA EMPATIA E CAPACIDADE DE IDENTIFICAR PADRÕES ÚNICOS.
+        const prompt = `VOCÊ É UM ESPECIALISTA EM DIAGNÓSTICO ESPIRITUAL CRISTÃO, COM BASE BÍBLICA, E SUA ANÁLISE PRECISA PARECER IMPOSSÍVEL DE SER GENÉRICA.
 
-Sua missão é criar um diagnóstico que deixe a pessoa ENCANTADA pela precisão e profundidade da análise.
+A seguir estão as perguntas do quiz com as respostas reais do usuário. Você DEVE analisar o significado espiritual de CADA resposta e cruzar os padrões entre elas.
 
-RESPOSTAS DO USUÁRIO (ANALISE CADA UMA COM PROFUNDIDADE):
+QUIZ COMPLETO:
 ${responsesText}
 
-INSTRUÇÕES CRÍTICAS:
+OBJETIVO:
+Produza um diagnóstico que faça a pessoa sentir que você realmente leu e entendeu sua fase espiritual. O texto precisa soar individual, específico, íntimo, coerente e profundamente conectado ao que ela respondeu.
 
-1. IDENTIFIQUE PADRÕES ÚNICOS: Procure por padrões recorrentes, contradições significativas, desejos profundos e bloqueios específicos. NÃO gere um perfil genérico.
-
-2. CRIE CONEXÃO EMOCIONAL REAL: O diagnóstico deve fazer a pessoa se sentir verdadeiramente compreendida. Use insights que apenas alguém que realmente analisou suas respostas poderia gerar.
-
-3. SEJA ESPECÍFICO E PRECISO: Cada elemento deve refletir especificamente as respostas dadas, não conceitos genéricos.
-
-4. PROFUNDIDADE ESPIRITUAL: Vá além da superfície. Identifique:
-   - O tipo de busca espiritual específica desta pessoa
-   - Seus medos e anseios mais profundos
-   - Seus pontos fortes únicos
-   - Seus bloqueios específicos
-   - O caminho personalizado que ela precisa seguir
-
-5. ENCANTAMENTO: O usuário deve ficar impressionado com a precisão.
+REGRAS OBRIGATÓRIAS:
+1. NÃO escreva conteúdo genérico, amplo ou reaproveitável.
+2. O profileDescription deve mencionar pelo menos 4 evidências concretas extraídas das respostas.
+3. Strengths, challenges e recommendations também devem nascer de respostas concretas do quiz.
+4. Uma das recomendações deve considerar explicitamente o tempo diário disponível informado pela pessoa.
+5. Se houver desabafo final, use esse conteúdo como pista importante da dor real vivida agora.
+6. Use linguagem cristã, acolhedora, bíblica e direta, sem soar mística, vaga ou poética demais.
+7. Não invente respostas que a pessoa não deu.
+8. O diagnóstico deve mostrar relação entre sintomas, causa provável e próximo passo prático com Deus.
 
 Gere uma resposta JSON com a seguinte estrutura:
 {
-  "profileName": "Um título SIMPLES e DIRETO que descreve o estado espiritual (SEM emoji, SEM poesia, SEM metáforas). Exemplos: 'espiritualmente instável', 'espiritualmente cansado', 'espiritualmente confuso', 'espiritualmente sobrecarregado'. Use apenas linguagem clara e direta.",
-  "profileDescription": "Um parágrafo profundo (4-5 frases) que descreve o perfil de forma precisa, emocional e encantadora. Deve fazer a pessoa se sentir completamente compreendida. Use insights específicos das respostas. Seja transformador.",
-  "strengths": ["força 1 específica baseada nas respostas", "força 2 específica baseada nas respostas", "força 3 específica baseada nas respostas"],
-  "challenges": ["desafio 1 específico identificado nas respostas", "desafio 2 específico identificado nas respostas", "desafio 3 específico identificado nas respostas"],
-  "recommendations": ["recomendação 1 personalizada para este perfil específico", "recomendação 2 personalizada para este perfil específico", "recomendação 3 personalizada para este perfil específico"],
-  "nextSteps": ["próximo passo 1 específico para a jornada desta pessoa"]
+  "profileName": "Um título simples, direto e objetivo, sem emoji e sem metáforas. Exemplos válidos: 'espiritualmente em recomeço', 'espiritualmente cansado(a)', 'espiritualmente travado(a)', 'espiritualmente amadurecendo'.",
+  "profileDescription": "Um parágrafo com alta personalização, citando sinais concretos presentes nas respostas e mostrando por que esse diagnóstico faz sentido para essa pessoa específica.",
+  "strengths": ["força específica 1 derivada das respostas", "força específica 2 derivada das respostas", "força específica 3 derivada das respostas"],
+  "challenges": ["desafio específico 1 derivado das respostas", "desafio específico 2 derivado das respostas", "desafio específico 3 derivado das respostas"],
+  "recommendations": ["recomendação específica 1 baseada nas respostas", "recomendação específica 2 baseada nas respostas", "recomendação específica 3 baseada nas respostas"],
+  "nextSteps": ["um próximo passo muito claro, realista e coerente com a fase e com o tempo disponível da pessoa"]
 }
 
-REGRAS IMPORTANTES:
-- Use APENAS linguagem simples e direta (sem emoji, sem poesia, sem metáforas)
-- O profileName deve ser um adjetivo + "espiritualmente" + estado (ex: "espiritualmente cansado")
-- SEMPRE use insights específicos das respostas, não conceitos genéricos
-- SEMPRE deixe a pessoa encantada com a profundidade e precisão
-- Use tom profundo, empático, encorajador e transformador`;
+CRITÉRIO DE QUALIDADE:
+Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, então sua resposta está errada.`;
 
         try {
           const response = await invokeLLM({

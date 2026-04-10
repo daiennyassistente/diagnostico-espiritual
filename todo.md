@@ -569,3 +569,15 @@
 - [x] Corrigir título do resultado para evitar combinações confusas entre prefixo da interface e profileName retornado
 - [x] Padronizar nomes de fallback do diagnóstico com linguagem direta e sem emojis
 - [x] Atualizar teste do fallback para garantir títulos claros e consistentes
+
+## Personalização Total do Diagnóstico
+- [ ] Reescrever o prompt da IA para obrigar análise específica de cada resposta do quiz
+- [ ] Ajustar a geração do diagnóstico para citar padrões concretos, dores e desejos extraídos das respostas
+- [ ] Revisar o resultado renderizado para garantir sensação de diagnóstico individual e não genérico
+- [ ] Criar ou atualizar testes para validar a especificidade mínima do diagnóstico gerado
+
+## Personalização Total do Diagnóstico - concluído
+- [x] Reescrever o prompt da IA para obrigar análise específica de cada resposta do quiz
+- [x] Ajustar a geração do diagnóstico para citar padrões concretos, dores e desejos extraídos das respostas
+- [x] Revisar o resultado renderizado para garantir sensação de diagnóstico individual e não genérico
+- [x] Criar ou atualizar testes para validar a especificidade mínima do diagnóstico gerado
