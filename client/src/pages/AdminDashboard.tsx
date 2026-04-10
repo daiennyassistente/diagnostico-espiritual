@@ -478,7 +478,40 @@ export function AdminDashboard() {
             description="Aqui ficam os pagamentos vinculados ao funil real do Diagnóstico Espiritual, usando a mesma base de leads e os registros do checkout."
           />
 
-          <div className="grid gap-4 md:grid-cols-3">
+          
+          <div className="flex gap-2 flex-wrap items-end">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">Data de Início</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">Data de Término</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+            </div>
+            {(startDate || endDate) && (
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                }}
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+              >
+                Limpar datas
+              </button>
+            )}
+          </div>
+
+<div className="grid gap-4 md:grid-cols-3">
             <MetricCard
               icon={CreditCard}
               label="Compras aprovadas"
@@ -548,6 +581,39 @@ export function AdminDashboard() {
     // Dashboard section
     return (
       <div className="space-y-8">
+        <div className="flex gap-2 flex-wrap items-end">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-muted-foreground">Data de Início</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-muted-foreground">Data de Término</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </div>
+          {(startDate || endDate) && (
+            <button
+              onClick={() => {
+                setStartDate("");
+                setEndDate("");
+              }}
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+            >
+              Limpar datas
+            </button>
+          )}
+        </div>
+
+
         <SectionHeading
           eyebrow="Dashboard de Resultados"
           title="Funil e diagnósticos reais do site"
