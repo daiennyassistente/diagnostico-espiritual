@@ -58,9 +58,7 @@ export function getMercadoPagoInitPoint(preference: any): string | null {
   const initPoint = preference?.init_point || null;
   if (!initPoint) return null;
   
-  // Adicionar parâmetro para abrir direto na página de pagamento
-  // ?preference-id=xxx abre no resumo
-  // ?preference-id=xxx&mode=payment abre na página de pagamento
-  const urlWithPaymentMode = `${initPoint}?mode=payment`;
-  return urlWithPaymentMode;
+  // Retornar o init_point diretamente
+  // O Mercado Pago irá detectar o dispositivo no navegador
+  return initPoint;
 }
