@@ -356,8 +356,11 @@ export default function Result() {
           {/* TÍTULO - DIRETO E CLARO */}
           <div className="text-center space-y-3">
             <h1 className="text-4xl md:text-5xl font-black leading-tight" style={{color: '#1E3A8A'}}>
-              {result.profileName}
+              Você está espiritualmente sobrecarregado(a)
             </h1>
+            <p className="text-lg" style={{color: '#6B7280'}}>
+              Seu diagnóstico revela pontos importantes da sua vida com Deus.
+            </p>
           </div>
 
           {/* DIAGNÓSTICO - CURTO E IMPACTANTE */}
@@ -398,10 +401,10 @@ export default function Result() {
             <Button
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
-              className="flex items-center gap-2 text-white font-semibold px-4 py-2 text-sm"
-              style={{backgroundColor: '#C9A646'}}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8953C'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C9A646'}
+              className="flex items-center gap-2 font-semibold px-4 py-2 text-sm"
+              style={{backgroundColor: '#FACC15', color: '#1F2937'}}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#EAB308'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FACC15'}
             >
               <Download className="w-4 h-4" />
               {isGeneratingPDF ? "Gerando..." : "Baixar"}
@@ -493,14 +496,14 @@ export default function Result() {
             <Button
               onClick={handleBuyDevocional}
               disabled={isBuyingGuide}
-              className="w-full text-white font-bold text-base py-4 rounded-lg shadow-md"
-              style={{backgroundColor: '#C9A646'}}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8953C'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C9A646'}
+              className="w-full font-bold text-base py-4 rounded-lg shadow-md"
+              style={{backgroundColor: '#FACC15', color: '#1F2937'}}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#EAB308'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FACC15'}
             >
               {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
             </Button>
-            <p className="text-center text-base font-bold" style={{color: '#C9A646'}}>R$ 12,90 investimento único</p>
+            <p className="text-center text-base font-bold" style={{color: '#FACC15'}}>R$ 12,90 investimento único</p>
           </div>
         </div>
 
