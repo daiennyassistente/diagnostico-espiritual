@@ -32,6 +32,7 @@ import {
   YAxis,
 } from "recharts";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { toast } from "sonner";
 
 type AdminSection = "dashboard" | "usuarios" | "compradores";
 
@@ -357,8 +358,9 @@ export function AdminDashboard() {
                                 textColor="text-amber-700"
                                 hoverColor="hover:bg-amber-200"
                                 onClick={() => {
-                                  console.log('Redirecting to checkout-success');
-                                  window.location.href = `/checkout-success?leadId=${user?.id}`;
+                                  const link = `${window.location.origin}/checkout-success?leadId=${item.id}`;
+                                  navigator.clipboard.writeText(link);
+                                  toast.success('Link copiado para a área de transferência!');
                                 }}
                                 isLoading={false}
                               />
@@ -369,9 +371,11 @@ export function AdminDashboard() {
                                 textColor="text-purple-700"
                                 hoverColor="hover:bg-purple-200"
                                 onClick={() => {
-                                  window.location.href = `/checkout-success?leadId=${item.id}`;
+                                  const link = `${window.location.origin}/checkout-success?leadId=${item.id}`;
+                                  navigator.clipboard.writeText(link);
+                                  toast.success('Link copiado para a área de transferência!');
                                 }}
-                                isLoading={unlockAccessMutation.isPending}
+                                isLoading={false}
                               />
                             </div>
                           </td>
