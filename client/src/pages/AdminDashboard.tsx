@@ -188,6 +188,8 @@ function ActionButton({
 export function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const { user } = useAuth();
 
   // Mutações para ações dos botões
@@ -205,6 +207,28 @@ export function AdminDashboard() {
   const buyers = snapshotQuery.data?.buyers ?? [];
   const diagnostics = snapshotQuery.data?.diagnostics ?? [];
 
+  const filteredBuyers = useMemo(() => {
+    let filtered = buyers.filter((buyer) => buyer.status === "succeeded");
+    
+    if (startDate || endDate) {
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      
+      filtered = filtered.filter((buyer) => {
+        const buyerDate = new Date(buyer.createdAt);
+        if (start && buyerDate < start) return false;
+        if (end) {
+          const endOfDay = new Date(end);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (buyerDate > endOfDay) return false;
+        }
+        return true;
+      });
+    }
+    
+    return filtered;
+  }, [buyers, startDate, endDate]);
+
   const approvedBuyers = useMemo(
     () => buyers.filter((buyer) => buyer.status === "succeeded"),
     [buyers],
@@ -213,19 +237,40 @@ export function AdminDashboard() {
   const latestDiagnostics = useMemo(() => diagnostics.slice(0, 6), [diagnostics]);
 
   const filteredUsers = useMemo(() => {
-    if (!searchQuery.trim()) return users;
-    const query = searchQuery.toLowerCase();
-    return users.filter((user) => {
-      const nameStr = typeof user.name === 'string' ? user.name : String(user.name || '');
-      const emailStr = typeof user.email === 'string' ? user.email : String(user.email || '');
-      const whatsappStr = typeof user.whatsapp === 'string' ? user.whatsapp : String(user.whatsapp || '');
-      return (
-        nameStr.toLowerCase().includes(query) ||
-        emailStr.toLowerCase().includes(query) ||
-        whatsappStr.toLowerCase().includes(query)
-      );
-    });
-  }, [users, searchQuery]);
+    let filtered = users;
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((user) => {
+        const nameStr = typeof user.name === 'string' ? user.name : String(user.name || '');
+        const emailStr = typeof user.email === 'string' ? user.email : String(user.email || '');
+        const whatsappStr = typeof user.whatsapp === 'string' ? user.whatsapp : String(user.whatsapp || '');
+        return (
+          nameStr.toLowerCase().includes(query) ||
+          emailStr.toLowerCase().includes(query) ||
+          whatsappStr.toLowerCase().includes(query)
+        );
+      });
+    }
+    
+    if (startDate || endDate) {
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      
+      filtered = filtered.filter((user) => {
+        const userDate = new Date(user.updatedAt);
+        if (start && userDate < start) return false;
+        if (end) {
+          const endOfDay = new Date(end);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (userDate > endOfDay) return false;
+        }
+        return true;
+      });
+    }
+    
+    return filtered;
+  }, [users, searchQuery, startDate, endDate]);
 
   const renderContent = () => {
     if (snapshotQuery.isLoading) {
@@ -259,14 +304,39 @@ export function AdminDashboard() {
             description="Lista de todas as pessoas que responderam o quiz de diagnóstico espiritual, com informações de contato e data de resposta."
           />
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <input
               type="text"
               placeholder="Buscar por nome, email ou telefone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              title="Data de início"
+            />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              title="Data de término"
+            />
+            {(startDate || endDate) && (
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                }}
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+              >
+                Limpar datas
+              </button>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -425,7 +495,7 @@ export function AdminDashboard() {
             />
           </div>
 
-          {approvedBuyers.length === 0 ? (
+          {filteredBuyers.length === 0 ? (
             <EmptyState
               title="Nenhum comprador registrado"
               description="Assim que alguém completar a compra do devocional, os dados aparecerão aqui com status de pagamento e informações de transação."
@@ -447,7 +517,7 @@ export function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {approvedBuyers.map((buyer) => (
+                    {filteredBuyers.map((buyer) => (
                       <tr key={buyer.id} className="border-t border-border/50 align-top">
                         <td className="px-5 py-4 text-foreground">{buyer.email || "-"}</td>
                         <td className="px-5 py-4 text-muted-foreground">{buyer.whatsapp || "-"}</td>
