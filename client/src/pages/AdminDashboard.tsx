@@ -357,7 +357,19 @@ export default function AdminDashboard() {
                                 textColor="text-amber-700"
                                 hoverColor="hover:bg-amber-200"
                                 onClick={() => {
-                                  generateLinkMutation.mutate({ leadId: item.id });
+                                  generateLinkMutation.mutate(
+                                    { leadId: item.id },
+                                    {
+                                      onSuccess: (data) => {
+                                        const shareUrl = `${window.location.origin}/share?token=${data.downloadToken}`;
+                                        navigator.clipboard.writeText(shareUrl);
+                                        alert(`Link copiado: ${shareUrl}`);
+                                      },
+                                      onError: (error) => {
+                                        alert(`Erro: ${error.message}`);
+                                      },
+                                    }
+                                  );
                                 }}
                                 isLoading={generateLinkMutation.isPending}
                               />

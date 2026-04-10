@@ -867,15 +867,21 @@ export async function getLeadWithDiagnosticByToken(token: string) {
     .where(eq(quizResponses.leadId, payment[0].leadId))
     .limit(1);
 
-  return {
-    profileName: diagnostic[0].profileName,
-    profileDescription: diagnostic[0].profileDescription,
-    strengths: JSON.parse(diagnostic[0].strengths),
-    challenges: JSON.parse(diagnostic[0].challenges),
-    recommendations: JSON.parse(diagnostic[0].recommendations),
-    nextSteps: JSON.parse(diagnostic[0].nextSteps),
-    userResponses: quizResponse?.[0] || null,
-  };
+  try {
+    return {
+      profileName: diagnostic[0].profileName,
+      profileDescription: diagnostic[0].profileDescription,
+      strengths: Array.isArray(diagnostic[0].strengths) ? diagnostic[0].strengths : JSON.parse(diagnostic[0].strengths || '[]'),
+      challenges: Array.isArray(diagnostic[0].challenges) ? diagnostic[0].challenges : JSON.parse(diagnostic[0].challenges || '[]'),
+      recommendations: Array.isArray(diagnostic[0].recommendations) ? diagnostic[0].recommendations : JSON.parse(diagnostic[0].recommendations || '[]'),
+      nextSteps: Array.isArray(diagnostic[0].nextSteps) ? diagnostic[0].nextSteps : JSON.parse(diagnostic[0].nextSteps || '[]'),
+      userResponses: quizResponse?.[0] || null,
+    };
+  } catch (error) {
+    console.error('Error parsing diagnostic data:', error);
+    console.error('Diagnostic data:', diagnostic[0]);
+    throw error;
+  }
 }
 
 export async function updatePaymentDownloadToken(leadId: number, token: string) {
@@ -891,11 +897,19 @@ export async function updatePaymentDownloadToken(leadId: number, token: string) 
     .limit(1);
 
   if (!payment || payment.length === 0) {
-    throw new Error("Payment not found for this lead");
+    // Create a new payment record if it doesn't exist
+    await db.insert(payments).values({
+      leadId,
+      amount: 0,
+      currency: "brl",
+      status: "pending",
+      productName: "Diagnóstico Espiritual",
+      downloadToken: token,
+    });
+  } else {
+    await db
+      .update(payments)
+      .set({ downloadToken: token })
+      .where(eq(payments.id, payment[0].id));
   }
-
-  await db
-    .update(payments)
-    .set({ downloadToken: token })
-    .where(eq(payments.id, payment[0].id));
 }
