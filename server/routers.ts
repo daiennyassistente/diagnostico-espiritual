@@ -641,7 +641,7 @@ INSTRUÇÕES CRÍTICAS:
 
 Gere uma resposta JSON com a seguinte estrutura:
 {
-  "profileName": "Um nome de perfil ÚNICO e específico (com emoji) que reflete exatamente o padrão identificado. NÃO use nomes genéricos como 'Buscador Sedento'. Exemplos: 🕊️ Alma Buscando Paz em Meio à Tempestade, 🔥 Coração Ardente Buscando Direção, 🌱 Semente Pronta para Germinar",
+  "profileName": "Um título SIMPLES e DIRETO que descreve o estado espiritual (SEM emoji, SEM poesia, SEM metáforas). Exemplos: 'espiritualmente instável', 'espiritualmente cansado', 'espiritualmente confuso', 'espiritualmente sobrecarregado'. Use apenas linguagem clara e direta.",
   "profileDescription": "Um parágrafo profundo (4-5 frases) que descreve o perfil de forma precisa, emocional e encantadora. Deve fazer a pessoa se sentir completamente compreendida. Use insights específicos das respostas. Seja transformador.",
   "strengths": ["força 1 específica baseada nas respostas", "força 2 específica baseada nas respostas", "força 3 específica baseada nas respostas"],
   "challenges": ["desafio 1 específico identificado nas respostas", "desafio 2 específico identificado nas respostas", "desafio 3 específico identificado nas respostas"],
@@ -650,8 +650,8 @@ Gere uma resposta JSON com a seguinte estrutura:
 }
 
 REGRAS IMPORTANTES:
-- NUNCA use nomes genéricos como 'Buscador Sedento', 'Alma Madura', 'Peregrino', etc.
-- SEMPRE crie nomes únicos que refletem o padrão específico encontrado
+- Use APENAS linguagem simples e direta (sem emoji, sem poesia, sem metáforas)
+- O profileName deve ser um adjetivo + "espiritualmente" + estado (ex: "espiritualmente cansado")
 - SEMPRE use insights específicos das respostas, não conceitos genéricos
 - SEMPRE deixe a pessoa encantada com a profundidade e precisão
 - Use tom profundo, empático, encorajador e transformador`;
