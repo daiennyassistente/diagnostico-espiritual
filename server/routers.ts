@@ -379,8 +379,8 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const { getLeadWithDiagnostic, updatePaymentDownloadToken } = await import('./db');
         const leadData = await getLeadWithDiagnostic(input.leadId);
-        if (!leadData) {
-          throw new Error('Lead not found');
+        if (!leadData || !leadData.diagnostic) {
+          throw new Error('Lead ou diagnóstico não encontrado');
         }
         const downloadToken = Buffer.from(`${input.leadId}-${Date.now()}-${Math.random().toString(36).substring(7)}`).toString('base64');
         await updatePaymentDownloadToken(input.leadId, downloadToken);

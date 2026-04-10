@@ -716,9 +716,11 @@ export async function getLeadWithDiagnostic(leadId: number) {
     .where(eq(diagnosticHistory.leadId, leadId))
     .limit(1);
 
+  if (diagnostic.length === 0) return null;
+
   return {
     ...lead[0],
-    diagnostic: diagnostic.length > 0 ? diagnostic[0] : null,
+    diagnostic: diagnostic[0],
   };
 }
 
