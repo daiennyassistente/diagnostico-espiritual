@@ -399,9 +399,9 @@ export default function Result() {
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
               className="flex items-center gap-2 text-white font-semibold px-4 py-2 text-sm"
-              style={{backgroundColor: '#D4AF37'}}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8962E'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#D4AF37'}
+              style={{backgroundColor: '#C9A646'}}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8953C'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C9A646'}
             >
               <Download className="w-4 h-4" />
               {isGeneratingPDF ? "Gerando..." : "Baixar"}
@@ -445,40 +445,37 @@ export default function Result() {
         {/* ===== SEÇÃO DE OFERTA - MINIMALISTA E FOCADA ===== */}
         <div className="rounded-xl p-8 space-y-6 shadow-lg" style={{backgroundColor: '#FFFFFF', border: '2px solid #3B82F6'}}>
           
-          {/* PREÇO EM DESTAQUE */}
-          <div className="text-center space-y-2">
-            <div className="text-5xl font-black" style={{color: '#D4AF37'}}>R$ 12,90</div>
-            <p className="text-sm font-medium" style={{color: '#6B7280'}}>Investimento único</p>
-          </div>
-
-          {/* OFERTA - DIRETO */}
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-black" style={{color: '#1E3A8A'}}>
-              📖 Devocional: 7 Dias para se Reconectar
+          {/* OFERTA - TÍTULO IMPACTANTE */}
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl md:text-5xl font-black leading-tight" style={{color: '#1E3A8A'}}>
+              Retome Sua Conexão com Deus
             </h2>
+            <p className="text-lg font-semibold" style={{color: '#C9A646'}}>
+              📖 Devocional: 7 Dias Guiados
+            </p>
             <p className="text-base" style={{color: '#1F2937'}}>
-              Um plano guiado para retomar sua conexão com Deus e voltar a sentir paz.
+              Um plano simples e profundo para voltar a sentir paz e direção.
             </p>
           </div>
 
           {/* O QUE INCLUI */}
-          <div className="space-y-3 rounded-lg p-4" style={{backgroundColor: '#F5E6B3'}}>
+          <div className="space-y-3 rounded-lg p-4" style={{backgroundColor: '#F2E8C9'}}>
             <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>Você recebe:</p>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
                 <span>7 dias de devocional guiado</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
                 <span>5-10 min de oração diária</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
                 <span>Versículos + reflexões</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#D4AF37'}} />
+                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
                 <span>Acesso imediato</span>
               </li>
             </ul>
@@ -491,26 +488,26 @@ export default function Result() {
             </p>
           </div>
 
-          {/* CTA - ÚNICO E FORTE */}
+          {/* CTA - Único E FORTE */}
           <div className="space-y-3">
             <Button
               onClick={handleBuyDevocional}
               disabled={isBuyingGuide}
               className="w-full text-white font-bold text-base py-4 rounded-lg shadow-md"
-              style={{backgroundColor: '#D4AF37'}}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8962E'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#D4AF37'}
+              style={{backgroundColor: '#C9A646'}}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B8953C'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C9A646'}
             >
               {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
             </Button>
-            <p className="text-center text-sm font-semibold" style={{color: '#D4AF37'}}>R$ 12,90 único</p>
+            <p className="text-center text-base font-bold" style={{color: '#C9A646'}}>R$ 12,90 investimento único</p>
           </div>
         </div>
 
         {/* TIMER */}
         <div className="text-center pb-4">
           <p className="text-sm font-semibold" style={{color: '#1E3A8A'}}>Seu resultado estará disponível por:</p>
-          <p className="text-2xl font-black" style={{color: '#D4AF37'}}>{formatTimeLeft(timeLeft)}</p>
+          <p className="text-2xl font-black" style={{color: '#C9A646'}}>{formatTimeLeft(timeLeft)}</p>
         </div>
       </div>
     </div>
