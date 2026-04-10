@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Share2, RotateCcw, CheckCircle2, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { PaymentModal } from "@/components/PaymentModal";
 
 interface AIResult {
   profileName: string;
@@ -29,7 +28,6 @@ export default function Result() {
   const timerRef = useRef<number | null>(null);
   const [isBuyingGuide, setIsBuyingGuide] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | null>(null);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
@@ -294,8 +292,25 @@ export default function Result() {
       return;
     }
     
-    // Abrir modal de pagamento
-    setIsPaymentModalOpen(true);
+    const { email } = JSON.parse(leadData);
+    
+    createMercadoPagoCheckoutMutation.mutate(
+      {
+        email,
+        profileName: result.profileName,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success && data.checkoutUrl) {
+            window.open(data.checkoutUrl, '_blank');
+            toast.success("Abrindo checkout...");
+          }
+        },
+        onError: () => {
+          toast.error("Erro ao criar checkout");
+        },
+      }
+    );
   };
 
   if (isLoading) {
