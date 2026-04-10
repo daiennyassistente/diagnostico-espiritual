@@ -326,7 +326,7 @@ export default function Result() {
     return (
       <div className="spiritual-background min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-foreground text-lg">Gerando seu diagnóstico personalizado...</p>
           <p className="text-foreground/70 text-sm mt-2">Se a análise inteligente demorar, mostraremos automaticamente um resultado com base nas suas respostas.</p>
         </div>
@@ -355,25 +355,25 @@ export default function Result() {
         <div className="space-y-6">
           {/* TÍTULO - DIRETO E CLARO */}
           <div className="text-center space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold text-blue-700 leading-tight">
               {result.profileName}
             </h1>
           </div>
 
           {/* DIAGNÓSTICO - CURTO E IMPACTANTE */}
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-md space-y-3 border border-slate-200">
-            <p className="text-base leading-relaxed text-foreground">
+          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-md space-y-3 border-l-4 border-blue-500">
+            <p className="text-base leading-relaxed text-slate-700">
               {result.profileDescription}
             </p>
           </div>
 
           {/* IMPACTO */}
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-3 border border-slate-200">
-            <h3 className="text-lg font-semibold text-foreground">Isso está gerando:</h3>
+          <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-3 border-l-4 border-blue-500">
+            <h3 className="text-lg font-semibold text-blue-700">Isso está gerando:</h3>
             <ul className="space-y-2">
               {result.challenges.slice(0, 3).map((challenge, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                  <span className="text-indigo-600 font-bold">•</span>
+                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                  <span className="text-blue-600 font-bold">•</span>
                   <span>{challenge}</span>
                 </li>
               ))}
@@ -381,12 +381,12 @@ export default function Result() {
           </div>
 
           {/* RECOMENDAÇÕES */}
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-3 border border-slate-200">
-            <h3 className="text-lg font-semibold text-foreground">Próximos passos:</h3>
+          <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-3 border-l-4 border-blue-500">
+            <h3 className="text-lg font-semibold text-blue-700">Próximos passos:</h3>
             <ul className="space-y-2">
               {result.recommendations.slice(0, 2).map((rec, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                  <CheckCircle2 className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>{rec}</span>
                 </li>
               ))}
@@ -398,7 +398,7 @@ export default function Result() {
             <Button
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 text-sm"
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 text-sm"
             >
               <Download className="w-4 h-4" />
               {isGeneratingPDF ? "Gerando..." : "Baixar"}
@@ -432,7 +432,7 @@ export default function Result() {
           </div>
           <div className="relative flex justify-center">
             <div className="bg-spiritual-background px-4">
-              <p className="text-center text-sm font-semibold text-indigo-700">
+              <p className="text-center text-sm font-semibold text-blue-700">
                 ⚡ MAS ESPERA... ISSO PODE MUDAR HOJE
               </p>
             </div>
@@ -440,50 +440,50 @@ export default function Result() {
         </div>
 
         {/* ===== SEÇÃO DE OFERTA - MINIMALISTA E FOCADA ===== */}
-        <div className="bg-gradient-to-br from-indigo-50 to-slate-50 rounded-xl p-8 space-y-6 border-2 border-indigo-200 shadow-lg">
+        <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-8 space-y-6 border-2 border-blue-300 shadow-lg">
           
           {/* PREÇO EM DESTAQUE */}
           <div className="text-center space-y-2">
-            <div className="text-4xl font-bold text-indigo-700">R$ 12,90</div>
-            <p className="text-sm text-foreground/70">Investimento único</p>
+            <div className="text-4xl font-bold text-amber-600">R$ 12,90</div>
+            <p className="text-sm text-slate-600">Investimento único</p>
           </div>
 
           {/* OFERTA - DIRETO */}
           <div className="text-center space-y-3">
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-2xl font-bold text-blue-700">
               📖 Devocional: 7 Dias para se Reconectar
             </h2>
-            <p className="text-base text-foreground/80">
+            <p className="text-base text-slate-700">
               Um plano guiado para retomar sua conexão com Deus e voltar a sentir paz.
             </p>
           </div>
 
           {/* O QUE INCLUI */}
           <div className="space-y-3 bg-white/60 rounded-lg p-4">
-            <p className="text-sm font-semibold text-foreground">Você recebe:</p>
+            <p className="text-sm font-semibold text-blue-700">Você recebe:</p>
             <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-sm text-foreground">
-                <Zap className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm text-slate-700">
+                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                 <span>7 dias de devocional guiado</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-foreground">
-                <Zap className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm text-slate-700">
+                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                 <span>5-10 min de oração diária</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-foreground">
-                <Zap className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm text-slate-700">
+                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                 <span>Versículos + reflexões</span>
               </li>
-              <li className="flex items-start gap-2 text-sm text-foreground">
-                <Zap className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2 text-sm text-slate-700">
+                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                 <span>Acesso imediato</span>
               </li>
             </ul>
           </div>
 
           {/* URGÊNCIA */}
-          <div className="bg-indigo-100/50 rounded-lg p-3 text-center">
-            <p className="text-sm font-semibold text-indigo-900">
+          <div className="bg-blue-100/50 rounded-lg p-3 text-center">
+            <p className="text-sm font-semibold text-blue-900">
               ⏳ Comece hoje e sinta a diferença nos próximos dias
             </p>
           </div>
@@ -492,7 +492,7 @@ export default function Result() {
           <Button
             onClick={handleBuyDevocional}
             disabled={isBuyingGuide}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base py-4 rounded-lg shadow-md"
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-base py-4 rounded-lg shadow-md"
           >
             {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
           </Button>
