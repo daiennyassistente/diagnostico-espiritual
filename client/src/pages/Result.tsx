@@ -285,47 +285,32 @@ export default function Result() {
 
   const handleBuyDevocional = async () => {
     if (!result || !responses) return;
-    setIsBuyingGuide(true);
-  };
-
-  const handleSelectPaymentMethod = async (method: 'mercadopago' | 'stripe') => {
-    if (!result || !responses) return;
     
     const leadData = localStorage.getItem("leadData");
     if (!leadData) {
       toast.error("Email não encontrado. Por favor, complete o quiz novamente.");
-      setIsBuyingGuide(false);
       return;
     }
     
     const { email } = JSON.parse(leadData);
     
-    if (method === 'mercadopago') {
-      createMercadoPagoCheckoutMutation.mutate(
-        {
-          email,
-          profileName: result.profileName,
+    createMercadoPagoCheckoutMutation.mutate(
+      {
+        email,
+        profileName: result.profileName,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success && data.checkoutUrl) {
+            window.open(data.checkoutUrl, '_blank');
+            toast.success("Abrindo checkout...");
+          }
         },
-        {
-          onSuccess: (data) => {
-            if (data.success && data.checkoutUrl) {
-              window.open(data.checkoutUrl, '_blank');
-              toast.success("Abrindo checkout...");
-            }
-            setIsBuyingGuide(false);
-            setPaymentMethod(null);
-          },
-          onError: () => {
-            toast.error("Erro ao criar checkout");
-            setIsBuyingGuide(false);
-            setPaymentMethod(null);
-          },
-        }
-      );
-    } else if (method === 'stripe') {
-      toast.info("Pagamento com Stripe em breve!");
-      setIsBuyingGuide(false);
-    }
+        onError: () => {
+          toast.error("Erro ao criar checkout");
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -367,7 +352,7 @@ export default function Result() {
           {/* TÍTULO - DIRETO E CLARO */}
           <div className="text-center space-y-2">
             <h1 className="text-2xl md:text-3xl font-black" style={{color: '#1E3A8A', lineHeight: '1.2'}}>
-              {result.profileName}
+              Você está {result.profileName}
             </h1>
             <p className="text-lg" style={{color: '#6B7280'}}>
               Seu diagnóstico revela pontos importantes da sua vida com Deus.
@@ -512,46 +497,11 @@ export default function Result() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#EAB308'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FACC15'}
             >
-              {isBuyingGuide ? "Selecione o método de pagamento..." : "👉 Quero me Reconectar com Deus"}
+              {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
             </Button>
             <p className="text-center text-base font-bold" style={{color: '#FACC15'}}>R$ 12,90 investimento único</p>
             
-            {/* MODAL DE SELEÇÃO DE PAGAMENTO */}
-            {isBuyingGuide && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-lg space-y-4">
-                  <h3 className="text-xl font-bold" style={{color: '#1E3A8A'}}>Escolha seu método de pagamento</h3>
-                  
-                  <button
-                    onClick={() => handleSelectPaymentMethod('mercadopago')}
-                    className="w-full p-4 rounded-lg border-2 font-semibold transition-all"
-                    style={{borderColor: '#1E3A8A', color: '#1E3A8A'}}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    💳 MercadoPago
-                  </button>
-                  
-                  <button
-                    onClick={() => handleSelectPaymentMethod('stripe')}
-                    className="w-full p-4 rounded-lg border-2 font-semibold transition-all"
-                    style={{borderColor: '#1E3A8A', color: '#1E3A8A'}}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    💳 Cartão de Crédito
-                  </button>
-                  
-                  <button
-                    onClick={() => setIsBuyingGuide(false)}
-                    className="w-full p-3 rounded-lg font-semibold"
-                    style={{backgroundColor: '#E5E7EB', color: '#1F2937'}}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            )}
+
           </div>
         </div>
 
