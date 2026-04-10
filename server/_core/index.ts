@@ -65,7 +65,7 @@ async function startServer() {
 
       // Importar funções necessárias
       const { generateDevotionalPDF } = await import("../devotional-generator");
-      const { getPaymentByToken, getDiagnosticByLeadId } = await import("../db");
+      const { getPaymentByToken, getDiagnosticByLeadId, getQuizResponseByLeadId } = await import("../db");
 
       // Buscar pagamento pelo token
       const payment = await getPaymentByToken(token);
@@ -81,12 +81,25 @@ async function startServer() {
         return res.status(404).json({ error: "Diagnóstico não encontrado" });
       }
 
+      const quizResponse = await getQuizResponseByLeadId(payment.leadId);
+      const responses: Record<string, string> = quizResponse
+        ? Object.fromEntries(
+            Object.entries(quizResponse)
+              .filter(([key, value]) => /^step\d+$/.test(key) && typeof value === "string" && value.trim().length > 0)
+              .map(([key, value]) => [key, String(value)])
+          )
+        : {};
+
       // Gerar PDF
       const pdfBuffer = await generateDevotionalPDF({
         profileName: diagnostic.profileName,
         profileDescription: diagnostic.profileDescription,
         challenges: JSON.parse(diagnostic.challenges),
         recommendations: JSON.parse(diagnostic.recommendations),
+        strengths: JSON.parse(diagnostic.strengths),
+        nextSteps: JSON.parse(diagnostic.nextSteps),
+        responses,
+        userName: responses.step1,
       });
 
       // Enviar PDF

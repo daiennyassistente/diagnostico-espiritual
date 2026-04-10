@@ -579,6 +579,8 @@ export const appRouter = router({
           profileDescription: z.string(),
           challenges: z.array(z.string()),
           recommendations: z.array(z.string()),
+          strengths: z.array(z.string()).optional(),
+          nextSteps: z.array(z.string()).optional(),
           responses: z.record(z.string(), z.string()),
           userName: z.string().optional(),
         }),
@@ -592,6 +594,9 @@ export const appRouter = router({
             profileDescription: input.profileDescription,
             challenges: input.challenges,
             recommendations: input.recommendations,
+            strengths: input.strengths,
+            nextSteps: input.nextSteps,
+            responses: input.responses as Record<string, string>,
             userName: input.userName,
           });
 

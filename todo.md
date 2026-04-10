@@ -581,3 +581,17 @@
 - [x] Ajustar a geração do diagnóstico para citar padrões concretos, dores e desejos extraídos das respostas
 - [x] Revisar o resultado renderizado para garantir sensação de diagnóstico individual e não genérico
 - [x] Criar ou atualizar testes para validar a especificidade mínima do diagnóstico gerado
+
+## Bug Atual - Geração do Devocional
+- [ ] Investigar o erro atual na geração do devocional
+- [ ] Garantir que o devocional use as respostas do quiz e o resultado final como base obrigatória
+- [ ] Reescrever a geração do devocional para conteúdo 100% bíblico, centrado em Jesus e adequado ao público cristão evangélico
+- [ ] Validar a geração do devocional com testes específicos de personalização e conteúdo
+
+## Bug Atual - Geração do Devocional
+- [x] Investigar o erro de schema na geração do devocional por IA
+- [x] Corrigir o schema da resposta estruturada do devocional
+- [x] Garantir que o devocional use as respostas reais do quiz e o resultado espiritual
+- [x] Reforçar a base cristã evangélica centrada em Jesus e na Bíblia no prompt e no fallback
+- [x] Preservar a personalização também no download por token após o pagamento
+- [x] Criar testes focados para validar personalização e estrutura do devocional
