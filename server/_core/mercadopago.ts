@@ -58,7 +58,11 @@ export function getMercadoPagoInitPoint(preference: any): string | null {
   const initPoint = preference?.init_point || null;
   if (!initPoint) return null;
   
-  // Retornar o init_point diretamente
-  // O Mercado Pago irá detectar o dispositivo no navegador
+  // Extrair preference ID e construir URL para abrir direto na página de pagamento
+  // Isso pula a página de resumo e vai direto para escolha de método
+  const preferenceId = initPoint.split('preference-id=')[1]?.split('&')[0];
+  if (preferenceId) {
+    return `https://www.mercadopago.com.br/checkout/v1/redirect?preference-id=${preferenceId}`;
+  }
   return initPoint;
 }
