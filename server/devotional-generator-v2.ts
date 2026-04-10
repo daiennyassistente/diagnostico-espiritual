@@ -54,49 +54,84 @@ async function generateDevotionalPDF(request: DevotionalRequest): Promise<Buffer
  * Retorna apenas os textos - o design é responsabilidade do pdf-designer.ts
  */
 async function generateDevotionalContent(request: DevotionalRequest): Promise<PDFDay[]> {
-  const prompt = `Você é um especialista em devocionais cristãos profundos e emocionais. Crie um devocional de 7 dias ALTAMENTE PERSONALIZADO para ${request.userName || "uma pessoa"} com o seguinte perfil espiritual:
+  const prompt = `Você é um especialista em devocionais cristãos profundos, emocionais e transformadores. Você entende a alma humana e a Palavra de Deus em profundidade. Crie um devocional de 7 dias EXTREMAMENTE PERSONALIZADO E EMOCIONAL para ${request.userName || "uma pessoa"} com o seguinte perfil espiritual:
 
-Perfil Espiritual: ${request.profileName}
+📋 PERFIL ESPIRITUAL:
+Nome: ${request.profileName}
 Descrição: ${request.profileDescription}
 
-Desafios identificados:
-${request.challenges.map((c) => `- ${c}`).join("\n")}
+💔 DESAFIOS IDENTIFICADOS (Dores Reais):
+${request.challenges.map((c) => `• ${c}`).join("\n")}
 
-Recomendações:
-${request.recommendations.map((r) => `- ${r}`).join("\n")}
+🙏 RECOMENDAÇÕES PARA CURA:
+${request.recommendations.map((r) => `• ${r}`).join("\n")}
 
-Crie um devocional de 7 dias que seja:
-1. PROFUNDAMENTE EMOCIONAL E SENTIMENTAL - Que toque o coração e a alma
-2. ALTAMENTE PERSONALIZADO - Use o nome "${request.userName || "você"}" ao se dirigir à pessoa
-3. BIBLICAMENTE SÓLIDO - Baseado em versículos reais e contexto bíblico
-4. CONECTADO COM OS DESAFIOS REAIS - Aborde especificamente os desafios mencionados
-5. ESPERANÇOSO E TRANSFORMADOR - Ofereça esperança genuína e caminhos práticos
-6. COM LINGUAGEM POÉTICA E PROFUNDA - Use metáforas, analogias e linguagem que toque a alma
+🎯 INSTRUÇÕES CRÍTICAS PARA MÁXIMA PERSONALIZAÇÃO:
 
-Cada reflexão deve:
-- Começar com empatia genuína sobre o que a pessoa está vivendo
-- Conectar a verdade bíblica com a realidade emocional
-- Usar linguagem que crie identificação e conexão
-- Terminar com esperança e direção clara
+1. CONEXÃO EMOCIONAL PROFUNDA:
+   - Comece cada reflexão reconhecendo a DOR real que ${request.userName || "essa pessoa"} está vivendo
+   - Use linguagem que fale diretamente ao coração, não apenas à mente
+   - Crie identificação imediata: "${request.userName || "Você"} sabe o que é..."
+   - Cada palavra deve ressoar com a experiência vivida
 
-Cada oração deve:
-- Ser autêntica e vulnerável
-- Usar o nome da pessoa (${request.userName || "você"})
-- Expressar emoções reais e pedidos genuínos
-- Conectar o coração da pessoa com o coração de Deus
+2. PERSONALIZAÇÃO 100%:
+   - Use o nome "${request.userName || "você"}" frequentemente
+   - Refira-se especificamente aos desafios mencionados
+   - Faça cada dia parecer escrito ESPECIALMENTE para essa pessoa
+   - Não seja genérico - seja cirúrgico na precisão emocional
 
-Para cada dia, forneça em formato JSON:
+3. AUTORIDADE BÍBLICA PROFUNDA:
+   - Cada versículo deve ser REAL, VERIFICADO e CONTEXTUALIZADO
+   - Explique por que esse versículo específico é a resposta para esse desafio específico
+   - Conecte a Palavra de Deus com a realidade emocional de forma irrefutável
+   - Mostre que Deus ENTENDE e RESPONDE às dores específicas
+
+4. LINGUAGEM POÉTICA E TRANSFORMADORA:
+   - Use metáforas que toquem a alma
+   - Crie imagens mentais que conectem com a experiência vivida
+   - Seja profundo, mas acessível
+   - Cada frase deve ter peso e significado
+
+5. ESPERANÇA GENUÍNA E PRÁTICA:
+   - Não prometa soluções mágicas, mas caminhos reais
+   - Mostre que a transformação começa com pequenos passos
+   - Ofereça esperança que é fundamentada em Deus, não em sentimentos
+   - Termine cada dia com direção CLARA e VIÁVEL
+
+6. ESTRUTURA EMOCIONAL DOS 7 DIAS:
+   - Dia 1: RECONHECIMENTO - Validar a dor e mostrar que Deus entende
+   - Dia 2: VERDADE - Revelar o que Deus diz sobre a situação
+   - Dia 3: ESPERANÇA - Mostrar que mudança é possível
+   - Dia 4: AÇÃO - Dar o primeiro passo prático
+   - Dia 5: PROFUNDIDADE - Aprofundar a compreensão espiritual
+   - Dia 6: FORÇA - Fortalecer a fé e a determinação
+   - Dia 7: TRANSFORMAÇÃO - Celebrar a nova identidade em Deus
+
+PARA CADA DIA, FORNEÇA EM FORMATO JSON:
 {
   "day": número de 1 a 7,
-  "title": "Título do dia (máx 50 caracteres) - seja poético e inspirador",
-  "verse": "Versículo completo da Bíblia",
-  "verseReference": "Livro Capítulo:Versículo",
-  "reflection": "Reflexão profunda e emocional (250-350 palavras) - deve tocar o coração",
-  "prayer": "Oração autêntica e vulnerável (150-200 palavras) - use o nome da pessoa",
-  "application": "Aplicação prática para o dia (80-120 palavras) - seja específico e viável"
+  "title": "Título poético e inspirador (máx 50 caracteres) - que resuma a jornada do dia",
+  "verse": "Versículo COMPLETO e REAL da Bíblia (não resumido)",
+  "verseReference": "Livro Capítulo:Versículo (ex: Salmos 23:1)",
+  "reflection": "Reflexão PROFUNDAMENTE EMOCIONAL (300-400 palavras)\n- Comece reconhecendo a dor específica\n- Conecte com a verdade bíblica\n- Use o nome da pessoa frequentemente\n- Crie identificação e esperança\n- Termine com direção clara",
+  "prayer": "Oração AUTÊNTICA E VULNERÁVEL (200-250 palavras)\n- Use o nome da pessoa (${request.userName || "você"})\n- Expresse emoções REAIS\n- Seja específico sobre os pedidos\n- Conecte o coração humano com o coração de Deus\n- Termine com confiança e esperança",
+  "application": "Aplicação PRÁTICA E ESPECÍFICA (100-150 palavras)\n- Seja concreto e viável\n- Conecte com os desafios mencionados\n- Dê um passo claro para o dia\n- Seja encorajador e realista"
 }
 
-Retorne um array JSON com 7 objetos, um para cada dia. Cada dia deve ser uma jornada emocional e espiritual que leve ${request.userName || "a pessoa"} mais perto de Deus. Certifique-se de que cada versículo é real e está correto.`;
+RETORNE UM ARRAY JSON COM EXATAMENTE 7 OBJETOS, UM PARA CADA DIA.
+
+Cada dia deve ser uma jornada EMOCIONAL E ESPIRITUAL que leve ${request.userName || "essa pessoa"} de:
+- Reconhecimento da dor → Verdade de Deus → Esperança → Ação → Profundidade → Força → Transformação
+
+Certifique-se de que:
+✓ Cada versículo é REAL e está CORRETO
+✓ Cada reflexão é PROFUNDAMENTE PERSONALIZADA
+✓ Cada oração é AUTÊNTICA e VULNERÁVEL
+✓ Cada aplicação é PRÁTICA e VIÁVEL
+✓ O tom é EMOCIONAL, ESPERANÇOSO e TRANSFORMADOR
+✓ A pessoa se IDENTIFICA e se CONECTA 100% com o conteúdo
+
+Lembre-se: Você está escrevendo para alguém que está REALMENTE SOFRENDO. Cada palavra importa. Cada frase deve tocar o coração e apontar para Deus.`;
 
   try {
     const response = await invokeLLM({
