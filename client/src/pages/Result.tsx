@@ -27,7 +27,18 @@ export default function Result() {
   const generationStartedRef = useRef(false);
   const timerRef = useRef<number | null>(null);
   const [isBuyingGuide, setIsBuyingGuide] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | null>(null);
+
+  const formatProfileHeadline = (profileName: string) => {
+    const sanitized = profileName
+      .replace(/^[^A-Za-zÀ-ÿ0-9]+/, "")
+      .trim();
+
+    if (!sanitized) {
+      return "Seu diagnóstico espiritual";
+    }
+
+    return /^você está/i.test(sanitized) ? sanitized : `Você está ${sanitized}`;
+  };
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
@@ -115,7 +126,7 @@ export default function Result() {
 
       if (step10.includes("recomeçar") || step10.includes("reconstrução") || step1.includes("voltar") || step1.includes("recomeço")) {
         return {
-          profileName: "Você está em recomeço espiritual",
+          profileName: "espiritualmente em recomeço",
           profileDescription: "Seu coração deseja voltar para Deus. Existe um chamado real dentro de você para reconstruir essa conexão.",
           strengths: ["Disposição para recomeçar", "Sensibilidade espiritual", "Humildade"],
           challenges: ["Manter constância", "Superar culpa", "Voltar à rotina"],
@@ -125,7 +136,7 @@ export default function Result() {
       }
 
       return {
-        profileName: "Você está espiritualmente sobrecarregado(a)",
+        profileName: "espiritualmente sobrecarregado(a)",
         profileDescription: "Sua vida espiritual está em transição. Você sente o chamado de Deus, mas enfrenta distrações que impedem uma conexão profunda.",
         strengths: ["Sensibilidade espiritual", "Desejo de crescimento", "Capacidade de reflexão"],
         challenges: ["Manter disciplina", "Lidar com distrações", "Encontrar consistência"],
@@ -294,6 +305,8 @@ export default function Result() {
     
     const { email } = JSON.parse(leadData);
     
+    setIsBuyingGuide(true);
+
     createMercadoPagoCheckoutMutation.mutate(
       {
         email,
@@ -304,13 +317,18 @@ export default function Result() {
           if (data.success && data.checkoutUrl) {
             window.open(data.checkoutUrl, '_blank');
             toast.success("Abrindo checkout...");
+          } else {
+            toast.error("Não foi possível abrir o checkout");
           }
+          setIsBuyingGuide(false);
         },
         onError: () => {
+          setIsBuyingGuide(false);
           toast.error("Erro ao criar checkout");
         },
       }
     );
+
   };
 
   if (isLoading) {
@@ -352,10 +370,10 @@ export default function Result() {
           {/* TÍTULO - DIRETO E CLARO */}
           <div className="text-center space-y-2">
             <h1 className="text-2xl md:text-3xl font-black" style={{color: '#1E3A8A', lineHeight: '1.2'}}>
-              Você está {result.profileName}
+              {formatProfileHeadline(result.profileName)}
             </h1>
             <p className="text-lg" style={{color: '#6B7280'}}>
-              Seu diagnóstico revela pontos importantes da sua vida com Deus.
+              Seu diagnóstico mostra com clareza o que hoje está pesando na sua vida com Deus.
             </p>
           </div>
 
@@ -368,7 +386,7 @@ export default function Result() {
 
           {/* IMPACTO */}
           <div className="rounded-xl p-6 space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
-            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Isso está gerando:</h3>
+            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Hoje isso aparece assim na sua vida:</h3>
             <ul className="space-y-2">
               {result.challenges.slice(0, 3).map((challenge, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
@@ -381,7 +399,7 @@ export default function Result() {
 
           {/* RECOMENDAÇÕES */}
           <div className="rounded-xl p-6 space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
-            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Próximos passos:</h3>
+            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>O que fazer agora:</h3>
             <ul className="space-y-2">
               {result.recommendations.slice(0, 2).map((rec, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>

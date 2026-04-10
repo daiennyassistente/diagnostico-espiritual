@@ -8,7 +8,7 @@ describe("buildFallbackDiagnosis", () => {
       "9": "Precisando recomeçar",
     });
 
-    expect(result.profileName).toContain("Coração em Recomeço");
+    expect(result.profileName).toBe("espiritualmente em recomeço");
     expect(result.strengths.length).toBeGreaterThan(0);
     expect(result.recommendations.length).toBeGreaterThan(0);
     expect(result.nextSteps[0]).toContain("passo");
@@ -20,7 +20,7 @@ describe("buildFallbackDiagnosis", () => {
       step10: "Cansada",
     });
 
-    expect(result.profileName).toContain("Fé Cansada");
+    expect(result.profileName).toBe("espiritualmente cansado(a)");
     expect(result.challenges.join(" ")).toContain("Cansaço");
   });
 
@@ -31,7 +31,7 @@ describe("buildFallbackDiagnosis", () => {
       step10: "Com fome de Deus",
     });
 
-    expect(result.profileName).toContain("Buscando Direção");
+    expect(result.profileName).toBe("espiritualmente buscando direção");
     expect(result.profileDescription).toContain("próximo passo");
   });
 
@@ -44,7 +44,7 @@ describe("buildFallbackDiagnosis", () => {
       step10: "Estado indefinido",
     });
 
-    expect(result.profileName).toContain("Caminho de Crescimento");
+    expect(result.profileName).toBe("espiritualmente em crescimento");
     expect(result.recommendations).toHaveLength(3);
     expect(result.nextSteps).toHaveLength(1);
   });

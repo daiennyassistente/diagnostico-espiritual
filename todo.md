@@ -561,3 +561,11 @@
 - [x] Escrever testes para login admin
 - [x] Escrever testes para geração do diagnóstico
 - [ ] Salvar checkpoint final
+- [ ] Investigar por que o resultado do quiz ficou confuso e identificar possíveis erros de conteúdo, fluxo ou exibição
+- [ ] Revisar a clareza do texto principal, subtítulo e blocos do resultado para garantir leitura simples e direta
+- [ ] Validar se o diagnóstico exibido corresponde corretamente às respostas do quiz e ao conteúdo retornado pelo backend
+
+## Ajustes de Clareza na Página de Resultado
+- [x] Corrigir título do resultado para evitar combinações confusas entre prefixo da interface e profileName retornado
+- [x] Padronizar nomes de fallback do diagnóstico com linguagem direta e sem emojis
+- [x] Atualizar teste do fallback para garantir títulos claros e consistentes

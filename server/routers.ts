@@ -58,7 +58,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
     step1.includes("recomeço")
   ) {
     return {
-      profileName: "🌱 Coração em Recomeço",
+      profileName: "espiritualmente em recomeço",
       profileDescription:
         "Você está em um momento de renovação espiritual. Existe dentro de você um desejo verdadeiro de voltar ao secreto, reconstruir sua constância e se aproximar de Deus com mais leveza e sinceridade.",
       strengths: [
@@ -82,7 +82,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
 
   if (step10.includes("cansada") || step5.includes("Paz") || step5.includes("paz")) {
     return {
-      profileName: "😔 Fé Cansada",
+      profileName: "espiritualmente cansado(a)",
       profileDescription:
         "Você ama a Deus, mas tem carregado um peso maior do que deveria. Seu coração precisa de descanso, cuidado e renovação para voltar a viver a presença de Deus com profundidade e paz.",
       strengths: [
@@ -106,7 +106,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
 
   if (step10.includes("Travada") || step10.includes("travada") || step3.includes("parada")) {
     return {
-      profileName: "🔗 Travada Espiritualmente",
+      profileName: "espiritualmente travado(a)",
       profileDescription:
         "Você sente que existe algo interrompendo seu avanço espiritual. Há sede de mudança, mas também bloqueios internos que precisam ser identificados e tratados com verdade, oração e constância.",
       strengths: ["Consciência do bloqueio", "Desejo real de mudança", "Potencial de transformação"],
@@ -127,7 +127,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
     step3.includes("frequente e profunda")
   ) {
     return {
-      profileName: "🌳 Amadurecendo na Fé",
+      profileName: "espiritualmente amadurecendo",
       profileDescription:
         "Você está em uma fase saudável de crescimento espiritual. Há sinais de profundidade, sede pela Palavra e disposição para viver uma caminhada mais consistente, madura e frutífera.",
       strengths: [
@@ -147,7 +147,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
 
   if (step5.includes("Direção") || step5.includes("direção") || step1.includes("sem direção") || step10.includes("fome")) {
     return {
-      profileName: "🧭 Buscando Direção",
+      profileName: "espiritualmente buscando direção",
       profileDescription:
         "Você tem fome de Deus e quer viver algo mais profundo, mas ainda sente falta de clareza para entender o próximo passo. Deus está trabalhando direção no meio da sua busca sincera.",
       strengths: ["Fome espiritual genuína", "Desejo de ouvir Deus", "Abertura para mudança"],
@@ -174,7 +174,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
     step3.includes("irregular")
   ) {
     return {
-      profileName: "📈 Fé Inconsistente",
+      profileName: "espiritualmente instável",
       profileDescription:
         "Sua caminhada com Deus tem sido marcada por fases de aproximação e afastamento. Ainda assim, existe dentro de você um desejo verdadeiro de viver uma constância mais saudável e madura.",
       strengths: [
@@ -195,7 +195,7 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
   }
 
   return {
-    profileName: "✨ Caminho de Crescimento",
+    profileName: "espiritualmente em crescimento",
     profileDescription:
       "Seu diagnóstico mostra que você está em um processo de crescimento espiritual com áreas importantes a fortalecer. Há potencial, fome e espaço para viver uma caminhada mais profunda com Deus a partir de agora.",
     strengths: ["Desejo de crescer", "Abertura para aprender", "Sensibilidade espiritual"],
