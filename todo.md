@@ -595,3 +595,6 @@
 - [x] Reforçar a base cristã evangélica centrada em Jesus e na Bíblia no prompt e no fallback
 - [x] Preservar a personalização também no download por token após o pagamento
 - [x] Criar testes focados para validar personalização e estrutura do devocional
+
+## Redirecionamento Direto para Pagamento
+- [x] Modificar botão "Quero me reconectar com Deus" para redirecionar diretamente para Mercado Pago (sem abrir em nova aba)

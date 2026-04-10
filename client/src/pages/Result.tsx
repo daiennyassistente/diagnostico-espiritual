@@ -315,12 +315,11 @@ export default function Result() {
       {
         onSuccess: (data) => {
           if (data.success && data.checkoutUrl) {
-            window.open(data.checkoutUrl, '_blank');
-            toast.success("Abrindo checkout...");
+            window.location.href = data.checkoutUrl;
           } else {
             toast.error("Não foi possível abrir o checkout");
+            setIsBuyingGuide(false);
           }
-          setIsBuyingGuide(false);
         },
         onError: () => {
           setIsBuyingGuide(false);
