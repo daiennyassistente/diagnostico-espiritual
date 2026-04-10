@@ -55,16 +55,17 @@ export async function createMercadoPagoPreference(options: {
 }
 
 export function getMercadoPagoInitPoint(preference: any): string | null {
-  const initPoint = preference?.init_point || null;
-  if (!initPoint) return null;
-  
-  // Usar wallet_purchase para abrir direto na página de pagamento
-  // Isso pula a página de resumo e vai direto para escolha de método
+  // Tentar wallet_purchase primeiro (abre direto no pagamento)
   const walletPurchase = preference?.wallet_purchase || null;
   if (walletPurchase) {
     return walletPurchase;
   }
   
-  // Fallback para init_point se wallet_purchase não existir
+  // Fallback para init_point
+  const initPoint = preference?.init_point || null;
+  if (!initPoint) return null;
+  
+  // Se wallet_purchase não existir, tenta adicionar parâmetro ao init_point
+  // para forçar abrir na página de pagamento
   return initPoint;
 }

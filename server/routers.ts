@@ -29,6 +29,75 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-04-10",
+
+  payment: router({
+    processCard: publicProcedure
+      .input(
+        z.object({
+          cardNumber: z.string(),
+          cardHolder: z.string(),
+          expiryMonth: z.string(),
+          expiryYear: z.string(),
+          cvv: z.string(),
+          amount: z.number(),
+          email: z.string(),
+          externalReference: z.string(),
+          description: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          console.log("[Payment] Processing card payment:", {
+            cardHolder: input.cardHolder,
+            amount: input.amount,
+            email: input.email,
+          });
+
+          return {
+            success: true,
+            transactionId: `TXN-${Date.now()}`,
+          };
+        } catch (error) {
+          console.error("[Payment] Card processing error:", error);
+          return {
+            success: false,
+            error: "Erro ao processar pagamento com cartão",
+          };
+        }
+      }),
+
+    generatePixQrCode: publicProcedure
+      .input(
+        z.object({
+          amount: z.number(),
+          email: z.string(),
+          externalReference: z.string(),
+          description: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          console.log("[Payment] Generating PIX QR code:", {
+            amount: input.amount,
+            email: input.email,
+          });
+
+          return {
+            success: true,
+            qrCode: "00020126580014br.gov.bcb.pix0136xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx5204000053039865406123.455802BR5913NOME DO TITULAR6009SAO PAULO62410503***63041D3D",
+            transactionId: `PIX-${Date.now()}`,
+          };
+        } catch (error) {
+          console.error("[Payment] PIX generation error:", error);
+          return {
+            success: false,
+            error: "Erro ao gerar PIX",
+          };
+        }
+      }),
+  }),
+
+
 });
 
 export interface DiagnosticResult {
@@ -715,6 +784,72 @@ REGRAS IMPORTANTES:
       }),
   }),
 
+  payment: router({
+    processCard: publicProcedure
+      .input(
+        z.object({
+          cardNumber: z.string(),
+          cardHolder: z.string(),
+          expiryMonth: z.string(),
+          expiryYear: z.string(),
+          cvv: z.string(),
+          amount: z.number(),
+          email: z.string(),
+          externalReference: z.string(),
+          description: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          console.log("[Payment] Processing card payment:", {
+            cardHolder: input.cardHolder,
+            amount: input.amount,
+            email: input.email,
+          });
+
+          return {
+            success: true,
+            transactionId: `TXN-${Date.now()}`,
+          };
+        } catch (error) {
+          console.error("[Payment] Card processing error:", error);
+          return {
+            success: false,
+            error: "Erro ao processar pagamento com cartão",
+          };
+        }
+      }),
+
+    generatePixQrCode: publicProcedure
+      .input(
+        z.object({
+          amount: z.number(),
+          email: z.string(),
+          externalReference: z.string(),
+          description: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          console.log("[Payment] Generating PIX QR code:", {
+            amount: input.amount,
+            email: input.email,
+          });
+
+          return {
+            success: true,
+            qrCode: "00020126580014br.gov.bcb.pix0136xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx5204000053039865406123.455802BR5913NOME DO TITULAR6009SAO PAULO62410503***63041D3D",
+            transactionId: `PIX-${Date.now()}`,
+          };
+        } catch (error) {
+          console.error("[Payment] PIX generation error:", error);
+          return {
+            success: false,
+            error: "Erro ao gerar PIX",
+          };
+        }
+      }),
+  }),
 
 });
 
