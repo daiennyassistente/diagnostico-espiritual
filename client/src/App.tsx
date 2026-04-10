@@ -10,7 +10,7 @@ import Resultado from "./pages/Resultado";
 import Result from "./pages/Result";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Admin from "./pages/Admin";
-import AdminDashboard from "./pages/AdminDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminLogin } from "./pages/AdminLogin";
 import SharePage from "./pages/SharePage";
 

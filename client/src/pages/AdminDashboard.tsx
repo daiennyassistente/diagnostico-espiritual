@@ -184,14 +184,14 @@ function ActionButton({
   );
 }
 
-export default function AdminDashboard() {
+export function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
 
   // Mutações para ações dos botões
   const resendEmailMutation = trpc.admin.resendEmail.useMutation();
-  const generateLinkMutation = trpc.admin.generateDownloadLink.useMutation();
+  // const generateLinkMutation = trpc.admin.generateDownloadLink.useMutation();
   const unlockAccessMutation = trpc.admin.unlockAccess.useMutation();
 
   const snapshotQuery = trpc.admin.snapshot.useQuery(undefined, {
@@ -357,21 +357,10 @@ export default function AdminDashboard() {
                                 textColor="text-amber-700"
                                 hoverColor="hover:bg-amber-200"
                                 onClick={() => {
-                                  generateLinkMutation.mutate(
-                                    { leadId: item.id },
-                                    {
-                                      onSuccess: (data) => {
-                                        const shareUrl = `${window.location.origin}/share?token=${data.downloadToken}`;
-                                        navigator.clipboard.writeText(shareUrl);
-                                        alert(`Link copiado: ${shareUrl}`);
-                                      },
-                                      onError: (error) => {
-                                        alert(`Erro: ${error.message}`);
-                                      },
-                                    }
-                                  );
+                                  console.log('Redirecting to checkout-success');
+                                  window.location.href = '/checkout-success';
                                 }}
-                                isLoading={generateLinkMutation.isPending}
+                                isLoading={false}
                               />
                               <ActionButton
                                 icon="🔓"
