@@ -251,7 +251,6 @@ export const appRouter = router({
           throw new Error("Credenciais inválidas");
         }
 
-        // Create session token for password-based login
         const openId = user.openId || `user-${user.id}`;
         const sessionToken = await sdk.createSessionToken(openId, {
           name: user.name || "",
@@ -269,30 +268,43 @@ export const appRouter = router({
     // Admin Login
     login: publicProcedure
       .input(z.object({ username: z.string(), password: z.string() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         try {
-          const { getAdminByUsername } = await import('./db');
-          
-          const admin = await getAdminByUsername(input.username);
+          const { getAdminByUsername, verifyPassword, createOrUpdateAdminUser } = await import('./db');
+
+          const admin = await getAdminByUsername(input.username.trim());
 
           if (!admin) {
             return { success: false, message: "Usuário ou senha incorretos" };
           }
 
-          // Compare password
-          const passwordMatch = input.password === admin.passwordHash;
+          const passwordMatch =
+            input.password === admin.passwordHash ||
+            verifyPassword(input.password, admin.passwordHash);
 
           if (!passwordMatch) {
             return { success: false, message: "Usuário ou senha incorretos" };
           }
 
-          // Generate a simple token
-          const token = Buffer.from(`${admin.id}:${Date.now()}`).toString('base64');
-          
-          return { 
-            success: true, 
-            token,
-            admin: { id: admin.id, username: admin.username }
+          const linkedUser = await createOrUpdateAdminUser(admin.username, input.password);
+          if (!linkedUser) {
+            return { success: false, message: "Não foi possível iniciar a sessão administrativa" };
+          }
+
+          const openId = linkedUser.openId || `user-${linkedUser.id}`;
+          const sessionToken = await sdk.createSessionToken(openId, {
+            name: linkedUser.name || admin.username,
+            expiresInMs: ONE_YEAR_MS,
+          });
+
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          (ctx.res as Response).cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+          return {
+            success: true,
+            token: sessionToken,
+            admin: { id: linkedUser.id, username: linkedUser.name || admin.username },
+            user: { id: linkedUser.id, name: linkedUser.name, role: linkedUser.role },
           };
         } catch (error) {
           console.error("Erro ao fazer login do admin:", error);
@@ -360,7 +372,7 @@ export const appRouter = router({
       }),
     generateDownloadLink: adminProcedure
       .input(z.object({ leadId: z.number(), type: z.enum(['result', 'devotional']) }))
-      .query(async ({ input }) => {
+      .mutation(async ({ input }) => {
         const { getLeadWithDiagnostic } = await import('./db');
         const leadData = await getLeadWithDiagnostic(input.leadId);
         if (!leadData) {

@@ -30,6 +30,7 @@ export default function Result() {
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
 
+  // Timer para contar o tempo restante
   useEffect(() => {
     timerRef.current = window.setInterval(() => {
       setTimeLeft((prev) => {
@@ -55,6 +56,7 @@ export default function Result() {
 
   const clearQuizSessionState = () => {
     if (typeof window === "undefined") return;
+
     window.sessionStorage.removeItem("quizIsNavigatingToResult");
     window.sessionStorage.removeItem("quizNavigationStartedAt");
     window.sessionStorage.removeItem("quizIsProcessing");
@@ -77,7 +79,6 @@ export default function Result() {
     generationStartedRef.current = true;
 
     const savedResponses = localStorage.getItem("quizResponses");
-    const savedResult = localStorage.getItem("quizResult");
 
     if (!savedResponses) {
       clearQuizSessionState();
@@ -85,9 +86,8 @@ export default function Result() {
       return;
     }
 
-    const parsed = JSON.parse(savedResponses);
+    const parsed = JSON.parse(savedResponses) as Record<string, string>;
     setResponses(parsed);
-    
     const name = parsed[0] || "Querido(a)";
     setUserName(name);
 
@@ -95,59 +95,96 @@ export default function Result() {
     const parsedLeadId = storedLeadId ? Number(storedLeadId) : undefined;
     const leadDataRaw = localStorage.getItem("leadData");
     const leadData = leadDataRaw ? JSON.parse(leadDataRaw) : null;
+    const leadId = Number.isFinite(parsedLeadId)
+      ? parsedLeadId
+      : typeof leadData?.leadId === "number"
+        ? leadData.leadId
+        : undefined;
 
-    if (savedResult) {
-      try {
-        const parsedResult = JSON.parse(savedResult);
-        setResult(parsedResult);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Erro ao parsear resultado salvo:", error);
-        setIsLoading(false);
+    localStorage.removeItem("quizResult");
+
+    const buildFallbackResult = (answers: Record<string, string>) => {
+      const step1 = answers["0"] || "";
+      const step3 = answers["2"] || "";
+      const step4 = answers["3"] || "";
+      const step5 = answers["4"] || "";
+      const step10 = answers["9"] || "";
+
+      if (step10.includes("recomeçar") || step10.includes("reconstrução") || step1.includes("voltar") || step1.includes("recomeço")) {
+        return {
+          profileName: "🌱 Coração em Recomeço",
+          profileDescription: "Você está em um momento de renovação espiritual. Existe dentro de você um desejo verdadeiro de voltar ao secreto, reconstruir sua constância e se aproximar de Deus com mais leveza e sinceridade.",
+          strengths: ["Disposição para recomeçar", "Sensibilidade espiritual", "Humildade para reconhecer a necessidade de Deus"],
+          challenges: ["Manter constância", "Superar culpa ou frustração", "Voltar à rotina espiritual com paz"],
+          recommendations: ["Comece pequeno: 5 minutos diários de oração", "Escolha um versículo para meditar cada dia", "Encontre um grupo de oração ou comunidade de fé"],
+          nextSteps: ["Seu próximo passo é retomar a disciplina espiritual com compaixão por si mesmo. Deus não se afastou de você."],
+        };
       }
-    } else {
+
+      return {
+        profileName: "✨ Buscador de Profundidade",
+        profileDescription: "Sua vida espiritual está em transição. Você sente o chamado de Deus, mas enfrenta distrações e inconstância que impedem uma conexão mais profunda.",
+        strengths: ["Sensibilidade espiritual aguçada", "Desejo genuíno de crescimento", "Capacidade de reflexão"],
+        challenges: ["Manter disciplina espiritual", "Lidar com distrações do mundo", "Encontrar consistência na oração"],
+        recommendations: ["Estabeleça um tempo fixo para oração diária", "Crie um espaço sagrado em sua casa", "Busque orientação espiritual de alguém de confiança"],
+        nextSteps: ["O próximo passo é transformar seu desejo em ação. Comece hoje mesmo."],
+      };
+    };
+
+    const applyFallbackResult = () => {
+      const fallbackResult = buildFallbackResult(parsed);
+      setResult(fallbackResult);
+      setIsLoading(false);
+      clearQuizSessionState();
+    };
+
+    // Se houver leadId, tentar gerar resultado com IA
+    if (leadId) {
       generateResultMutation.mutate(
-        { responses: parsed, leadId: parsedLeadId },
+        { leadId, responses: parsed },
         {
-          onSuccess: (data) => {
-            if (data.success && data.result) {
-              setResult(data.result);
-              localStorage.setItem("quizResult", JSON.stringify(data.result));
+          onSuccess: (data: any) => {
+            if (data.success && data) {
+              setResult(data);
+              localStorage.setItem("quizResult", JSON.stringify(data));
+              setIsLoading(false);
+              clearQuizSessionState();
             } else {
-              setResult(null);
+              applyFallbackResult();
             }
-            setIsLoading(false);
           },
-          onError: (error) => {
-            console.error("Erro ao gerar resultado:", error);
-            setIsLoading(false);
+          onError: () => {
+            if (fallbackTimeoutRef.current) {
+              window.clearTimeout(fallbackTimeoutRef.current);
+              fallbackTimeoutRef.current = null;
+            }
+            applyFallbackResult();
           },
         }
       );
 
-      if (fallbackTimeoutRef.current) {
-        clearTimeout(fallbackTimeoutRef.current);
-      }
-
+      // Timeout de 30 segundos para fallback automático
       fallbackTimeoutRef.current = window.setTimeout(() => {
-        if (result === null) {
-          setIsLoading(false);
+        if (isLoading) {
+          applyFallbackResult();
         }
       }, 30000);
+    } else {
+      applyFallbackResult();
     }
 
     return () => {
       if (fallbackTimeoutRef.current) {
-        clearTimeout(fallbackTimeoutRef.current);
+        window.clearTimeout(fallbackTimeoutRef.current);
+        fallbackTimeoutRef.current = null;
       }
     };
-  }, []);
+  }, [setLocation, isLoading]);
 
   const handleDownloadPDF = async () => {
     if (!result || !responses) return;
 
     setIsGeneratingPDF(true);
-
     try {
       const pdfResponse = await generatePDFMutation.mutateAsync({
         profileName: result.profileName,
@@ -336,255 +373,128 @@ export default function Result() {
     );
   }
 
-  const emojiMatch = result.profileName.match(/^(.)\s/);
-  const emoji = emojiMatch ? emojiMatch[1] : "✨";
-  const profileTitle = result.profileName.replace(/^(.)\s/, "");
-
   return (
-    <div className="spiritual-background min-h-screen flex flex-col items-center justify-center p-4 py-8">
-      <div className="quiz-card w-full max-w-2xl">
-        
-        {/* ===== SEÇÃO DE RESULTADO COM ESTRUTURA PROFISSIONAL ===== */}
-        
-        {/* 🔍 TÍTULO */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Seu resultado: {profileTitle}
-          </h1>
-          <div className="text-6xl mb-4">{emoji}</div>
+    <div className="spiritual-background min-h-screen py-8 px-4">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-foreground">{result.profileName}</h1>
+          <p className="text-lg text-foreground/80">Seu Diagnóstico Espiritual</p>
         </div>
 
-        {/* 💔 DIAGNÓSTICO (CONEXÃO) */}
-        <div className="mb-8 p-6 bg-secondary/50 rounded-lg border-l-4 border-accent">
-          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span className="text-2xl">💔</span> Diagnóstico
-          </h3>
-          <p className="text-foreground text-lg leading-relaxed mb-3">
-            {result.profileDescription}
-          </p>
-          <p className="text-foreground/80 text-sm italic">
-            Isso não significa que você perdeu sua fé… mas pode indicar que você está se afastando da presença Dele sem perceber.
-          </p>
-        </div>
+        {/* Main Result Card */}
+        <div className="bg-card text-card-foreground rounded-lg shadow-lg p-8 space-y-6">
+          {/* Profile Description */}
+          <div>
+            <h2 className="text-2xl font-semibold mb-3">Quem você é</h2>
+            <p className="text-lg leading-relaxed">{result.profileDescription}</p>
+          </div>
 
-        {/* ⚠️ IMPACTO (DOR) */}
-        <div className="mb-8 p-6 bg-red-50/30 rounded-lg border border-red-200/50">
-          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span className="text-2xl">⚠️</span> Impacto
-          </h3>
-          <p className="text-foreground mb-4 font-semibold">Isso pode estar gerando em você:</p>
-          <div className="space-y-2">
-            {result.challenges.map((challenge, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <span className="text-red-500 font-bold">•</span>
-                <p className="text-foreground">{challenge}</p>
-              </div>
-            ))}
+          {/* Strengths */}
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-accent">Seus Pontos Fortes</h3>
+            <ul className="space-y-2">
+              {result.strengths.map((strength, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span className="text-accent font-bold">✓</span>
+                  <span>{strength}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Challenges */}
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-amber-600">Desafios a Superar</h3>
+            <ul className="space-y-2">
+              {result.challenges.map((challenge, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span className="text-amber-600 font-bold">•</span>
+                  <span>{challenge}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Recommendations */}
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-green-600">Recomendações Personalizadas</h3>
+            <ul className="space-y-2">
+              {result.recommendations.map((rec, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span className="text-green-600 font-bold">→</span>
+                  <span>{rec}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Next Steps */}
+          <div className="bg-accent/10 p-4 rounded-lg border-l-4 border-accent">
+            <h3 className="text-xl font-semibold mb-2 text-accent">Seu Próximo Passo</h3>
+            <p className="text-lg">{result.nextSteps[0]}</p>
           </div>
         </div>
 
-        {/* 🙏 VERDADE (AUTORIDADE + FÉ) */}
-        <div className="mb-8 p-6 bg-gradient-to-r from-accent/10 to-accent/5 rounded-lg border border-accent/30">
-          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span className="text-2xl">🙏</span> Verdade
-          </h3>
-          <p className="text-foreground text-lg leading-relaxed font-semibold mb-3">
-            A verdade é que Deus não se afastou de você.
-          </p>
-          <p className="text-foreground text-lg leading-relaxed font-semibold">
-            Ele continua presente — esperando apenas que você volte a se aproximar.
-          </p>
-        </div>
-
-        {/* ✨ ESPERANÇA */}
-        <div className="mb-8 p-6 bg-blue-50/30 rounded-lg border border-blue-200/50">
-          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span className="text-2xl">✨</span> Esperança
-          </h3>
-          <p className="text-foreground text-lg leading-relaxed font-semibold">
-            E a boa notícia é que isso pode começar a mudar ainda hoje, com pequenos passos.
-          </p>
-          <div className="space-y-2 mt-4">
-            {result.strengths.map((strength, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <span className="text-accent text-xl">✓</span>
-                <p className="text-foreground">{strength}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Botões de ação secundários */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-center flex-wrap">
           <Button
             onClick={handleDownloadPDF}
             disabled={isGeneratingPDF}
-            className="w-full"
-            variant="outline"
+            className="flex items-center gap-2 bg-accent hover:bg-accent/90"
           >
-            {isGeneratingPDF ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Gerando...
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4 mr-2" />
-                Baixar Resultado
-              </>
-            )}
-          </Button>
-
-          <Button
-            onClick={handleRetakeQuiz}
-            className="w-full"
-            variant="outline"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Fazer Novamente
+            <Download className="w-4 h-4" />
+            {isGeneratingPDF ? "Gerando PDF..." : "Baixar Diagnóstico"}
           </Button>
 
           <Button
             onClick={() => handleShare()}
-            className="w-full"
+            disabled={isSharing}
             variant="outline"
+            className="flex items-center gap-2"
           >
-            <Share2 className="w-4 h-4 mr-2" />
-            Compartilhar
+            <Share2 className="w-4 h-4" />
+            {isSharing ? "Compartilhando..." : "Compartilhar"}
+          </Button>
+
+          <Button
+            onClick={handleRetakeQuiz}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Refazer Quiz
           </Button>
         </div>
 
-        {/* ===== SEÇÃO DE OFERTA IRRESISTÍVEL ===== */}
-        
-        <div className="h-1 bg-gradient-to-r from-transparent via-accent to-transparent mb-8"></div>
-
-        {/* 🔄 TRANSIÇÃO */}
-        <div className="text-center mb-8">
-          <p className="text-lg text-foreground font-semibold">
-            Pensando nisso, com base nas suas respostas…
+        {/* Devocional CTA */}
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-8 text-center space-y-4 border border-amber-200">
+          <h3 className="text-2xl font-bold text-amber-900">Aprofunde Sua Jornada Espiritual</h3>
+          <p className="text-amber-800">
+            Receba um devocional de 7 dias personalizado baseado em seu diagnóstico
           </p>
-        </div>
-
-        {/* 💰 🎯 OFERTA */}
-        <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg p-8 border-2 border-accent/40 mb-8">
-          
-          {/* Badge de oferta especial */}
-          <div className="text-center mb-6">
-            <span className="inline-block bg-accent text-white px-4 py-1 rounded-full text-sm font-semibold">
-              ✨ OFERTA ESPECIAL HOJE
-            </span>
-          </div>
-
-          {/* 🧾 NOME */}
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-6">
-            Devocional: 7 Dias para se Reconectar com Deus
-          </h2>
-
-          {/* 🧠 PROMESSA */}
-          <p className="text-center text-lg text-foreground/90 mb-6 leading-relaxed font-semibold">
-            Um plano simples e guiado que vai te ajudar a retomar sua conexão com Deus, organizar sua vida espiritual e voltar a sentir paz e direção.
-          </p>
-
-          {/* 💬 QUEBRA DE OBJEÇÃO */}
-          <div className="bg-white/60 rounded-lg p-4 mb-6 text-center">
-            <p className="text-foreground italic">
-              Mesmo que você esteja sem rotina, sem força ou se sentindo distante.
-            </p>
-          </div>
-
-          {/* 📦 O QUE VOCÊ VAI RECEBER */}
-          <div className="bg-white/40 rounded-lg p-6 mb-8">
-            <h4 className="font-bold text-foreground mb-4 text-center">📦 O que você vai receber:</h4>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <span className="text-accent text-xl">📖</span>
-                <p className="text-foreground">Devocional guiado por 7 dias</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-accent text-xl">🙏</span>
-                <p className="text-foreground">Passos práticos de oração (5 a 10 minutos por dia)</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-accent text-xl">📌</span>
-                <p className="text-foreground">Versículos certos para cada momento</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-accent text-xl">💡</span>
-                <p className="text-foreground">Reflexões simples e profundas</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-accent text-xl">🎯</span>
-                <p className="text-foreground">Direcionamento baseado no seu resultado</p>
-              </div>
-            </div>
-          </div>
-
-          {/* 🎁 BÔNUS */}
-          <div className="bg-accent/10 rounded-lg p-4 mb-8 border border-accent/30">
-            <h4 className="font-bold text-accent mb-2 text-center">🎁 BÔNUS (IMPORTANTE)</h4>
-            <p className="text-center text-foreground font-semibold">✔ Checklist diário com Deus</p>
-          </div>
-
-          {/* PERSONALIZAÇÃO (OURO) */}
-          <div className="bg-yellow-50/50 rounded-lg p-4 mb-6 text-center border border-yellow-200/50">
-            <p className="text-foreground font-semibold">
-              Baseado nas suas respostas, recomendamos que você comece ainda hoje.
-            </p>
-          </div>
-
-          {/* ⏳ URGÊNCIA LEVE */}
-          <div className="text-center mb-6">
-            <p className="text-foreground font-semibold mb-2">
-              Comece hoje e já perceba diferença nos próximos dias.
-            </p>
-          </div>
-
-          {/* Preço e CTA */}
-          <div className="text-center mb-6 p-4 bg-red-50/50 rounded-lg border border-red-200/50">
-            <p className="text-sm text-foreground/70 mb-2">Investimento único:</p>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="text-4xl font-bold text-accent">R$ 12,90</span>
-            </div>
-            
-            {/* Contador de Urgência */}
-            <div className="bg-accent text-white rounded-lg p-3 mb-3">
-              <p className="text-sm font-semibold">⏰ Oferta disponível por:</p>
-              <p className="text-2xl font-bold font-mono">{formatTimeLeft(timeLeft)}</p>
-            </div>
-            
-            <p className="text-xs text-red-600 font-semibold">
-              ⚠️ Esta oferta especial termina em 24 horas!
-            </p>
-          </div>
-
-          {/* CTA (BOTÃO) */}
-          <div className="space-y-3">
+          <div className="flex gap-3 justify-center flex-wrap">
+            <Button
+              onClick={() => handleBuyGuide('stripe')}
+              disabled={isBuyingGuide}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {paymentMethod === 'stripe' && isBuyingGuide ? "Processando..." : "Comprar com Cartão"}
+            </Button>
             <Button
               onClick={() => handleBuyGuide('mercadopago')}
               disabled={isBuyingGuide}
-              className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-3 md:py-6 text-sm md:text-lg rounded-lg transition-all duration-200 h-auto"
+              className="bg-blue-500 hover:bg-blue-600"
             >
-              {isBuyingGuide && paymentMethod === 'mercadopago' ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                <>
-                  👉 Quero me reconectar com Deus
-                </>
-              )}
+              {paymentMethod === 'mercadopago' && isBuyingGuide ? "Processando..." : "Comprar com MercadoPago"}
             </Button>
-
-            {/* 🧨 EXTRA (AUMENTA MUITO A CONVERSÃO) */}
-            <div className="text-center p-3 bg-green-50/50 rounded-lg border border-green-200/50">
-              <p className="text-sm text-foreground font-semibold">
-                ✔ Acesso imediato
-              </p>
-            </div>
           </div>
         </div>
 
+        {/* Time Left */}
+        <div className="text-center text-sm text-foreground/60">
+          Seu resultado estará disponível por: {formatTimeLeft(timeLeft)}
+        </div>
       </div>
     </div>
   );

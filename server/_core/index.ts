@@ -31,10 +31,10 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
-  // Initialize admin user on startup
+  // Initialize admin user on startup with the current project credentials
   try {
-    await createOrUpdateAdminUser("Daienny", "Netflix520@", "daienny@example.com");
-    console.log("[Admin] Daienny user initialized/updated");
+    await createOrUpdateAdminUser("daienny", "vitoria1023", "daienny@example.com");
+    console.log("[Admin] daienny user initialized/updated");
   } catch (error) {
     console.warn("[Admin] Failed to initialize admin user:", error);
   }

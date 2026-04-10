@@ -16,7 +16,7 @@ export function AdminLogin() {
     onSuccess: (data) => {
       if (data.success && data.token) {
         localStorage.setItem("adminToken", data.token);
-        setLocation("/admin-dashboard");
+        setLocation("/admin");
       } else {
         setError(data.message || "Erro ao fazer login");
       }

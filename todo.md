@@ -533,3 +533,31 @@
   - [x] Análise profunda de cansaço, confusão, desejo de intimidade
   - [x] Texto encantador que conecta emocionalmente
 - [x] Salvar checkpoint após correção
+
+## Bugs Reportados - Persistência após correções (2026-04-09)
+- [ ] Reproduzir caso em que o diagnóstico volta a aparecer como "Buscador Sedento"
+- [ ] Verificar se todas as 12 respostas estão chegando corretamente ao backend no momento da geração
+- [ ] Confirmar se o fallback está sobrescrevendo o resultado personalizado da OpenAI
+- [ ] Corrigir a lógica para impedir retorno ao perfil genérico quando houver respostas suficientes
+- [ ] Reproduzir erro no login da admin com as credenciais atuais
+- [ ] Identificar se a falha do login está na autenticação, sessão, rota ou redirecionamento
+- [ ] Corrigir o login da admin e validar acesso real ao painel
+- [ ] Testar novamente os fluxos de resultado e login
+- [ ] Salvar checkpoint após correção definitiva
+
+## Bugs Reportados - Lentidão, resultado genérico e login admin (2026-04-09)
+- [x] Investigar por que a tela /result pode ficar travada
+- [x] Verificar geração do diagnóstico e fallback
+- [x] Confirmar se ainda existe qualquer caminho que produza o perfil genérico repetido
+- [x] Validar login administrativo
+- [x] Ampliar os testes automatizados
+
+## Correções Aplicadas (2026-04-10)
+- [x] Resolver conflito de merge no Result.tsx
+- [x] Instalar dependência openai
+- [x] Corrigir tipo de procedure generateDownloadLink de query para mutation
+- [x] Adicionar timeout de 30 segundos para fallback automático
+- [x] Criar admin padrão no banco de dados
+- [x] Escrever testes para login admin
+- [x] Escrever testes para geração do diagnóstico
+- [ ] Salvar checkpoint final
