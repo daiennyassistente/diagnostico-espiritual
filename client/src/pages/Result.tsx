@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Share2, RotateCcw } from "lucide-react";
+import { Download, Loader2, Share2, RotateCcw, CheckCircle2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -26,9 +26,12 @@ export default function Result() {
   const fallbackTimeoutRef = useRef<number | null>(null);
   const generationStartedRef = useRef(false);
   const timerRef = useRef<number | null>(null);
+  const [isBuyingGuide, setIsBuyingGuide] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | null>(null);
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
+  const createMercadoPagoCheckoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
 
   // Timer para contar o tempo restante
   useEffect(() => {
@@ -280,16 +283,11 @@ export default function Result() {
     }
   };
 
-  const [isBuyingGuide, setIsBuyingGuide] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'mercadopago' | null>(null);
-  const createCheckoutMutation = trpc.quiz.createDevocionalCheckout.useMutation();
-  const createMercadoPagoCheckoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
-
-  const handleBuyGuide = async (method: 'stripe' | 'mercadopago') => {
+  const handleBuyDevocional = async () => {
     if (!result || !responses) return;
     
     setIsBuyingGuide(true);
-    setPaymentMethod(method);
+    setPaymentMethod('mercadopago');
     
     const leadData = localStorage.getItem("leadData");
     if (!leadData) {
@@ -301,51 +299,27 @@ export default function Result() {
     
     const { email } = JSON.parse(leadData);
     
-    if (method === 'stripe') {
-      createCheckoutMutation.mutate(
-        {
-          email,
-          profileName: result.profileName,
+    createMercadoPagoCheckoutMutation.mutate(
+      {
+        email,
+        profileName: result.profileName,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success && data.checkoutUrl) {
+            window.open(data.checkoutUrl, '_blank');
+            toast.success("Abrindo checkout...");
+          }
+          setIsBuyingGuide(false);
+          setPaymentMethod(null);
         },
-        {
-          onSuccess: (data) => {
-            if (data.success && data.checkoutUrl) {
-              window.open(data.checkoutUrl, '_blank');
-              toast.success("Abrindo checkout...");
-            }
-            setIsBuyingGuide(false);
-            setPaymentMethod(null);
-          },
-          onError: () => {
-            toast.error("Erro ao criar checkout");
-            setIsBuyingGuide(false);
-            setPaymentMethod(null);
-          },
-        }
-      );
-    } else if (method === 'mercadopago') {
-      createMercadoPagoCheckoutMutation.mutate(
-        {
-          email,
-          profileName: result.profileName,
+        onError: () => {
+          toast.error("Erro ao criar checkout");
+          setIsBuyingGuide(false);
+          setPaymentMethod(null);
         },
-        {
-          onSuccess: (data) => {
-            if (data.success && data.checkoutUrl) {
-              window.open(data.checkoutUrl, '_blank');
-              toast.success("Abrindo checkout...");
-            }
-            setIsBuyingGuide(false);
-            setPaymentMethod(null);
-          },
-          onError: () => {
-            toast.error("Erro ao criar checkout");
-            setIsBuyingGuide(false);
-            setPaymentMethod(null);
-          },
-        }
-      );
-    }
+      }
+    );
   };
 
   if (isLoading) {
@@ -374,125 +348,212 @@ export default function Result() {
   }
 
   return (
-    <div className="spiritual-background min-h-screen py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-foreground">{result.profileName}</h1>
-          <p className="text-lg text-foreground/80">Seu Diagnóstico Espiritual</p>
-        </div>
+    <div className="spiritual-background min-h-screen py-12 px-4">
+      <div className="max-w-3xl mx-auto space-y-12">
+        
+        {/* ===== SEÇÃO DE RESULTADO ===== */}
+        <div className="space-y-8">
+          {/* TÍTULO */}
+          <div className="text-center space-y-3">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
+              {result.profileName}
+            </h1>
+            <p className="text-lg text-foreground/70">Seu resultado do diagnóstico espiritual</p>
+          </div>
 
-        {/* Main Result Card */}
-        <div className="bg-card text-card-foreground rounded-lg shadow-lg p-8 space-y-6">
-          {/* Profile Description */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-3">Quem você é</h2>
+          {/* DIAGNÓSTICO (CONEXÃO) */}
+          <div className="bg-card text-card-foreground rounded-xl p-8 shadow-lg space-y-4 border-l-4 border-accent">
+            <h2 className="text-2xl font-bold text-accent">💔 Seu Diagnóstico</h2>
             <p className="text-lg leading-relaxed">{result.profileDescription}</p>
+            <p className="text-base text-foreground/80 italic border-t pt-4">
+              Isso não significa que você perdeu sua fé... mas pode indicar que você está se afastando da presença Dele sem perceber.
+            </p>
           </div>
 
-          {/* Strengths */}
-          <div>
-            <h3 className="text-xl font-semibold mb-3 text-accent">Seus Pontos Fortes</h3>
-            <ul className="space-y-2">
-              {result.strengths.map((strength, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span className="text-accent font-bold">✓</span>
-                  <span>{strength}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Challenges */}
-          <div>
-            <h3 className="text-xl font-semibold mb-3 text-amber-600">Desafios a Superar</h3>
-            <ul className="space-y-2">
+          {/* IMPACTO (DOR) */}
+          <div className="bg-amber-50 text-amber-900 rounded-xl p-8 space-y-4 border border-amber-200">
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              ⚠️ Isso pode estar gerando em você:
+            </h3>
+            <ul className="space-y-3">
               {result.challenges.map((challenge, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <span className="text-amber-600 font-bold">•</span>
-                  <span>{challenge}</span>
+                  <span className="text-amber-600 font-bold text-lg">•</span>
+                  <span className="text-base">{challenge}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Recommendations */}
-          <div>
-            <h3 className="text-xl font-semibold mb-3 text-green-600">Recomendações Personalizadas</h3>
-            <ul className="space-y-2">
+          {/* VERDADE (AUTORIDADE + FÉ) */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 space-y-4 border-l-4 border-blue-500">
+            <h3 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+              🙏 A Verdade é que...
+            </h3>
+            <p className="text-lg text-blue-900 font-semibold leading-relaxed">
+              Deus não se afastou de você.
+            </p>
+            <p className="text-base text-blue-800 leading-relaxed">
+              Ele continua presente — esperando apenas que você volte a se aproximar.
+            </p>
+          </div>
+
+          {/* ESPERANÇA */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-8 space-y-4 border border-green-200">
+            <h3 className="text-2xl font-bold text-green-900 flex items-center gap-2">
+              ✨ A Boa Notícia
+            </h3>
+            <p className="text-lg text-green-900 leading-relaxed">
+              E isso pode começar a mudar ainda hoje, com pequenos passos.
+            </p>
+          </div>
+
+          {/* RECOMENDAÇÕES */}
+          <div className="bg-card text-card-foreground rounded-xl p-8 space-y-4">
+            <h3 className="text-2xl font-bold text-accent">💡 Recomendações Personalizadas</h3>
+            <ul className="space-y-3">
               {result.recommendations.map((rec, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <span className="text-green-600 font-bold">→</span>
-                  <span>{rec}</span>
+                  <CheckCircle2 className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
+                  <span className="text-base">{rec}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Next Steps */}
-          <div className="bg-accent/10 p-4 rounded-lg border-l-4 border-accent">
-            <h3 className="text-xl font-semibold mb-2 text-accent">Seu Próximo Passo</h3>
-            <p className="text-lg">{result.nextSteps[0]}</p>
+          {/* AÇÕES RÁPIDAS */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center flex-wrap">
+            <Button
+              onClick={handleDownloadPDF}
+              disabled={isGeneratingPDF}
+              className="flex items-center gap-2 bg-accent hover:bg-accent/90 text-white font-semibold px-6 py-3"
+            >
+              <Download className="w-4 h-4" />
+              {isGeneratingPDF ? "Gerando PDF..." : "Baixar Diagnóstico"}
+            </Button>
+
+            <Button
+              onClick={() => handleShare()}
+              disabled={isSharing}
+              variant="outline"
+              className="flex items-center gap-2 font-semibold px-6 py-3"
+            >
+              <Share2 className="w-4 h-4" />
+              {isSharing ? "Compartilhando..." : "Compartilhar"}
+            </Button>
+
+            <Button
+              onClick={handleRetakeQuiz}
+              variant="outline"
+              className="flex items-center gap-2 font-semibold px-6 py-3"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Refazer Quiz
+            </Button>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-center flex-wrap">
-          <Button
-            onClick={handleDownloadPDF}
-            disabled={isGeneratingPDF}
-            className="flex items-center gap-2 bg-accent hover:bg-accent/90"
-          >
-            <Download className="w-4 h-4" />
-            {isGeneratingPDF ? "Gerando PDF..." : "Baixar Diagnóstico"}
-          </Button>
-
-          <Button
-            onClick={() => handleShare()}
-            disabled={isSharing}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Share2 className="w-4 h-4" />
-            {isSharing ? "Compartilhando..." : "Compartilhar"}
-          </Button>
-
-          <Button
-            onClick={handleRetakeQuiz}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Refazer Quiz
-          </Button>
-        </div>
-
-        {/* Devocional CTA */}
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-8 text-center space-y-4 border border-amber-200">
-          <h3 className="text-2xl font-bold text-amber-900">Aprofunde Sua Jornada Espiritual</h3>
-          <p className="text-amber-800">
-            Receba um devocional de 7 dias personalizado baseado em seu diagnóstico
+        {/* ===== TRANSIÇÃO PARA OFERTA ===== */}
+        <div className="text-center py-8 border-t border-foreground/10">
+          <p className="text-lg text-foreground/70 font-medium">
+            Pensando nisso, com base nas suas respostas…
           </p>
-          <div className="flex gap-3 justify-center flex-wrap">
+        </div>
+
+        {/* ===== SEÇÃO DE OFERTA ===== */}
+        <div className="bg-gradient-to-br from-amber-900 via-amber-800 to-orange-900 rounded-2xl p-8 md:p-12 space-y-8 text-white shadow-2xl">
+          
+          {/* NOME DA OFERTA */}
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              📖 Devocional: 7 Dias para se Reconectar com Deus
+            </h2>
+            <p className="text-amber-100 text-lg">Uma jornada guiada de transformação espiritual</p>
+          </div>
+
+          {/* PROMESSA */}
+          <div className="bg-white/10 backdrop-blur rounded-xl p-6 space-y-3 border border-white/20">
+            <h3 className="text-2xl font-bold text-amber-100">🧠 A Promessa</h3>
+            <p className="text-lg leading-relaxed">
+              Um plano simples e guiado que vai te ajudar a retomar sua conexão com Deus, organizar sua vida espiritual e voltar a sentir paz e direção.
+            </p>
+          </div>
+
+          {/* QUEBRA DE OBJEÇÃO */}
+          <div className="bg-white/5 rounded-lg p-4 border-l-4 border-amber-300">
+            <p className="text-base text-amber-50 italic">
+              💬 Mesmo que você esteja sem rotina, sem força ou se sentindo distante.
+            </p>
+          </div>
+
+          {/* O QUE VOCÊ VAI RECEBER */}
+          <div className="space-y-4">
+            <h3 className="text-2xl font-bold text-amber-100">📦 O Que Você Vai Receber</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-white/10 rounded-lg p-4 space-y-2 border border-white/20">
+                <p className="font-semibold text-amber-100 flex items-center gap-2">
+                  <span className="text-xl">📖</span> Devocional Guiado
+                </p>
+                <p className="text-sm text-amber-50">7 dias de reflexão profunda e transformadora</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4 space-y-2 border border-white/20">
+                <p className="font-semibold text-amber-100 flex items-center gap-2">
+                  <span className="text-xl">🙏</span> Passos Práticos
+                </p>
+                <p className="text-sm text-amber-50">5 a 10 minutos de oração diária</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4 space-y-2 border border-white/20">
+                <p className="font-semibold text-amber-100 flex items-center gap-2">
+                  <span className="text-xl">📌</span> Versículos Certos
+                </p>
+                <p className="text-sm text-amber-50">Selecionados para cada momento</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4 space-y-2 border border-white/20">
+                <p className="font-semibold text-amber-100 flex items-center gap-2">
+                  <span className="text-xl">💡</span> Reflexões Profundas
+                </p>
+                <p className="text-sm text-amber-50">Simples mas transformadoras</p>
+              </div>
+            </div>
+          </div>
+
+          {/* PERSONALIZAÇÃO (OURO) */}
+          <div className="bg-gradient-to-r from-yellow-400/20 to-amber-400/20 rounded-xl p-6 border border-yellow-400/30 space-y-3">
+            <p className="text-lg font-semibold text-amber-100">
+              🎯 Baseado nas suas respostas, recomendamos que você comece ainda hoje.
+            </p>
+            <p className="text-base text-amber-50">
+              Seu devocional será totalmente personalizado para sua situação espiritual específica.
+            </p>
+          </div>
+
+          {/* URGÊNCIA LEVE */}
+          <div className="text-center space-y-2">
+            <p className="text-lg font-semibold text-amber-100">
+              ⏳ Comece hoje e já perceba diferença nos próximos dias.
+            </p>
+          </div>
+
+          {/* CTA PRINCIPAL */}
+          <div className="space-y-4">
             <Button
-              onClick={() => handleBuyGuide('stripe')}
+              onClick={handleBuyDevocional}
               disabled={isBuyingGuide}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-white text-amber-900 hover:bg-amber-50 font-bold text-lg py-6 rounded-xl shadow-lg"
             >
-              {paymentMethod === 'stripe' && isBuyingGuide ? "Processando..." : "Comprar com Cartão"}
+              {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
             </Button>
-            <Button
-              onClick={() => handleBuyGuide('mercadopago')}
-              disabled={isBuyingGuide}
-              className="bg-blue-500 hover:bg-blue-600"
-            >
-              {paymentMethod === 'mercadopago' && isBuyingGuide ? "Processando..." : "Comprar com MercadoPago"}
-            </Button>
+
+            {/* EXTRA: AUMENTA CONVERSÃO */}
+            <div className="flex items-center justify-center gap-2 text-white">
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
+              <span className="font-semibold">✔ Acesso Imediato</span>
+            </div>
           </div>
         </div>
 
-        {/* Time Left */}
-        <div className="text-center text-sm text-foreground/60">
+        {/* TIMER */}
+        <div className="text-center text-sm text-foreground/60 pb-8">
           Seu resultado estará disponível por: {formatTimeLeft(timeLeft)}
         </div>
       </div>
