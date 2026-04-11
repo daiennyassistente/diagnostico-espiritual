@@ -38,6 +38,11 @@ export default function CheckoutSuccess() {
       setResponses(parsedResponses);
       setResult(parsedResult);
       setIsLoading(false);
+      
+      // Baixar PDF automaticamente após 1 segundo
+      setTimeout(() => {
+        handleDownloadDevocional();
+      }, 1000);
     } else if (leadId) {
       // Se houver leadId, mostrar mensagem de sucesso genérica
       setIsLoading(false);
@@ -60,6 +65,8 @@ export default function CheckoutSuccess() {
   }, [setLocation]);
 
   const handleDownloadDevocional = async () => {
+    // Se já foi gerado, não fazer nada
+    if (pdfGenerated) return;
     if (!result || !responses) return;
 
     setIsGeneratingPDF(true);

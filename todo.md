@@ -640,3 +640,10 @@
 - [x] Modificar função formatWhatsApp para incluir +55
 - [x] Atualizar placeholder para mostrar formato com +55
 - [x] Testar formatação automática
+
+## Fluxo de Pagamento - Pix Apenas com Redirecionamento Automático
+- [x] Remover opção de Stripe do checkout (já usa apenas Mercado Pago)
+- [x] Manter apenas Pix/Mercado Pago como opção de pagamento
+- [x] Configurar redirecionamento automático para página de sucesso após pagamento
+- [x] Implementar download automático de PDF na página de sucesso
+- [x] Testar fluxo completo: Quiz → Pagamento → Sucesso com PDF baixado
