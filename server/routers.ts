@@ -374,6 +374,26 @@ export const appRouter = router({
         console.log(`Resending ${input.type} to ${input.email}`);
         return { success: true, message: 'Email reenviado com sucesso' };
       }),
+    resendViaWhatsApp: publicProcedure
+      .input(z.object({ whatsappNumber: z.string().min(10), pdfUrl: z.string().url(), userName: z.string().optional() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { sendDevocionalPdfViaWhatsApp } = await import("./_core/twilio");
+          const success = await sendDevocionalPdfViaWhatsApp(
+            input.whatsappNumber,
+            input.pdfUrl,
+            input.userName
+          );
+          if (success) {
+            return { success: true, message: 'PDF reenviado via WhatsApp com sucesso!' };
+          } else {
+            throw new Error('Erro ao enviar via WhatsApp');
+          }
+        } catch (error: any) {
+          console.error('Erro ao reenviar via WhatsApp:', error);
+          throw new Error('Erro ao reenviar PDF via WhatsApp');
+        }
+      }),
     generateDownloadLink: adminProcedure
       .input(z.object({ leadId: z.number() }))
       .mutation(async ({ input }) => {

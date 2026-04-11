@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Download, Home, Loader2, CheckCircle } from "lucide-react";
+import { Download, Home, Loader2, CheckCircle, MessageCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -12,8 +12,11 @@ export default function CheckoutSuccess() {
   const [result, setResult] = useState<any>(null);
   const [responses, setResponses] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string>("");
 
   const generateDevotionalMutation = trpc.pdf.generateDevocionalPDF.useMutation();
+  const resendViaWhatsAppMutation = trpc.admin.resendViaWhatsApp.useMutation();
 
   useEffect(() => {
     // Extrair leadId do URL
@@ -23,6 +26,11 @@ export default function CheckoutSuccess() {
     // Recuperar dados do resultado e respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
     const savedResult = localStorage.getItem("quizResult");
+    const savedWhatsapp = localStorage.getItem("userWhatsapp");
+    const savedPdfUrl = localStorage.getItem("generatedPdfUrl");
+
+    if (savedWhatsapp) setWhatsappNumber(savedWhatsapp);
+    if (savedPdfUrl) setPdfUrl(savedPdfUrl);
 
     if (savedResponses && savedResult) {
       const parsedResponses = JSON.parse(savedResponses);
@@ -103,11 +111,37 @@ export default function CheckoutSuccess() {
     );
   };
 
+  const handleResendViaWhatsApp = async () => {
+    if (!whatsappNumber || !pdfUrl) {
+      toast.error("Número de WhatsApp ou URL do PDF não disponível");
+      return;
+    }
+
+    resendViaWhatsAppMutation.mutate(
+      {
+        whatsappNumber,
+        pdfUrl,
+        userName: responses?.["0"] || responses?.["step1"] || "Usuário",
+      },
+      {
+        onSuccess: () => {
+          toast.success("PDF reenviado via WhatsApp com sucesso!");
+        },
+        onError: (error) => {
+          console.error("Erro ao reenviar via WhatsApp:", error);
+          toast.error("Erro ao reenviar PDF via WhatsApp. Tente novamente.");
+        },
+      }
+    );
+  };
+
   const handleBackToHome = () => {
     // Limpar dados do localStorage
     localStorage.removeItem("quizResponses");
     localStorage.removeItem("quizResult");
     localStorage.removeItem("leadData");
+    localStorage.removeItem("userWhatsapp");
+    localStorage.removeItem("generatedPdfUrl");
     setLocation("/");
   };
 
@@ -216,6 +250,36 @@ export default function CheckoutSuccess() {
             )}
           </Button>
 
+          {whatsappNumber && pdfUrl && (
+            <Button
+              onClick={handleResendViaWhatsApp}
+              disabled={resendViaWhatsAppMutation.isPending}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-6 text-lg"
+            >
+              {resendViaWhatsAppMutation.isPending ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Reenviar via WhatsApp
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+
+        {!whatsappNumber && (
+          <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-800">
+              💡 Para reenviar o PDF via WhatsApp, atualize seu número na próxima compra.
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Button
             onClick={handleBackToHome}
             className="w-full"

@@ -615,3 +615,9 @@
 - [x] Integrar com webhook de pagamento Mercado Pago
 - [x] Testar envio de PDF via WhatsApp
 - [x] Validar fluxo completo: Pagamento → PDF enviado via WhatsApp
+
+## Botão de Reenvio via WhatsApp
+- [x] Adicionar botão "Reenviar via WhatsApp" na página CheckoutSuccess
+- [x] Criar endpoint tRPC para reenviar PDF via WhatsApp
+- [x] Conectar botão ao endpoint
+- [x] Testar funcionalidade de reenvio
