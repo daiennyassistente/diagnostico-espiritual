@@ -11,6 +11,26 @@ export interface SendWhatsAppOptions {
 }
 
 /**
+ * Normaliza número de WhatsApp para formato internacional (+55...)
+ */
+function normalizeWhatsAppNumber(phoneNumber: string): string {
+  // Remove caracteres especiais
+  let normalized = phoneNumber.replace(/\D/g, '');
+  
+  // Se não começar com código do país, adiciona +55
+  if (!phoneNumber.includes('+') && !normalized.startsWith('55')) {
+    normalized = '55' + normalized;
+  }
+  
+  // Garante que começa com +
+  if (!normalized.startsWith('+')) {
+    normalized = '+' + normalized;
+  }
+  
+  return normalized;
+}
+
+/**
  * Envia uma mensagem de texto via WhatsApp
  */
 export async function sendWhatsAppMessage(to: string, message: string): Promise<boolean> {
@@ -20,9 +40,10 @@ export async function sendWhatsAppMessage(to: string, message: string): Promise<
       return false;
     }
 
+    const normalizedTo = normalizeWhatsAppNumber(to);
     const result = await client.messages.create({
       from: `whatsapp:${ENV.twilioWhatsappNumber}`,
-      to: `whatsapp:${to}`,
+      to: `whatsapp:${normalizedTo}`,
       body: message,
     });
 
@@ -48,9 +69,10 @@ export async function sendWhatsAppFile(
       return false;
     }
 
+    const normalizedTo = normalizeWhatsAppNumber(to);
     const result = await client.messages.create({
       from: `whatsapp:${ENV.twilioWhatsappNumber}`,
-      to: `whatsapp:${to}`,
+      to: `whatsapp:${normalizedTo}`,
       body: message || "Seu arquivo está pronto!",
       mediaUrl: [fileUrl],
     });

@@ -451,6 +451,12 @@ export function AdminDashboard() {
                                 hoverColor="hover:bg-green-200"
                                 onClick={() => {
                                   if (whatsappStr) {
+                                    // Validar e normalizar número
+                                    const normalizedWhatsapp = whatsappStr.replace(/\D/g, '');
+                                    if (normalizedWhatsapp.length < 10) {
+                                      toast.error('Número de WhatsApp inválido');
+                                      return;
+                                    }
                                     // Gerar URL do PDF (usando a URL de sucesso como referência)
                                     const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${item.id}`;
                                     resendWhatsAppMutation.mutate({
@@ -597,18 +603,24 @@ export function AdminDashboard() {
                               bgColor="bg-green-100"
                               textColor="text-green-700"
                               hoverColor="hover:bg-green-200"
-                              onClick={() => {
-                                if (buyer.whatsapp) {
-                                  const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${buyer.id}`;
-                                  resendWhatsAppMutation.mutate({
-                                    whatsappNumber: buyer.whatsapp,
-                                    pdfUrl: pdfUrl,
-                                    userName: buyer.email?.split('@')[0] || 'Comprador'
-                                  });
-                                } else {
-                                  toast.error('Comprador não tem WhatsApp cadastrado');
-                                }
-                              }}
+                                onClick={() => {
+                                  if (buyer.whatsapp) {
+                                    // Validar e normalizar número
+                                    const normalizedWhatsapp = buyer.whatsapp.replace(/\D/g, '');
+                                    if (normalizedWhatsapp.length < 10) {
+                                      toast.error('Número de WhatsApp inválido');
+                                      return;
+                                    }
+                                    const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${buyer.id}`;
+                                    resendWhatsAppMutation.mutate({
+                                      whatsappNumber: buyer.whatsapp,
+                                      pdfUrl: pdfUrl,
+                                      userName: buyer.email?.split('@')[0] || 'Comprador'
+                                    });
+                                  } else {
+                                    toast.error('Comprador não tem WhatsApp cadastrado');
+                                  }
+                                }}
                               isLoading={resendWhatsAppMutation.isPending}
                             />
                           </div>

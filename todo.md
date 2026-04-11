@@ -630,3 +630,8 @@
 - [x] Implementar reenvio via WhatsApp para compradores
 - [x] Testar reenvio para admin
 - [x] Testar reenvio para compradores
+
+## Correção de Formato de WhatsApp
+- [x] Adicionar função de normalização de número (+55)
+- [x] Adicionar validação no frontend
+- [x] Testar reenvio com número formatado
