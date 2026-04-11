@@ -39,6 +39,35 @@ export default function Result() {
 
     return /^você está/i.test(sanitized) ? sanitized : `Você está ${sanitized}`;
   };
+
+  const generateIntroductoryMessage = (profileName: string) => {
+    const messages = [
+      "Você não está sozinho nesse sentimento. Muitos cristãos passam por exatamente o que você está vivendo agora.",
+      "Essa é uma realidade que muitos cristãos enfrentam em algum momento da vida.",
+      "Você não é o único que sente isso. Muitos irmãos na fé passam por situações semelhantes.",
+      "Essa é uma jornada que muitos cristãos vivem, e a boa notícia é que tem solução.",
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  const generateConsequenceMessage = (profileName: string, challenges: string[]) => {
+    const profileLower = profileName.toLowerCase();
+    const challenge = challenges && challenges.length > 0 ? challenges[0].toLowerCase() : "essa situação";
+    
+    if (profileLower.includes("sobrecarregado")) {
+      return `Sem direcionamento, essa sobrecarga espiritual tende a aumentar. Você pode acordar daqui a 6 meses, 1 ano, e perceber que se afastou ainda mais de Deus. Que a fé que você tinha ficou fraca. Que aquela paz que Deus promete parece cada vez mais distante.`;
+    } else if (profileLower.includes("distante")) {
+      return `Sem um plano claro, essa distância de Deus tende a aumentar. O cansaço espiritual vai crescer. Você pode acordar daqui a poucos meses e perceber que está ainda mais longe da presença de Deus.`;
+    } else if (profileLower.includes("confuso")) {
+      return `Sem clareza, essa confusão espiritual vai aumentar. Você pode ficar preso em dúvidas, sem saber qual caminho seguir. E cada dia que passa, mais difícil fica voltar.`;
+    } else if (profileLower.includes("fraco")) {
+      return `Sem força espiritual, essa fraqueza tende a aumentar. Você pode acordar daqui a poucos meses e perceber que perdeu a fé que tinha. Que aquela força para enfrentar a vida desapareceu.`;
+    } else if (profileLower.includes("perdido")) {
+      return `Sem um caminho claro, você pode ficar ainda mais perdido. Os meses passam, a distância de Deus aumenta, e de repente você percebe que se afastou demais.`;
+    }
+    
+    return `Sem direcionamento, essa situação espiritual tende a piorar. Você pode acordar daqui a 6 meses, 1 ano, e perceber que se afastou ainda mais de Deus. Que a fé que você tinha ficou fraca. Que aquela paz que Deus promete parece cada vez mais distante.`;
+  };
   
   const generatePDFMutation = trpc.pdf.generateDiagnosticPDF.useMutation();
   const generateResultMutation = trpc.aiResult.generateFromResponses.useMutation();
@@ -115,7 +144,19 @@ export default function Result() {
         ? leadData.leadId
         : undefined;
 
-    localStorage.removeItem("quizResult");
+    // Verificar se há resultado salvo no localStorage
+    const savedResult = localStorage.getItem("quizResult");
+    if (savedResult) {
+      try {
+        const parsedResult = JSON.parse(savedResult);
+        setResult(parsedResult);
+        setIsLoading(false);
+        clearQuizSessionState();
+        return;
+      } catch (e) {
+        console.error("Erro ao parsear resultado salvo", e);
+      }
+    }
 
     const buildFallbackResult = (answers: Record<string, string>) => {
       const step1 = answers["0"] || "";
@@ -371,10 +412,10 @@ export default function Result() {
           {/* TÍTULO - IMPACTANTE E CURIOSO */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl md:text-4xl font-black" style={{color: '#1E3A8A', lineHeight: '1.2'}}>
-              Existe algo te afastando de Deus — e você pode não estar percebendo
+              {formatProfileHeadline(result.profileName)}
             </h1>
             <p className="text-lg mt-4" style={{color: '#1F2937'}}>
-              Você não está sozinho nesse sentimento. Muitos cristãos passam por exatamente o que você está vivendo agora.
+              {generateIntroductoryMessage(result.profileName)}
             </p>
             <p className="text-base mt-3" style={{color: '#6B7280'}}>
               E a boa notícia? <strong style={{color: '#1E3A8A'}}>Isso tem solução.</strong>
@@ -397,7 +438,7 @@ export default function Result() {
           <div className="rounded-xl p-6 space-y-4" style={{backgroundColor: '#FEF2F2', borderLeft: '4px solid #DC2626'}}>
             <h3 className="text-lg font-semibold" style={{color: '#991B1B'}}>Se você continuar assim, o que vai acontecer?</h3>
             <p className="text-base leading-relaxed" style={{color: '#7F1D1D'}}>
-              Sem direção, essa distância de Deus tende a aumentar. Você pode acordar daqui a 6 meses, 1 ano, e perceber que se afastou ainda mais. Que a fé que você tinha ficou fraca. Que aquela paz que Deus promete parece cada vez mais distante.
+              {generateConsequenceMessage(result.profileName, result.challenges)}
             </p>
             <p className="text-base font-semibold" style={{color: '#991B1B'}}>
               Mas aqui está o ponto: você NÃO precisa deixar isso acontecer.
