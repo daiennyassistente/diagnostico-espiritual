@@ -303,7 +303,7 @@ export default function Result() {
       return;
     }
     
-    const { email } = JSON.parse(leadData);
+    const { email, name, whatsapp } = JSON.parse(leadData);
     
     setIsBuyingGuide(true);
 
@@ -311,6 +311,8 @@ export default function Result() {
       {
         email,
         profileName: result.profileName,
+        userName: name,
+        userPhone: whatsapp,
       },
       {
         onSuccess: (data) => {

@@ -527,11 +527,25 @@ export const appRouter = router({
         z.object({
           email: z.string().email(),
           profileName: z.string(),
+          userName: z.string().optional(),
+          userPhone: z.string().optional(),
         }),
       )
       .mutation(async ({ input, ctx }) => {
         try {
           const { createMercadoPagoPreference, getMercadoPagoInitPoint } = await import("./_core/mercadopago");
+          
+          // Extrair nome e sobrenome do usuário
+          const fullName = input.userName || input.email.split('@')[0];
+          const nameParts = fullName.split(' ');
+          const firstName = nameParts[0] || "Cliente";
+          const lastName = nameParts.slice(1).join(' ') || "Devocional";
+          
+          // Extrair DDD e número do WhatsApp
+          const phoneNumber = input.userPhone || "11999999999";
+          const cleanPhone = phoneNumber.replace(/\D/g, '');
+          const areaCode = cleanPhone.substring(0, 2) || "11";
+          const number = cleanPhone.substring(2) || "999999999";
           
           const preference = await createMercadoPagoPreference({
             title: "Devocional: 7 Dias para se Aproximar de Deus",
@@ -543,6 +557,9 @@ export const appRouter = router({
             successUrl: `${ctx.req.headers.origin}/checkout-success`,
             failureUrl: `${ctx.req.headers.origin}/result`,
             pendingUrl: `${ctx.req.headers.origin}/result`,
+            payerName: firstName,
+            payerSurname: lastName,
+            payerPhone: { areaCode, number },
           });
 
           const initPoint = getMercadoPagoInitPoint(preference);

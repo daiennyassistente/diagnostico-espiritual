@@ -16,6 +16,9 @@ export async function createMercadoPagoPreference(options: {
   successUrl: string;
   failureUrl: string;
   pendingUrl: string;
+  payerName?: string;
+  payerSurname?: string;
+  payerPhone?: { areaCode: string; number: string };
 }) {
   try {
     const preference = await mercadopagoClient.create({
@@ -32,6 +35,16 @@ export async function createMercadoPagoPreference(options: {
         ],
         payer: {
           email: options.email,
+          name: options.payerName || "Cliente",
+          surname: options.payerSurname || "Diagnóstico Espiritual",
+          phone: {
+            area_code: options.payerPhone?.areaCode || "11",
+            number: options.payerPhone?.number || "999999999",
+          },
+          identification: {
+            type: "CPF",
+            number: "00000000000",
+          },
         },
         external_reference: options.externalReference,
         back_urls: {
