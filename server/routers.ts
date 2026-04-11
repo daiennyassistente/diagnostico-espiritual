@@ -661,6 +661,7 @@ REGRAS OBRIGATÓRIAS:
 6. Use linguagem cristã, acolhedora, bíblica e direta, sem soar mística, vaga ou poética demais.
 7. Não invente respostas que a pessoa não deu.
 8. O diagnóstico deve mostrar relação entre sintomas, causa provável e próximo passo prático com Deus.
+9. NUNCA inclua referências como "(resposta 2)", "(resposta 4)", "(step 3)" ou qualquer outra notação de referência no texto. O texto deve fluir naturalmente sem essas marcações.
 
 Gere uma resposta JSON com a seguinte estrutura:
 {

@@ -662,3 +662,8 @@
 - [x] Destacar que foi criado especialmente para o usuário
 - [x] Melhorar descrição dos benefícios (versículos, reflexões, etc)
 - [x] Adicionar urgência na seção de timer (mostrar tempo de expiração)
+
+## Bug: Referências de Respostas Aparecendo no Resultado
+- [x] Remover "(resposta 2)", "(resposta 4)", etc do texto do resultado
+- [x] Limpar o resultado para exibir apenas o texto gerado
+- [x] Testar se o resultado fica limpo e profissional
