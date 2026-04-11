@@ -340,10 +340,31 @@ export default function Quiz() {
   };
 
   const formatWhatsApp = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 2) return cleaned;
-    if (cleaned.length <= 7) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
-    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+    let cleaned = value.replace(/\D/g, '');
+    
+    // Se o usuário digitou +55 no início, remove para processar
+    if (value.startsWith('+55')) {
+      cleaned = value.slice(3).replace(/\D/g, '');
+    }
+    
+    // Se não começar com 55 e tiver menos de 11 dígitos, assume que é Brasil
+    if (!cleaned.startsWith('55') && cleaned.length <= 11) {
+      // Formata como (XX) XXXXX-XXXX com +55 no início
+      if (cleaned.length === 0) return '+55 ';
+      if (cleaned.length <= 2) return `+55 (${cleaned}`;
+      if (cleaned.length <= 7) return `+55 (${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+      return `+55 (${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+    }
+    
+    // Se já tem 55 no início
+    if (cleaned.startsWith('55')) {
+      const withoutCountry = cleaned.slice(2);
+      if (withoutCountry.length <= 2) return `+55 (${withoutCountry}`;
+      if (withoutCountry.length <= 7) return `+55 (${withoutCountry.slice(0, 2)}) ${withoutCountry.slice(2)}`;
+      return `+55 (${withoutCountry.slice(0, 2)}) ${withoutCountry.slice(2, 7)}-${withoutCountry.slice(7, 11)}`;
+    }
+    
+    return `+55 ${cleaned}`;
   };
 
   const handleSubmitLead = async (e: React.FormEvent) => {
@@ -558,7 +579,7 @@ export default function Quiz() {
                 <Input
                   id="whatsapp"
                   type="tel"
-                  placeholder="(11) 99999-9999"
+                  placeholder="+55 (11) 99999-9999"
                   value={leadData.whatsapp}
                   onChange={(e) => setLeadData({ ...leadData, whatsapp: formatWhatsApp(e.target.value) })}
                   className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3"

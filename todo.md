@@ -635,3 +635,8 @@
 - [x] Adicionar função de normalização de número (+55)
 - [x] Adicionar validação no frontend
 - [x] Testar reenvio com número formatado
+
+## Campo de WhatsApp com +55 Automático
+- [x] Modificar função formatWhatsApp para incluir +55
+- [x] Atualizar placeholder para mostrar formato com +55
+- [x] Testar formatação automática
