@@ -608,3 +608,10 @@
 - [x] Verificar se a lógica de resolução de perfil funciona corretamente com a nova opção
 - [x] Testar geração de resultado com a nova opção "Próxima de Deus"
 - [x] Testar geração de devocional com a nova opção "Próxima de Deus"
+
+## Integração WhatsApp - Envio de PDF
+- [x] Adicionar credenciais Twilio (Account SID, Auth Token, Número, Service SID)
+- [x] Criar função para enviar PDF via WhatsApp
+- [x] Integrar com webhook de pagamento Mercado Pago
+- [x] Testar envio de PDF via WhatsApp
+- [x] Validar fluxo completo: Pagamento → PDF enviado via WhatsApp
