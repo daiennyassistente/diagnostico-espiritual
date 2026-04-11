@@ -621,3 +621,12 @@
 - [x] Criar endpoint tRPC para reenviar PDF via WhatsApp
 - [x] Conectar botão ao endpoint
 - [x] Testar funcionalidade de reenvio
+
+## Funcionalidade de Reenvio via WhatsApp - Admin e Compradores
+- [x] Localizar botões de reenvio no AdminDashboard
+- [x] Implementar reenvio via WhatsApp no AdminDashboard (aba Usuários)
+- [x] Implementar reenvio via WhatsApp no AdminDashboard (aba Compradores)
+- [x] Localizar botões de reenvio na página de checkout/sucesso
+- [x] Implementar reenvio via WhatsApp para compradores
+- [x] Testar reenvio para admin
+- [x] Testar reenvio para compradores

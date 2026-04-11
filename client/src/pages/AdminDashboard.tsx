@@ -194,6 +194,7 @@ export function AdminDashboard() {
 
   // Mutações para ações dos botões
   const resendEmailMutation = trpc.admin.resendEmail.useMutation();
+  const resendWhatsAppMutation = trpc.admin.resendViaWhatsApp.useMutation();
   // const generateLinkMutation = trpc.admin.generateDownloadLink.useMutation();
   const unlockAccessMutation = trpc.admin.unlockAccess.useMutation();
 
@@ -430,7 +431,7 @@ export function AdminDashboard() {
                                 isLoading={resendEmailMutation.isPending}
                               />
                               <ActionButton
-                                icon="🔗"
+                                icon="📄"
                                 title="Link para resultado + guia"
                                 bgColor="bg-amber-100"
                                 textColor="text-amber-700"
@@ -441,6 +442,27 @@ export function AdminDashboard() {
                                   toast.success('Link copiado para a área de transferência!');
                                 }}
                                 isLoading={false}
+                              />
+                              <ActionButton
+                                icon="📱"
+                                title="Reenviar via WhatsApp"
+                                bgColor="bg-green-100"
+                                textColor="text-green-700"
+                                hoverColor="hover:bg-green-200"
+                                onClick={() => {
+                                  if (whatsappStr) {
+                                    // Gerar URL do PDF (usando a URL de sucesso como referência)
+                                    const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${item.id}`;
+                                    resendWhatsAppMutation.mutate({
+                                      whatsappNumber: whatsappStr,
+                                      pdfUrl: pdfUrl,
+                                      userName: nameStr
+                                    });
+                                  } else {
+                                    toast.error('Usuário não tem WhatsApp cadastrado');
+                                  }
+                                }}
+                                isLoading={resendWhatsAppMutation.isPending}
                               />
                               <ActionButton
                                 icon="🔓"
@@ -567,6 +589,30 @@ export function AdminDashboard() {
                           </span>
                         </td>
                         <td className="px-5 py-4 text-muted-foreground">{formatDateTime(buyer.createdAt)}</td>
+                        <td className="px-5 py-4">
+                          <div className="flex gap-2">
+                            <ActionButton
+                              icon="📱"
+                              title="Reenviar via WhatsApp"
+                              bgColor="bg-green-100"
+                              textColor="text-green-700"
+                              hoverColor="hover:bg-green-200"
+                              onClick={() => {
+                                if (buyer.whatsapp) {
+                                  const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${buyer.id}`;
+                                  resendWhatsAppMutation.mutate({
+                                    whatsappNumber: buyer.whatsapp,
+                                    pdfUrl: pdfUrl,
+                                    userName: buyer.email?.split('@')[0] || 'Comprador'
+                                  });
+                                } else {
+                                  toast.error('Comprador não tem WhatsApp cadastrado');
+                                }
+                              }}
+                              isLoading={resendWhatsAppMutation.isPending}
+                            />
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
