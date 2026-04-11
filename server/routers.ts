@@ -535,6 +535,7 @@ export const appRouter = router({
           
           const preference = await createMercadoPagoPreference({
             title: "Devocional: 7 Dias para se Aproximar de Deus",
+            description: `Guia devocional personalizado baseado em seu perfil: ${input.profileName}. Contém 7 dias de reflexões, versículos bíblicos e orações específicas para sua jornada espiritual.`,
             price: 12.90,
             quantity: 1,
             email: input.email,
@@ -553,6 +554,54 @@ export const appRouter = router({
         } catch (error: any) {
           console.error("Mercado Pago checkout error:", error);
           throw new Error("Erro ao criar sessao de pagamento");
+        }
+      }),
+
+    processSecureFieldsPayment: publicProcedure
+      .input(
+        z.object({
+          cardToken: z.string(),
+          email: z.string().email(),
+          profileName: z.string(),
+          leadId: z.number(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        try {
+          const { MercadoPagoConfig, Payment } = await import("mercadopago");
+          
+          const client = new MercadoPagoConfig({
+            accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "",
+          });
+
+          const paymentClient = new Payment(client);
+
+          const payment = await paymentClient.create({
+            body: {
+              token: input.cardToken,
+              transaction_amount: 12.90,
+              installments: 1,
+              payment_method_id: "visa",
+              payer: {
+                email: input.email,
+              },
+              description: `Devocional personalizado - Perfil: ${input.profileName}`,
+              external_reference: `devotional-${input.leadId}-${Date.now()}`,
+            },
+          });
+
+          if ((payment.status as any) === "201" || (payment.status as any) === "200" || (payment.status as any) === 201 || (payment.status as any) === 200) {
+            return { 
+              success: true, 
+              paymentId: payment.id,
+              status: payment.status,
+            };
+          } else {
+            throw new Error("Erro ao processar pagamento");
+          }
+        } catch (error: any) {
+          console.error("Secure Fields payment error:", error);
+          throw new Error(`Erro ao processar pagamento: ${error.message}`);
         }
       }),
   }),
@@ -650,8 +699,14 @@ QUIZ COMPLETO:
 ${responsesText}
 
 OBJETIVO:
-Produza um diagnóstico que faça a pessoa sentir que você realmente leu e entendeu sua fase espiritual. O texto precisa soar individual, específico, íntimo, coerente e profundamente conectado ao que ela respondeu.
+Produza um diagnóstico que faça a pessoa sentir que você realmente leu e entendeu sua fase espiritual. O texto precisa soar individual, específ ico, íntimo, coerente e profundamente conectado ao que ela respondeu.
 
+TOM E ESTILO:
+- Fale DIRETAMENTE com a pessoa: use "você", "sua vida", "seu coração", "sua jornada"
+- Crie CONEXÃO EMOCIONAL: mostre que você entende a dor real, não apenas os sintomas
+- Seja ACOLHEDOR E ESPERANÇOSO: reconheça as lutas, mas aponte para a graça de Deus
+- PERSONALIZE PROFUNDAMENTE: cada frase deve soar como se fosse escrita apenas para essa pessoa
+- Evite GENERICO: não escreva algo que pudesse servir para outra pessoa com respostas diferentes
 REGRAS OBRIGATÓRIAS:
 1. NÃO escreva conteúdo genérico, amplo ou reaproveitável.
 2. O profileDescription deve mencionar pelo menos 4 evidências concretas extraídas das respostas.
@@ -662,6 +717,8 @@ REGRAS OBRIGATÓRIAS:
 7. Não invente respostas que a pessoa não deu.
 8. O diagnóstico deve mostrar relação entre sintomas, causa provável e próximo passo prático com Deus.
 9. NUNCA inclua referências como "(resposta 2)", "(resposta 4)", "(step 3)" ou qualquer outra notação de referência no texto. O texto deve fluir naturalmente sem essas marcações.
+10. O profileDescription deve começar reconhecendo a realidade espiritual da pessoa e terminar apontando para a esperança em Cristo.
+11. Use evidencias concretas das respostas para construir uma narrativa que mostre: (a) onde a pessoa está, (b) por que está lá, (c) para onde Deus a chama.
 
 Gere uma resposta JSON com a seguinte estrutura:
 {

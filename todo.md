@@ -667,3 +667,17 @@
 - [x] Remover "(resposta 2)", "(resposta 4)", etc do texto do resultado
 - [x] Limpar o resultado para exibir apenas o texto gerado
 - [x] Testar se o resultado fica limpo e profissional
+
+## Melhoria de Tom e Conexão Emocional
+- [ ] Reforçar prompt para falar diretamente com o usuário
+- [ ] Garantir que o resultado cria conexão emocional profunda
+- [ ] Validar que o tom é pessoal e não genérico
+- [ ] Testar novo resultado com melhorias
+
+## Requisitos Mercado Pago - Melhorar Índice de Aprovação
+- [x] Adicionar items.category_id no checkout
+- [x] Adicionar items.description no checkout
+- [x] Instalar SDK MercadoPago.JS V2
+- [x] Implementar Secure Fields para captura de cartão
+- [x] Testar integração com novos requisitos
+- [ ] Validar índice de aprovação no Mercado Pago (próximo passo: testar com pagamento real)

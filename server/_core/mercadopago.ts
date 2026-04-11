@@ -8,6 +8,7 @@ export const mercadopagoClient = new Preference(mercadopagoConfig);
 
 export async function createMercadoPagoPreference(options: {
   title: string;
+  description?: string;
   price: number;
   quantity: number;
   email: string;
@@ -23,6 +24,8 @@ export async function createMercadoPagoPreference(options: {
           {
             id: "1",
             title: options.title,
+            description: options.description || "Guia devocional personalizado de 7 dias para se aproximar de Deus",
+            category_id: "books",
             quantity: options.quantity,
             unit_price: options.price,
           },
@@ -44,6 +47,7 @@ export async function createMercadoPagoPreference(options: {
             },
           ],
         },
+        notification_url: "https://diagnosticoespiritual.manus.space/api/mercadopago/webhook",
       },
     });
 
