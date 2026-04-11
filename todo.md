@@ -647,3 +647,18 @@
 - [x] Configurar redirecionamento automático para página de sucesso após pagamento
 - [x] Implementar download automático de PDF na página de sucesso
 - [x] Testar fluxo completo: Quiz → Pagamento → Sucesso com PDF baixado
+
+## Configuração de Webhook Mercado Pago
+- [ ] Configurar webhook no Mercado Pago Console
+- [ ] URL: https://3000-iktqkx8fkwgmhs7gamw5z-e3d4cff9.us1.manus.computer/api/mercadopago/webhook
+- [ ] Eventos: payment.approved, payment.created
+- [ ] Testar pagamento com webhook ativo
+- [ ] Validar redirecionamento automático para página de sucesso
+
+## Melhoria de Persuasão - Página de Resultado
+- [x] Deixar contador em vermelho (maior urgência)
+- [x] Melhorar título da oferta ("Não Deixe Seu Resultado Expirar")
+- [x] Adicionar descrição personalizada do devocional
+- [x] Destacar que foi criado especialmente para o usuário
+- [x] Melhorar descrição dos benefícios (versículos, reflexões, etc)
+- [x] Adicionar urgência na seção de timer (mostrar tempo de expiração)

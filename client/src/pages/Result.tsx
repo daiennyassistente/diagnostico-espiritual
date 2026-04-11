@@ -464,43 +464,49 @@ export default function Result() {
           {/* OFERTA - TÍTULO IMPACTANTE */}
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-black leading-tight" style={{color: '#1E3A8A'}}>
-              Retome Sua Conexão com Deus
+              Não Deixe Seu Resultado Expirar
             </h2>
             <p className="text-lg font-semibold" style={{color: '#C9A646'}}>
-              📖 Devocional: 7 Dias Guiados
+              📖 Devocional Personalizado: 7 Dias Transformadores
             </p>
             <p className="text-base" style={{color: '#1F2937'}}>
-              Um plano simples e profundo para voltar a sentir paz e direção.
+              Baseado no seu diagnóstico espiritual, receba um plano personalizado para reconectar com Deus, encontrar paz interior e clareza para sua vida.
+            </p>
+            <p className="text-sm font-semibold" style={{color: '#DC2626'}}>
+              ⚠️ Este devocional foi criado especialmente para você
             </p>
           </div>
 
           {/* O QUE INCLUI */}
           <div className="space-y-3 rounded-lg p-4" style={{backgroundColor: '#F2E8C9'}}>
-            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>Você recebe:</p>
+            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>Seu Devocional Inclui:</p>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
                 <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span>7 dias de devocional guiado</span>
+                <span><strong>7 dias personalizados</strong> baseados no seu diagnóstico</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
                 <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span>5-10 min de oração diária</span>
+                <span><strong>Versículos bíblicos</strong> para sua situação específica</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
                 <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span>Versículos + reflexões</span>
+                <span><strong>Reflexões profundas</strong> para transformar sua fé</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
                 <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span>Acesso imediato</span>
+                <span><strong>Acesso imediato</strong> - baixe agora mesmo</span>
               </li>
             </ul>
           </div>
 
           {/* URGÊNCIA */}
-          <div className="rounded-lg p-3 text-center" style={{backgroundColor: '#EFF6FF'}}>
-            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>
-              ⏳ Comece hoje e sinta a diferença nos próximos dias
+          <div className="rounded-lg p-4 text-center" style={{backgroundColor: '#FEE2E2', border: '2px solid #DC2626'}}>
+            <p className="text-sm font-bold" style={{color: '#991B1B'}}>
+              ⏳ Seu resultado expira em {formatTimeLeft(timeLeft)}
+            </p>
+            <p className="text-xs mt-2" style={{color: '#7F1D1D'}}>
+              Após isso, você perderá acesso ao seu devocional personalizado
             </p>
           </div>
 
@@ -525,7 +531,7 @@ export default function Result() {
         {/* TIMER */}
         <div className="text-center pb-4">
           <p className="text-sm font-semibold" style={{color: '#1E3A8A'}}>Seu resultado estará disponível por:</p>
-          <p className="text-2xl font-black" style={{color: '#C9A646'}}>{formatTimeLeft(timeLeft)}</p>
+          <p className="text-3xl font-black" style={{color: '#DC2626'}}>{formatTimeLeft(timeLeft)}</p>
         </div>
       </div>
     </div>
