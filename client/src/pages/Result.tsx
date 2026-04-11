@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Share2, RotateCcw, CheckCircle2, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 interface AIResult {
   profileName: string;
@@ -27,6 +28,18 @@ export default function Result() {
   const generationStartedRef = useRef(false);
   const timerRef = useRef<number | null>(null);
   const [isBuyingGuide, setIsBuyingGuide] = useState(false);
+  
+  // Memoizar o subtítulo introdutório para que não mude a cada render
+  const memoizedIntroductoryMessage = useMemo(
+    () => result ? generateIntroductoryMessage(result.profileName) : "",
+    [result?.profileName]
+  );
+  
+  // Memoizar a mensagem de consequência para que não mude a cada render
+  const memoizedConsequenceMessage = useMemo(
+    () => result ? generateConsequenceMessage(result.profileName, result.challenges) : "",
+    [result?.profileName, result?.challenges]
+  );
 
   const formatProfileHeadline = (profileName: string) => {
     const sanitized = profileName
@@ -415,7 +428,7 @@ export default function Result() {
               {formatProfileHeadline(result.profileName)}
             </h1>
             <p className="text-lg mt-4" style={{color: '#1F2937'}}>
-              {generateIntroductoryMessage(result.profileName)}
+              {memoizedIntroductoryMessage}
             </p>
             <p className="text-base mt-3" style={{color: '#6B7280'}}>
               E a boa notícia? <strong style={{color: '#1E3A8A'}}>Isso tem solução.</strong>
@@ -438,7 +451,7 @@ export default function Result() {
           <div className="rounded-xl p-6 space-y-4" style={{backgroundColor: '#FEF2F2', borderLeft: '4px solid #DC2626'}}>
             <h3 className="text-lg font-semibold" style={{color: '#991B1B'}}>Se você continuar assim, o que vai acontecer?</h3>
             <p className="text-base leading-relaxed" style={{color: '#7F1D1D'}}>
-              {generateConsequenceMessage(result.profileName, result.challenges)}
+              {memoizedConsequenceMessage}
             </p>
             <p className="text-base font-semibold" style={{color: '#991B1B'}}>
               Mas aqui está o ponto: você NÃO precisa deixar isso acontecer.
