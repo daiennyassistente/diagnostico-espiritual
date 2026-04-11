@@ -368,44 +368,63 @@ export default function Result() {
         
         {/* ===== SEÇÃO DE RESULTADO ===== */}
         <div className="space-y-6">
-          {/* TÍTULO - DIRETO E CLARO */}
+          {/* TÍTULO - IMPACTANTE E CURIOSO */}
           <div className="text-center space-y-2">
-            <h1 className="text-2xl md:text-3xl font-black" style={{color: '#1E3A8A', lineHeight: '1.2'}}>
-              {formatProfileHeadline(result.profileName)}
+            <h1 className="text-3xl md:text-4xl font-black" style={{color: '#1E3A8A', lineHeight: '1.2'}}>
+              Existe algo te afastando de Deus — e você pode não estar percebendo
             </h1>
-            <p className="text-lg" style={{color: '#6B7280'}}>
-              Seu diagnóstico mostra com clareza o que hoje está pesando na sua vida com Deus.
+            <p className="text-lg mt-4" style={{color: '#1F2937'}}>
+              Você não está sozinho nesse sentimento. Muitos cristãos passam por exatamente o que você está vivendo agora.
+            </p>
+            <p className="text-base mt-3" style={{color: '#6B7280'}}>
+              E a boa notícia? <strong style={{color: '#1E3A8A'}}>Isso tem solução.</strong>
             </p>
           </div>
 
-          {/* DIAGNÓSTICO - CURTO E IMPACTANTE */}
-          <div className="rounded-xl p-6 shadow-md space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
+          {/* DIAGNÓSTICO - EMOCIONAL E PESSOAL */}
+          <div className="rounded-xl p-6 shadow-md space-y-4" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
             <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
-              {result.profileDescription}
+              Seu resultado mostra com precisão o que está acontecendo na sua vida espiritual neste momento. Não é coincidência você estar aqui. Deus sabe exatamente o que você precisa.
+            </p>
+            <div style={{borderTop: '1px solid #E5E7EB', paddingTop: '1rem'}}>
+              <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
+                <strong style={{color: '#1E3A8A'}}>Seu diagnóstico:</strong> {result.profileDescription}
+              </p>
+            </div>
+          </div>
+
+          {/* SEÇÃO DE DOR + CONSEQUÊNCIA */}
+          <div className="rounded-xl p-6 space-y-4" style={{backgroundColor: '#FEF2F2', borderLeft: '4px solid #DC2626'}}>
+            <h3 className="text-lg font-semibold" style={{color: '#991B1B'}}>Se você continuar assim, o que vai acontecer?</h3>
+            <p className="text-base leading-relaxed" style={{color: '#7F1D1D'}}>
+              Sem direção, essa distância de Deus tende a aumentar. Você pode acordar daqui a 6 meses, 1 ano, e perceber que se afastou ainda mais. Que a fé que você tinha ficou fraca. Que aquela paz que Deus promete parece cada vez mais distante.
+            </p>
+            <p className="text-base font-semibold" style={{color: '#991B1B'}}>
+              Mas aqui está o ponto: você NÃO precisa deixar isso acontecer.
             </p>
           </div>
 
-          {/* IMPACTO */}
+          {/* IMPACTO - RECONHECIMENTO */}
           <div className="rounded-xl p-6 space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
-            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Hoje isso aparece assim na sua vida:</h3>
+            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Você reconhece isso na sua vida?</h3>
             <ul className="space-y-2">
               {result.challenges.slice(0, 3).map((challenge, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                  <span className="font-bold" style={{color: '#1E3A8A'}}>•</span>
+                  <span className="font-bold" style={{color: '#1E3A8A'}}>✓</span>
                   <span>{challenge}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* RECOMENDAÇÕES */}
+          {/* RECOMENDAÇÕES - CAMINHO SIMPLES */}
           <div className="rounded-xl p-6 space-y-3" style={{backgroundColor: '#FFFFFF', borderLeft: '4px solid #1E3A8A'}}>
-            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>O que fazer agora:</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>O caminho para voltar é mais simples do que você pensa:</h3>
+            <ul className="space-y-3">
               {result.recommendations.slice(0, 2).map((rec, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#1E3A8A'}} />
-                  <span>{rec}</span>
+                <li key={idx} className="flex items-start gap-3 text-sm" style={{color: '#1F2937'}}>
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#1E3A8A'}} />
+                  <span className="leading-relaxed">{rec}</span>
                 </li>
               ))}
             </ul>
@@ -446,7 +465,7 @@ export default function Result() {
           </div>
         </div>
 
-        {/* ===== TRANSIÇÃO FORTE PARA OFERTA ===== */}
+        {/* ===== TRANSIÇÃO PARA OFERTA ===== */}
         <div className="relative py-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full" style={{borderTop: '2px solid #3B82F6'}}></div>
@@ -454,65 +473,92 @@ export default function Result() {
           <div className="relative flex justify-center">
             <div className="px-4" style={{backgroundColor: '#FAF7F2'}}>
               <p className="text-center text-sm font-bold" style={{color: '#1E3A8A'}}>
-                ⚡ MAS ESPERA... ISSO PODE MUDAR HOJE
+                ⚡ MAS AQUI ESTÁ O SEGREDO: Você não precisa fazer isso sozinho
               </p>
             </div>
           </div>
         </div>
 
-        {/* ===== SEÇÃO DE OFERTA - MINIMALISTA E FOCADA ===== */}
+        {/* PARÁGRAFO DE TRANSIÇÃO */}
+        <div className="text-center space-y-4 px-4">
+          <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
+            Sabe aquele sentimento de estar perdido espiritualmente? De não saber por onde começar? De querer voltar para Deus, mas não saber como?
+          </p>
+          <p className="text-lg font-semibold" style={{color: '#1E3A8A'}}>
+            Existe um caminho. E ele foi criado especialmente para você.
+          </p>
+        </div>
+
+        {/* ===== SEÇÃO DE OFERTA - OTIMIZADA ===== */}
         <div className="rounded-xl p-8 space-y-6 shadow-lg" style={{backgroundColor: '#FFFFFF', border: '2px solid #3B82F6'}}>
           
-          {/* OFERTA - TÍTULO IMPACTANTE */}
+          {/* OFERTA - TÍTULO TRANSFORMADOR */}
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-black leading-tight" style={{color: '#1E3A8A'}}>
-              Não Deixe Seu Resultado Expirar
+              Um Plano Espiritual Guiado de 7 Dias Para Restaurar Sua Vida Com Deus
             </h2>
-            <p className="text-lg font-semibold" style={{color: '#C9A646'}}>
-              📖 Devocional Personalizado: 7 Dias Transformadores
+            <p className="text-xl font-semibold" style={{color: '#C9A646'}}>
+              Seu Guia Pessoal Para Voltar a Sentir a Presença de Deus
             </p>
-            <p className="text-base" style={{color: '#1F2937'}}>
-              Baseado no seu diagnóstico espiritual, receba um plano personalizado para reconectar com Deus, encontrar paz interior e clareza para sua vida.
+            <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
+              Este não é um devocional comum. É um plano criado especialmente para <strong>VOCÊ</strong>, baseado no seu diagnóstico espiritual. Cada dia foi pensado para levar você de volta à presença de Deus, passo a passo, sem pressa, sem julgamento.
+            </p>
+            <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
+              Você vai descobrir como reconectar com Deus de forma profunda e real. Como sentir aquela paz que você sente falta. Como voltar a ter constância e propósito na sua vida espiritual.
             </p>
             <p className="text-sm font-semibold" style={{color: '#DC2626'}}>
               ⚠️ Este devocional foi criado especialmente para você
             </p>
           </div>
 
-          {/* O QUE INCLUI */}
+          {/* BENEFÍCIOS EMOCIONAIS */}
           <div className="space-y-3 rounded-lg p-4" style={{backgroundColor: '#F2E8C9'}}>
-            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>Seu Devocional Inclui:</p>
-            <ul className="space-y-2">
+            <p className="text-sm font-bold" style={{color: '#1E3A8A'}}>O que você vai ganhar:</p>
+            <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span><strong>7 dias personalizados</strong> baseados no seu diagnóstico</span>
+                <Zap className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
+                <span><strong>✨ Saiba exatamente o que fazer cada dia</strong> — sem dúvidas, sem culpa, sem se sentir perdido</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span><strong>Versículos bíblicos</strong> para sua situação específica</span>
+                <Zap className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
+                <span><strong>💎 Sinta a presença de Deus voltando</strong> — aquela paz que você sente falta vai voltar</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span><strong>Reflexões profundas</strong> para transformar sua fé</span>
+                <Zap className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
+                <span><strong>🙏 Tenha uma rotina espiritual que funciona</strong> — constância que você sempre quis</span>
               </li>
               <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
-                <span><strong>Acesso imediato</strong> - baixe agora mesmo</span>
+                <Zap className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
+                <span><strong>📖 Versículos que falam direto com seu coração</strong> — não genéricos, mas para VOCÊ</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm" style={{color: '#1F2937'}}>
+                <Zap className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#C9A646'}} />
+                <span><strong>⚡ Transformação real em 7 dias</strong> — não promessas vazias, mas mudança que você vai sentir</span>
               </li>
             </ul>
           </div>
 
-          {/* URGÊNCIA */}
+          {/* URGÊNCIA - EMOCIONAL */}
           <div className="rounded-lg p-4 text-center" style={{backgroundColor: '#FEE2E2', border: '2px solid #DC2626'}}>
             <p className="text-sm font-bold" style={{color: '#991B1B'}}>
-              ⏳ Seu resultado expira em {formatTimeLeft(timeLeft)}
+              ⚠️ Seu diagnóstico é único e pode expirar em {formatTimeLeft(timeLeft)}
             </p>
             <p className="text-xs mt-2" style={{color: '#7F1D1D'}}>
-              Após isso, você perderá acesso ao seu devocional personalizado
+              Se você sair agora, pode perder esse direcionamento espiritual que foi criado especialmente para você. Deus está falando com você AGORA.
             </p>
           </div>
 
-          {/* CTA - Único E FORTE */}
+          {/* PRÉ-BOTÃO - VISUALIZAÇÃO EMOCIONAL */}
+          <div className="text-center space-y-4 px-4 py-4" style={{backgroundColor: '#F9FAFB', borderRadius: '0.5rem'}}>
+            <p className="text-base leading-relaxed" style={{color: '#1F2937'}}>
+              Imagine como seria acordar amanhã com clareza. Sentir Deus perto de você novamente. Ter uma direção, um propósito, uma paz que você não sente há tempo.
+            </p>
+            <p className="text-lg font-semibold" style={{color: '#1E3A8A'}}>
+              Isso pode começar hoje.
+            </p>
+          </div>
+
+          {/* CTA - TRANSFORMADO */}
           <div className="space-y-3">
             <Button
               onClick={handleBuyDevocional}
@@ -522,17 +568,15 @@ export default function Result() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#EAB308'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FACC15'}
             >
-              {isBuyingGuide ? "Processando..." : "👉 Quero me Reconectar com Deus"}
+              {isBuyingGuide ? "Processando..." : "✨ Quero Voltar a Sentir a Presença de Deus"}
             </Button>
-            <p className="text-center text-base font-bold" style={{color: '#FACC15'}}>R$ 12,90 investimento único</p>
-            
-
+            <p className="text-center text-base font-bold" style={{color: '#FACC15'}}>R$ 12,90 — Menos que um café ☕</p>
           </div>
         </div>
 
-        {/* TIMER */}
+        {/* TIMER - REESCRITO */}
         <div className="text-center pb-4">
-          <p className="text-sm font-semibold" style={{color: '#1E3A8A'}}>Seu resultado estará disponível por:</p>
+          <p className="text-sm font-semibold" style={{color: '#1E3A8A'}}>⏳ Seu resultado personalizado estará disponível por mais:</p>
           <p className="text-3xl font-black" style={{color: '#DC2626'}}>{formatTimeLeft(timeLeft)}</p>
         </div>
       </div>

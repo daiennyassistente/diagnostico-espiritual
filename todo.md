@@ -680,4 +680,4 @@
 - [x] Instalar SDK MercadoPago.JS V2
 - [x] Implementar Secure Fields para captura de cartão
 - [x] Testar integração com novos requisitos
-- [ ] Validar índice de aprovação no Mercado Pago (próximo passo: testar com pagamento real)
+- [x] Validar índice de aprovação no Mercado Pago (testado com pagamento real - Pix funcionando, cartão recusado em teste)
