@@ -25,25 +25,6 @@ const formatTimeLeft = (seconds: number) => {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
 
-const buildFallbackResult = (responses: Record<string, string>): AIResult => {
-  return {
-    profileName: "em busca de profundidade espiritual",
-    profileDescription: "Você está vivendo uma fase espiritualmente marcada por uma sede profunda, porém sem direção clara.",
-    strengths: [
-      "Reconhecimento genuíno da necessidade de Deus",
-      "Desejo sincero de mudança",
-      "Abertura para receber orientação espiritual",
-    ],
-    challenges: [
-      "Falta de disciplina na Palavra e oração",
-      "Sensação de ausência de direção espiritual",
-      "Dificuldade para manter a sensibilidade espiritual",
-    ],
-    recommendations: [],
-    nextSteps: [],
-  };
-};
-
 const clearQuizSessionState = () => {
   sessionStorage.removeItem("quizStep");
   sessionStorage.removeItem("quizResponses");
@@ -57,6 +38,7 @@ export default function Result() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [timeLeft, setTimeLeft] = useState(86400);
   const [leadId, setLeadId] = useState<number | null>(null);
+  const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
 
   // Get leadId from URL query string
   useEffect(() => {
@@ -67,39 +49,99 @@ export default function Result() {
     }
   }, []);
 
-  // Fetch result using tRPC hook (only when leadId is available)
-  const { data: trpcResult, isLoading } = trpc.quiz.getResult.useQuery(
-    leadId ? { leadId } : undefined,
-    { enabled: !!leadId }
-  );
-
-  // Get result from tRPC or fallback
-  const result = trpcResult || null;
-
+  // Get stored data
   useEffect(() => {
     const storedUserName = sessionStorage.getItem("userName");
     const storedResponses = sessionStorage.getItem("quizResponses");
 
     if (storedUserName) setUserName(storedUserName);
     if (storedResponses) setResponses(JSON.parse(storedResponses));
-  }, []);  useEffect(() => {
+  }, []);
+
+  // Timer
+  useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // Fetch result using tRPC hook (only when leadId is available)
+  const { data: trpcResult, isLoading, refetch } = trpc.quiz.getResult.useQuery(
+    leadId ? { leadId } : undefined,
+    { enabled: !!leadId }
+  );
+
+  // Generate diagnosis mutation
+  const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
+
+  // Generate diagnosis if needed
+  useEffect(() => {
+    if (trpcResult && !trpcResult.diagnostic && !isGeneratingDiagnosis && responses && leadId) {
+      setIsGeneratingDiagnosis(true);
+      
+      // Convert responses to the format expected by the API
+      const responsesMap: Record<string, string> = {};
+      Object.entries(responses).forEach(([key, value]) => {
+        const stepNum = parseInt(key, 10) + 1;
+        responsesMap[`step${stepNum}`] = value;
+      });
+      
+      generateDiagnosisMutation.mutate(
+        {
+          responses: responsesMap,
+          leadId: leadId,
+        },
+        {
+          onSuccess: () => {
+            // Refetch the result after generating diagnosis
+            setTimeout(() => {
+              refetch();
+              setIsGeneratingDiagnosis(false);
+            }, 2000);
+          },
+          onError: (error) => {
+            console.error('Error generating diagnosis:', error);
+            setIsGeneratingDiagnosis(false);
+            toast.error('Erro ao gerar diagnóstico');
+          },
+        }
+      );
+    }
+  }, [trpcResult, isGeneratingDiagnosis, responses, leadId, generateDiagnosisMutation, refetch]);
+
   // Show loading state while fetching
-  if (isLoading) {
+  if (isLoading || !trpcResult || !trpcResult.diagnostic || isGeneratingDiagnosis) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p>Carregando seu diagnóstico...</p>
+      <div className="min-h-screen flex items-center justify-center spiritual-background">
+        <div className="text-center relative z-10">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#1E40AF" }} />
+          <p className="text-foreground font-medium">Gerando seu diagnóstico personalizado...</p>
         </div>
       </div>
     );
   }
+
+  const result = trpcResult.diagnostic;
+
+  const diagnosis = generateDeepSpiritualDiagnosis(
+    result.profileName,
+    result.challenges,
+    userName
+  );
+
+  const personalizedTitle = generatePersonalizedTitle(
+    result.profileName,
+    result.challenges,
+    userName
+  );
+
+  // Cores
+  const AZUL_PROFUNDO = "#1E40AF";
+  const OURO = "#D4AF37";
+  const OURO_CLARO = "#F4E4C1";
+  const AZUL_CLARO = "#EFF6FF";
+
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
@@ -135,35 +177,6 @@ export default function Result() {
     clearQuizSessionState();
     setLocation("/quiz");
   };
-
-  if (!result) {
-    return (
-      <div className="min-h-screen flex items-center justify-center spiritual-background">
-        <div className="text-center relative z-10">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#1E40AF" }} />
-          <p className="text-foreground font-medium">Gerando seu diagnóstico personalizado...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const diagnosis = generateDeepSpiritualDiagnosis(
-    result.profileName,
-    result.challenges,
-    userName
-  );
-
-  const personalizedTitle = generatePersonalizedTitle(
-    result.profileName,
-    result.challenges,
-    userName
-  );
-
-  // Cores
-  const AZUL_PROFUNDO = "#1E40AF"; // Azul para títulos
-  const OURO = "#D4AF37"; // Ouro vibrante
-  const OURO_CLARO = "#F4E4C1"; // Ouro claro para fundos
-  const AZUL_CLARO = "#EFF6FF"; // Azul muito claro para fundos
 
   return (
     <div className="min-h-screen spiritual-background relative">
@@ -205,21 +218,21 @@ export default function Result() {
           </div>
         </section>
 
-        {/* SEÇÃO 5: CONEXÃO EMOCIONAL */}
+        {/* SEÇÃO 5: ACOLHIMENTO */}
         <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Você não está sozinho</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.emotionalConnection.split('\n\n').map((paragraph, idx) => (
+            {diagnosis.acceptance.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}
           </div>
         </section>
 
-        {/* SEÇÃO 6: ACOLHIMENTO */}
-        <section className="quiz-card text-center mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
+        {/* SEÇÃO 6: ESPERANÇA */}
+        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Há esperança</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4 italic">
-            {diagnosis.acceptance.split('\n\n').map((paragraph, idx) => (
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
+            {diagnosis.hope.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}
           </div>
@@ -227,124 +240,98 @@ export default function Result() {
 
         {/* SEÇÃO 7: TRANSIÇÃO PARA SOLUÇÃO */}
         <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4 font-medium">
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>E aqui está o mais importante</h2>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
             {diagnosis.transitionToSolution.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}
           </div>
         </section>
 
-        {/* SEÇÃO 8: SOLUÇÃO - PLANO PERSONALIZADO */}
-        <section className="quiz-card mb-12 bg-gradient-to-br from-blue-900 to-blue-800 text-white shadow-2xl border-0">
-          <h2 className="text-3xl font-bold mb-6 text-white" style={{ color: OURO }}>✨ Seu plano de transformação</h2>
-          
-          <div className="text-base leading-relaxed text-white/95 mb-8">
-            <p className="mb-4 text-lg">Um plano simples de 7 dias. Não é um devocional comum. É um caminho de volta. Feito especialmente para você.</p>
-            <p className="text-lg">Para sua situação. Para sua alma. Para sua transformação.</p>
+        {/* SEÇÃO 8: APRESENTAÇÃO DA SOLUÇÃO */}
+        <section className="quiz-card mb-12 text-white" style={{ backgroundColor: AZUL_PROFUNDO }}>
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: OURO }}>✨ Seu plano de transformação</h2>
+          <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8">
+            {diagnosis.solution.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
 
-          {/* BENEFÍCIOS */}
-          <div className="mb-8 bg-white/10 backdrop-blur rounded-lg p-6 border-2" style={{ borderColor: OURO }}>
-            <h3 className="font-bold mb-4 text-white text-lg">O que você vai conseguir:</h3>
-            <div className="space-y-3">
-              {[
-                "Clareza sobre sua vida espiritual",
-                "Sentir a presença de Deus voltando",
-                "Criar uma rotina que funciona",
-                "Voltar a ter direção",
-                "Transformação real em 7 dias"
-              ].map((benefit, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0 mt-1 font-bold" style={{ color: OURO }}>
-                    ✓
-                  </span>
-                  <span className="text-base text-white/95">{benefit}</span>
-                </div>
+          {/* Benefícios */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">O que você vai conseguir:</h3>
+            <ul className="space-y-3">
+              {diagnosis.benefits.map((benefit, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span style={{ color: OURO }} className="text-xl">✔</span>
+                  <span>{benefit}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          {/* CHAMADO INTERNO */}
-          <div className="rounded-lg p-6 mb-8 bg-white/10 border-2 backdrop-blur" style={{ borderColor: OURO }}>
-            <div className="text-base leading-relaxed text-white italic font-medium">
-              <p className="mb-3">Talvez esse seja o momento. O momento em que você para de ignorar o que sente.</p>
-              <p className="mb-3">O momento em que você decide voltar.</p>
-              <p className="font-bold text-white text-lg">Não ignore isso dentro de você. Esse chamado que você está sentindo… é real.</p>
-            </div>
-          </div>
-
-          {/* CTA PRINCIPAL */}
-          <button
-            onClick={() => {
-              const checkoutUrl = `${window.location.origin}/checkout`;
-              window.open(checkoutUrl, "_blank");
-            }}
-            className="w-full py-5 rounded-xl font-bold text-xl transition-all hover:scale-105 mb-4 flex items-center justify-center gap-2 shadow-lg border-2"
-            style={{ backgroundColor: OURO, color: "#000", borderColor: OURO }}
-          >
-            <Zap size={24} />
-            <span>Quero recomeçar com Deus</span>
-          </button>
-
-          {/* PREÇO */}
-          <div className="text-center bg-white/10 backdrop-blur rounded-lg p-4 border-2" style={{ borderColor: OURO }}>
-            <p className="text-lg leading-relaxed text-white font-bold">
-              R$ 12,90<br />
-              <span className="text-base text-white/90">Menos que um café. Mas que pode mudar tudo.</span>
+          {/* Chamado interno */}
+          <div className="bg-white bg-opacity-10 p-6 rounded-lg border border-white border-opacity-20 mb-8">
+            <p className="text-center text-lg font-medium">
+              {diagnosis.internalCall}
             </p>
           </div>
+
+          {/* CTA Principal */}
+          <Button 
+            size="lg" 
+            className="w-full text-lg font-bold"
+            style={{ backgroundColor: OURO, color: "#000" }}
+          >
+            <Zap className="w-5 h-5 mr-2" />
+            {diagnosis.cta}
+          </Button>
+
+          {/* Preço */}
+          <p className="text-center text-sm mt-4 text-gray-300">
+            {diagnosis.price}
+          </p>
         </section>
 
         {/* SEÇÃO 9: REFLEXÃO FINAL */}
-        <section className="quiz-card text-center mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
+        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Você merece</h2>
-          <div className="text-base leading-relaxed text-foreground italic">
-            <p className="font-bold text-lg">Você merece estar perto de Deus.</p>
-            <p className="mt-3">Você merece sentir paz.</p>
-            <p className="mt-3">Você merece voltar.</p>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
+            {diagnosis.finalReflection.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
         </section>
 
         {/* SEÇÃO 10: AÇÕES SECUNDÁRIAS */}
-        <section className="mb-12">
-          <div className="flex gap-3 flex-wrap justify-center">
-            <Button
-              onClick={handleDownloadPDF}
-              disabled={isGeneratingPDF}
-              variant="outline"
-              className="border-2 font-semibold"
-              style={{ borderColor: AZUL_PROFUNDO, color: AZUL_PROFUNDO }}
-            >
-              <Download size={18} className="mr-2" />
-              {isGeneratingPDF ? "Baixando..." : "Baixar Resultado"}
-            </Button>
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              className="border-2 font-semibold"
-              style={{ borderColor: AZUL_PROFUNDO, color: AZUL_PROFUNDO }}
-            >
-              <Share2 size={18} className="mr-2" />
-              Compartilhar
-            </Button>
-            <Button
-              onClick={handleRetake}
-              variant="outline"
-              className="border-2 font-semibold"
-              style={{ borderColor: AZUL_PROFUNDO, color: AZUL_PROFUNDO }}
-            >
-              <RotateCcw size={18} className="mr-2" />
-              Refazer Quiz
-            </Button>
-          </div>
+        <section className="mb-12 flex gap-4 justify-center flex-wrap">
+          <Button 
+            variant="outline" 
+            onClick={handleDownloadPDF}
+            disabled={isGeneratingPDF}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {isGeneratingPDF ? "Gerando..." : "Baixar PDF"}
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleShare}
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Compartilhar
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleRetake}
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Refazer
+          </Button>
         </section>
 
         {/* SEÇÃO 11: TIMER */}
-        <section className="quiz-card text-center bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <p className="text-foreground/60 text-sm mb-2">⏳ Seu resultado estará disponível por mais:</p>
-          <p style={{ color: AZUL_PROFUNDO }} className="font-bold text-3xl">
-            {formatTimeLeft(timeLeft)}
-          </p>
+        <section className="text-center text-sm text-gray-500">
+          <p>Seu resultado estará disponível por mais {formatTimeLeft(timeLeft)}</p>
         </section>
       </div>
     </div>

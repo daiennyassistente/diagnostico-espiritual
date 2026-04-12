@@ -591,8 +591,14 @@ export const appRouter = router({
           }
           
           const diagnostic = await getDiagnosticByLeadId(input.leadId);
+          
+          // Se o diagnóstico não existe, retornar null para que o frontend gere
           if (!diagnostic) {
-            throw new Error('Diagnostic not found');
+            return {
+              lead,
+              quizResponse,
+              diagnostic: null,
+            };
           }
           
           // Converter diagnostic JSON strings para objetos
