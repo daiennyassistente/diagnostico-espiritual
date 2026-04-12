@@ -681,9 +681,3 @@
 - [x] Implementar Secure Fields para captura de cartão
 - [x] Testar integração com novos requisitos
 - [x] Validar índice de aprovação no Mercado Pago (testado com pagamento real - Pix funcionando, cartão recusado em teste)
-
-
-## Restauração da Paleta de Cores (2026-04-11)
-- [x] Restaurar cores originais (marrom/bege/creme) no arquivo Result.tsx
-- [x] Validar paleta em toda a página (Testado e validado com sucesso)
-- [x] Testar fluxo completo com cores restauradas
