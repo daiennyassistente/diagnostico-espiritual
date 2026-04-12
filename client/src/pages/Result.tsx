@@ -7,6 +7,7 @@ import { Download, Loader2, Share2, RotateCcw, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { generateDeepSpiritualDiagnosis } from "@/lib/deepSpiritualDiagnosis";
+import { generatePersonalizedTitle } from "@/lib/personalizedTitles";
 
 interface AIResult {
   profileName: string;
@@ -143,6 +144,12 @@ export default function Result() {
     userName
   );
 
+  const personalizedTitle = generatePersonalizedTitle(
+    result.profileName,
+    result.challenges,
+    userName
+  );
+
   // Cores
   const AZUL_PROFUNDO = "#1E40AF"; // Azul para títulos
   const OURO = "#D4AF37"; // Ouro vibrante
@@ -155,7 +162,7 @@ export default function Result() {
         {/* SEÇÃO 1: ABERTURA INTIMISTA */}
         <section className="mb-12 text-center">
           <div className="text-lg leading-relaxed text-foreground whitespace-pre-line font-medium mb-6">
-            {diagnosis.opening}
+            {personalizedTitle}
           </div>
         </section>
 
