@@ -154,8 +154,8 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 2: EXPLICAÇÃO PROFUNDA */}
-        <section className="quiz-card mb-12">
-          <h2 className="text-2xl font-semibold mb-6 text-primary">Sua situação espiritual</h2>
+        <section className="quiz-card mb-12 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: "#2563EB" }}>Sua situação espiritual</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
             {diagnosis.deepExplanation.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -164,8 +164,8 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 3: RAIZ DO PROBLEMA */}
-        <section className="quiz-card mb-12 border-l-4" style={{ borderLeftColor: "#3E342C" }}>
-          <h2 className="text-2xl font-semibold mb-6 text-primary">A raiz do problema</h2>
+        <section className="quiz-card mb-12 border-l-4 bg-gradient-to-br from-purple-50 to-pink-50" style={{ borderLeftColor: "#9333EA" }}>
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: "#9333EA" }}>A raiz do problema</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
             {diagnosis.rootOfProblem.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -174,8 +174,8 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 4: CONSEQUÊNCIA REAL */}
-        <section className="quiz-card mb-12" style={{ backgroundColor: "#FAF6F1" }}>
-          <h2 className="text-2xl font-semibold mb-6 text-primary">O impacto real</h2>
+        <section className="quiz-card mb-12 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200">
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: "#DC2626" }}>O impacto real</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
             {diagnosis.realConsequence.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -184,8 +184,8 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 5: CONEXÃO EMOCIONAL */}
-        <section className="quiz-card mb-12" style={{ backgroundColor: "#F9F5F0" }}>
-          <h2 className="text-2xl font-semibold mb-6 text-primary">Você não está sozinho</h2>
+        <section className="quiz-card mb-12 bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200">
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: "#B45309" }}>Você não está sozinho</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
             {diagnosis.emotionalConnection.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -194,7 +194,8 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 6: ACOLHIMENTO */}
-        <section className="quiz-card text-center mb-12">
+        <section className="quiz-card text-center mb-12 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: "#059669" }}>Há esperança</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4 italic">
             {diagnosis.acceptance.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -203,7 +204,7 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 7: TRANSIÇÃO PARA SOLUÇÃO */}
-        <section className="quiz-card mb-12 bg-gradient-to-br" style={{ backgroundColor: "#F5F1EA" }}>
+        <section className="quiz-card mb-12 bg-gradient-to-br from-cyan-50 to-blue-50 border-2 border-cyan-200">
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4 font-medium">
             {diagnosis.transitionToSolution.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -212,17 +213,17 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 8: SOLUÇÃO - PLANO PERSONALIZADO */}
-        <section className="quiz-card mb-12">
-          <h2 className="text-2xl font-semibold mb-6 text-primary">Seu plano de transformação</h2>
+        <section className="quiz-card mb-12 bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl border-0">
+          <h2 className="text-3xl font-bold mb-6 text-white">✨ Seu plano de transformação</h2>
           
-          <div className="text-base leading-relaxed text-foreground mb-8">
-            <p className="mb-4">Um plano simples de 7 dias. Não é um devocional comum. É um caminho de volta. Feito especialmente para você.</p>
-            <p>Para sua situação. Para sua alma. Para sua transformação.</p>
+          <div className="text-base leading-relaxed text-white/95 mb-8">
+            <p className="mb-4 text-lg">Um plano simples de 7 dias. Não é um devocional comum. É um caminho de volta. Feito especialmente para você.</p>
+            <p className="text-lg">Para sua situação. Para sua alma. Para sua transformação.</p>
           </div>
 
           {/* BENEFÍCIOS */}
-          <div className="mb-8 bg-secondary/30 rounded-lg p-6">
-            <h3 className="font-semibold mb-4 text-primary">O que você vai conseguir:</h3>
+          <div className="mb-8 bg-white/20 backdrop-blur rounded-lg p-6 border border-white/30">
+            <h3 className="font-bold mb-4 text-white text-lg">O que você vai conseguir:</h3>
             <div className="space-y-3">
               {[
                 "Clareza sobre sua vida espiritual",
@@ -232,21 +233,21 @@ export default function Result() {
                 "Transformação real em 7 dias"
               ].map((benefit, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <span style={{ color: "#3E342C" }} className="text-lg flex-shrink-0 mt-1 font-bold">
+                  <span className="text-2xl flex-shrink-0 mt-1 font-bold">
                     ✓
                   </span>
-                  <span className="text-sm text-foreground">{benefit}</span>
+                  <span className="text-base text-white/95">{benefit}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* CHAMADO INTERNO */}
-          <div className="rounded-lg p-6 mb-8 bg-muted/20 border-l-4" style={{ borderLeftColor: "#3E342C" }}>
-            <div className="text-sm leading-relaxed text-foreground italic">
+          <div className="rounded-lg p-6 mb-8 bg-white/10 border-2 border-white/40 backdrop-blur">
+            <div className="text-base leading-relaxed text-white italic font-medium">
               <p className="mb-3">Talvez esse seja o momento. O momento em que você para de ignorar o que sente.</p>
               <p className="mb-3">O momento em que você decide voltar.</p>
-              <p className="font-semibold">Não ignore isso dentro de você. Esse chamado que você está sentindo… é real.</p>
+              <p className="font-bold text-white text-lg">Não ignore isso dentro de você. Esse chamado que você está sentindo… é real.</p>
             </div>
           </div>
 
@@ -256,28 +257,29 @@ export default function Result() {
               const checkoutUrl = `${window.location.origin}/checkout`;
               window.open(checkoutUrl, "_blank");
             }}
-            className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 mb-4 flex items-center justify-center gap-2 text-primary-foreground"
-            style={{ backgroundColor: "#3E342C" }}
+            className="w-full py-5 rounded-xl font-bold text-xl transition-all hover:scale-105 mb-4 flex items-center justify-center gap-2 text-white shadow-lg"
+            style={{ backgroundColor: "#FCD34D" }}
           >
-            <Zap size={20} />
-            Quero recomeçar com Deus
+            <Zap size={24} style={{ color: "#000" }} />
+            <span style={{ color: "#000" }}>Quero recomeçar com Deus</span>
           </button>
 
           {/* PREÇO */}
-          <div className="text-center bg-secondary/40 rounded-lg p-4">
-            <p className="text-sm leading-relaxed text-foreground font-medium">
+          <div className="text-center bg-white/20 backdrop-blur rounded-lg p-4 border border-white/30">
+            <p className="text-lg leading-relaxed text-white font-bold">
               R$ 12,90<br />
-              Menos que um café. Mas que pode mudar tudo.
+              <span className="text-base text-white/90">Menos que um café. Mas que pode mudar tudo.</span>
             </p>
           </div>
         </section>
 
         {/* SEÇÃO 9: REFLEXÃO FINAL */}
-        <section className="quiz-card text-center mb-12">
+        <section className="quiz-card text-center mb-12 bg-gradient-to-br from-rose-50 to-pink-50 border-2 border-rose-200">
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: "#BE123C" }}>Você merece</h2>
           <div className="text-base leading-relaxed text-foreground italic">
-            <p className="font-semibold">Você merece estar perto de Deus.</p>
-            <p className="mt-2">Você merece sentir paz.</p>
-            <p className="mt-2">Você merece voltar.</p>
+            <p className="font-bold text-lg">Você merece estar perto de Deus.</p>
+            <p className="mt-3">Você merece sentir paz.</p>
+            <p className="mt-3">Você merece voltar.</p>
           </div>
         </section>
 
@@ -288,7 +290,7 @@ export default function Result() {
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
               variant="outline"
-              className="border-2"
+              className="border-2 font-semibold"
               style={{ borderColor: "#3E342C", color: "#3E342C" }}
             >
               <Download size={18} className="mr-2" />
@@ -297,7 +299,7 @@ export default function Result() {
             <Button
               onClick={handleShare}
               variant="outline"
-              className="border-2"
+              className="border-2 font-semibold"
               style={{ borderColor: "#3E342C", color: "#3E342C" }}
             >
               <Share2 size={18} className="mr-2" />
@@ -306,7 +308,7 @@ export default function Result() {
             <Button
               onClick={handleRetake}
               variant="outline"
-              className="border-2"
+              className="border-2 font-semibold"
               style={{ borderColor: "#3E342C", color: "#3E342C" }}
             >
               <RotateCcw size={18} className="mr-2" />
@@ -316,9 +318,9 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 11: TIMER */}
-        <section className="quiz-card text-center">
+        <section className="quiz-card text-center bg-gradient-to-br from-slate-100 to-gray-100 border-2 border-slate-300">
           <p className="text-foreground/60 text-sm mb-2">⏳ Seu resultado estará disponível por mais:</p>
-          <p style={{ color: "#3E342C" }} className="font-bold text-2xl">
+          <p style={{ color: "#DC2626" }} className="font-bold text-3xl">
             {formatTimeLeft(timeLeft)}
           </p>
         </section>
