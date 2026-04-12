@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateDiagnosticPDF, normalizePdfText } from "./pdf-generator";
+import { generateDiagnosticPDF } from "./pdf-generator";
 
 describe("PDF Generation", () => {
   it("should generate a valid PDF buffer", async () => {
@@ -40,11 +40,5 @@ describe("PDF Generation", () => {
 
     expect(pdfBuffer).toBeDefined();
     expect(Buffer.isBuffer(pdfBuffer)).toBe(true);
-  });
-
-  it("should preserve portuguese accents while removing emojis and invalid characters", () => {
-    const text = "🌱 Coração em Recomeço com oração, direção e fé\u0000";
-
-    expect(normalizePdfText(text)).toBe("Coração em Recomeço com oração, direção e fé");
   });
 });

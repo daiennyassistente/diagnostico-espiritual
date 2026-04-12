@@ -1,1 +1,0 @@
-ALTER TABLE `payments` ADD `downloadToken` varchar(255);

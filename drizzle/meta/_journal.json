@@ -29,48 +29,6 @@
       "when": 1775574821358,
       "tag": "0003_equal_sage",
       "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1775661514122,
-      "tag": "0004_marvelous_carnage",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1775683262258,
-      "tag": "0005_medical_mandrill",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1775691713629,
-      "tag": "0006_kind_darkhawk",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1775696694160,
-      "tag": "0007_lame_big_bertha",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "5",
-      "when": 1775745861266,
-      "tag": "0008_crazy_korath",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "5",
-      "when": 1775756345236,
-      "tag": "0009_red_nightcrawler",
-      "breakpoints": true
     }
   ]
 }

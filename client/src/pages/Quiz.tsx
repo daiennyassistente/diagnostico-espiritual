@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,14 +15,9 @@ interface QuizStep {
 const QUIZ_STEPS: QuizStep[] = [
   {
     id: 1,
-    question: 'Qual é o seu nome?',
-    options: [], // Campo de texto livre
-  },
-  {
-    id: 2,
     question: 'Como você se sente espiritualmente hoje?',
     options: [
-      'Próxima de Deus',
+      'Próxima de Deus, mas inconstante',
       'Distante e querendo voltar',
       'Com sede, mas sem direção',
       'Cansada espiritualmente',
@@ -30,7 +25,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 3,
+    id: 2,
     question: 'O que mais tem dificultado sua constância com Deus?',
     options: [
       'Distrações',
@@ -42,7 +37,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 4,
+    id: 3,
     question: 'Como está sua rotina com a Palavra?',
     options: [
       'Frequente e profunda',
@@ -53,7 +48,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 5,
+    id: 4,
     question: 'Como você descreveria sua vida de oração hoje?',
     options: [
       'Sincera, mas instável',
@@ -64,7 +59,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 6,
+    id: 5,
     question: 'O que você mais sente falta hoje na sua vida com Deus?',
     options: [
       'Intimidade',
@@ -76,7 +71,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 7,
+    id: 6,
     question: 'O que você sente que mais tem sido tratado em você nessa fase?',
     options: [
       'Disciplina',
@@ -89,7 +84,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 8,
+    id: 7,
     question: 'O que você mais deseja viver com Deus agora?',
     options: [
       'Voltar ao secreto',
@@ -100,7 +95,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 9,
+    id: 8,
     question: 'Quanto tempo por dia você consegue dedicar com intencionalidade?',
     options: [
       '5 minutos',
@@ -110,7 +105,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 10,
+    id: 9,
     question: 'Qual é sua maior dificuldade?',
     options: [
       'Emocional',
@@ -121,7 +116,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 11,
+    id: 10,
     question: 'Como você se descreve espiritualmente neste momento?',
     options: [
       'Com fome de Deus',
@@ -132,11 +127,6 @@ const QUIZ_STEPS: QuizStep[] = [
       'Precisando recomeçar',
     ],
   },
-  {
-    id: 12,
-    question: 'Algo que você queira acrescentar ou desabafar?',
-    options: [], // Campo de texto livre
-  },
 ];
 
 const PROCESSING_MESSAGES = [
@@ -146,170 +136,30 @@ const PROCESSING_MESSAGES = [
   'Seu diagnóstico está pronto!',
 ];
 
-const readSessionJSON = <T,>(key: string, fallback: T): T => {
-  if (typeof window === 'undefined') return fallback;
-
-  try {
-    const storedValue = window.sessionStorage.getItem(key);
-    return storedValue ? (JSON.parse(storedValue) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-const readSessionNumber = (key: string, fallback: number) => {
-  if (typeof window === 'undefined') return fallback;
-
-  const storedValue = window.sessionStorage.getItem(key);
-  const parsedValue = storedValue ? Number(storedValue) : fallback;
-  return Number.isFinite(parsedValue) ? parsedValue : fallback;
-};
-
-const readRecentNavigationFlag = () => {
-  if (typeof window === 'undefined') return false;
-
-  const startedAt = Number(window.sessionStorage.getItem('quizNavigationStartedAt') || '0');
-  const isFlagged = window.sessionStorage.getItem('quizIsNavigatingToResult') === '1';
-
-  return isFlagged && Date.now() - startedAt < 15000;
-};
-
-const readRecentProcessingFlag = () => {
-  if (typeof window === 'undefined') return false;
-
-  const startedAt = Number(window.sessionStorage.getItem('quizProcessingStartedAt') || '0');
-  const isFlagged = window.sessionStorage.getItem('quizIsProcessing') === '1';
-
-  return isFlagged && Date.now() - startedAt < 30000;
-};
-
-const readPendingResultRedirect = () => {
-  if (typeof window === 'undefined') return false;
-
-  const startedAt = Number(window.sessionStorage.getItem('quizPendingResultRedirectAt') || '0');
-  const isFlagged = window.sessionStorage.getItem('quizPendingResultRedirect') === '1';
-
-  return isFlagged && Date.now() - startedAt < 15000;
-};
-
 export default function Quiz() {
   const [, setLocation] = useLocation();
-  const [currentStep, setCurrentStep] = useState(() => readSessionNumber('quizCurrentStep', 0));
-  const [responses, setResponses] = useState<Record<number, string>>(() =>
-    readSessionJSON<Record<number, string>>('quizResponsesDraft', {})
-  );
-  const [showLeadForm, setShowLeadForm] = useState(() => readSessionJSON<boolean>('quizShowLeadForm', false));
-  const [isProcessing, setIsProcessing] = useState(() => readRecentProcessingFlag());
-  const [processingStep, setProcessingStep] = useState(() => readSessionNumber('quizProcessingStep', 0));
-  const [leadData, setLeadData] = useState(() =>
-    readSessionJSON('quizLeadDraft', { whatsapp: '', email: '' })
-  );
-  const [hasStarted, setHasStarted] = useState(() => {
-    const storedStarted = readSessionJSON<boolean>('quizHasStarted', false);
-    const storedStep = readSessionNumber('quizCurrentStep', 0);
-    const storedResponses = readSessionJSON<Record<number, string>>('quizResponsesDraft', {});
-
-    return storedStarted || storedStep > 0 || Object.keys(storedResponses).length > 0;
-  });
-  const [isNavigatingToResult, setIsNavigatingToResult] = useState(() => readRecentNavigationFlag() || readPendingResultRedirect());
-  const advanceTimeoutRef = useRef<number | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [responses, setResponses] = useState<Record<number, string>>({});
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStep, setProcessingStep] = useState(0);
+  const [leadData, setLeadData] = useState({ whatsapp: '', email: '' });
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
   const submitResponsesMutation = trpc.quiz.submitResponses.useMutation();
 
   const isQuizComplete = currentStep >= QUIZ_STEPS.length;
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    window.sessionStorage.setItem('quizCurrentStep', String(currentStep));
-    window.sessionStorage.setItem('quizResponsesDraft', JSON.stringify(responses));
-    window.sessionStorage.setItem('quizShowLeadForm', JSON.stringify(showLeadForm));
-    window.sessionStorage.setItem('quizLeadDraft', JSON.stringify(leadData));
-    window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
-  }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    if (isNavigatingToResult) {
-      window.sessionStorage.setItem('quizIsNavigatingToResult', '1');
-      window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
-      return;
-    }
-
-    window.sessionStorage.removeItem('quizIsNavigatingToResult');
-    window.sessionStorage.removeItem('quizNavigationStartedAt');
-  }, [isNavigatingToResult]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    if (isProcessing) {
-      window.sessionStorage.setItem('quizIsProcessing', '1');
-      window.sessionStorage.setItem('quizProcessingStartedAt', String(Date.now()));
-      window.sessionStorage.setItem('quizProcessingStep', String(processingStep));
-      return;
-    }
-
-    window.sessionStorage.removeItem('quizIsProcessing');
-    window.sessionStorage.removeItem('quizProcessingStartedAt');
-    window.sessionStorage.removeItem('quizProcessingStep');
-  }, [isProcessing, processingStep]);
-
-  useEffect(() => {
-    if (hasStarted) return;
-
-    if (currentStep > 0 || Object.keys(responses).length > 0 || showLeadForm || isProcessing || isNavigatingToResult) {
-      setHasStarted(true);
-    }
-  }, [currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult, hasStarted]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!readPendingResultRedirect()) return;
-
-    setHasStarted(true);
-    setShowLeadForm(false);
-    setIsProcessing(false);
-    setIsNavigatingToResult(true);
-    window.sessionStorage.setItem('quizIsNavigatingToResult', '1');
-    window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
-
-    const redirectTimer = window.setTimeout(() => {
-      setLocation('/result');
-    }, 0);
-
-    return () => {
-      window.clearTimeout(redirectTimer);
-    };
-  }, [setLocation]);
-
-  useEffect(() => {
-    return () => {
-      if (advanceTimeoutRef.current) {
-        window.clearTimeout(advanceTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const handleSelectOption = (option: string) => {
-    const selectedStep = currentStep;
-
-    setHasStarted(true);
-    setResponses((previousResponses) => ({
-      ...previousResponses,
-      [selectedStep - 1]: option,
-    }));
-
-    if (advanceTimeoutRef.current) {
-      window.clearTimeout(advanceTimeoutRef.current);
-    }
-
+    setResponses({
+      ...responses,
+      [currentStep]: option,
+    });
+    
     // Avanço automático após 600ms para o usuário ver a seleção
-    advanceTimeoutRef.current = window.setTimeout(() => {
-      if (selectedStep < QUIZ_STEPS.length) {
-        setCurrentStep((previousStep) => previousStep + 1);
+    setTimeout(() => {
+      if (currentStep < QUIZ_STEPS.length - 1) {
+        setCurrentStep(currentStep + 1);
       } else {
         setShowLeadForm(true);
       }
@@ -317,17 +167,13 @@ export default function Quiz() {
   };
 
   const handleNext = () => {
-    // Pergunta 12 (desabafo) é opcional, todas as outras são obrigatórias
-    const isLastQuestion = currentStep === QUIZ_STEPS.length;
-    if (!isLastQuestion && !responses[currentStep - 1]) {
+    if (!responses[currentStep]) {
       toast.error('Por favor, selecione uma opção para continuar');
       return;
     }
 
-    setHasStarted(true);
-
-    if (currentStep < QUIZ_STEPS.length) {
-      setCurrentStep((previousStep) => previousStep + 1);
+    if (currentStep < QUIZ_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
     } else {
       setShowLeadForm(true);
     }
@@ -340,31 +186,10 @@ export default function Quiz() {
   };
 
   const formatWhatsApp = (value: string) => {
-    let cleaned = value.replace(/\D/g, '');
-    
-    // Se o usuário digitou +55 no início, remove para processar
-    if (value.startsWith('+55')) {
-      cleaned = value.slice(3).replace(/\D/g, '');
-    }
-    
-    // Se não começar com 55 e tiver menos de 11 dígitos, assume que é Brasil
-    if (!cleaned.startsWith('55') && cleaned.length <= 11) {
-      // Formata como (XX) XXXXX-XXXX com +55 no início
-      if (cleaned.length === 0) return '+55 ';
-      if (cleaned.length <= 2) return `+55 (${cleaned}`;
-      if (cleaned.length <= 7) return `+55 (${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
-      return `+55 (${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
-    }
-    
-    // Se já tem 55 no início
-    if (cleaned.startsWith('55')) {
-      const withoutCountry = cleaned.slice(2);
-      if (withoutCountry.length <= 2) return `+55 (${withoutCountry}`;
-      if (withoutCountry.length <= 7) return `+55 (${withoutCountry.slice(0, 2)}) ${withoutCountry.slice(2)}`;
-      return `+55 (${withoutCountry.slice(0, 2)}) ${withoutCountry.slice(2, 7)}-${withoutCountry.slice(7, 11)}`;
-    }
-    
-    return `+55 ${cleaned}`;
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 2) return cleaned;
+    if (cleaned.length <= 7) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
   };
 
   const handleSubmitLead = async (e: React.FormEvent) => {
@@ -375,55 +200,42 @@ export default function Quiz() {
       return;
     }
 
+    // Validar WhatsApp
     const whatsappRegex = /^(\d{10,15})$/;
     if (!whatsappRegex.test(leadData.whatsapp.replace(/\D/g, ''))) {
       toast.error('WhatsApp inválido');
       return;
     }
 
+    // Validar Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(leadData.email)) {
       toast.error('E-mail inválido');
       return;
     }
 
-    let redirectedToResult = false;
-
-    setHasStarted(true);
-    setIsNavigatingToResult(false);
     setIsProcessing(true);
     setShowLeadForm(false);
     setProcessingStep(0);
 
-    if (typeof window !== 'undefined') {
-      window.sessionStorage.setItem('quizIsProcessing', '1');
-      window.sessionStorage.setItem('quizProcessingStartedAt', String(Date.now()));
-      window.sessionStorage.setItem('quizProcessingStep', '0');
-      window.sessionStorage.setItem('quizHasStarted', JSON.stringify(true));
-      window.sessionStorage.setItem('quizShowLeadForm', JSON.stringify(false));
-    }
-
     try {
+      // Animar as etapas de processamento
       for (let i = 0; i < PROCESSING_MESSAGES.length; i++) {
         setProcessingStep(i);
-
-        if (typeof window !== 'undefined') {
-          window.sessionStorage.setItem('quizProcessingStep', String(i));
-        }
-
         await new Promise(resolve => setTimeout(resolve, 1200));
       }
 
+      // Salvar lead
       const leadResult = await submitLeadMutation.mutateAsync({
         whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         email: leadData.email,
-        name: responses[0], // Nome da primeira pergunta (índice 0)
       });
 
       if (leadResult.success && leadResult.leadId) {
+        // Salvar respostas do quiz
         const responsesData = {
           leadId: leadResult.leadId,
-          step1: responses[0], // Nome
+          step1: responses[0],
           step2: responses[1],
           step3: responses[2],
           step4: responses[3],
@@ -433,52 +245,33 @@ export default function Quiz() {
           step8: responses[7],
           step9: responses[8],
           step10: responses[9],
-          step11: responses[10],
-          step12: responses[11] || '', // Desabafo (opcional)
         };
 
         await submitResponsesMutation.mutateAsync(responsesData);
 
+        // Salvar respostas no localStorage para a página de resultado
         localStorage.setItem('quizResponses', JSON.stringify(responses));
-        localStorage.setItem('quizLeadId', String(leadResult.leadId));
-        localStorage.setItem('leadData', JSON.stringify({
-          leadId: leadResult.leadId,
-          email: leadData.email,
-          whatsapp: leadData.whatsapp.replace(/\D/g, ''),
-        }));
 
-        if (typeof window !== 'undefined') {
-          window.sessionStorage.setItem('quizIsNavigatingToResult', '1');
-          window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
-          window.sessionStorage.setItem('quizPendingResultRedirect', '1');
-          window.sessionStorage.setItem('quizPendingResultRedirectAt', String(Date.now()));
-        }
-
-        redirectedToResult = true;
-        setIsNavigatingToResult(true);
         toast.success('Diagnóstico enviado com sucesso!');
-        setLocation('/result');
-        return;
+        // Redirecionar para página de resultado
+        setTimeout(() => {
+          setLocation('/result');
+        }, 2000);
+      } else {
+        toast.error('Não foi possível salvar seus dados. Tente novamente.');
+        setShowLeadForm(true);
       }
-
-      toast.error('Não foi possível salvar seus dados. Tente novamente.');
-      setShowLeadForm(true);
     } catch (error) {
       console.error('Erro ao enviar dados:', error);
       toast.error('Erro ao enviar dados. Tente novamente.');
       setShowLeadForm(true);
     } finally {
-      if (!redirectedToResult) {
-        setIsProcessing(false);
-        setIsNavigatingToResult(false);
-      }
+      setIsProcessing(false);
     }
   };
 
-  const hasPendingResultRedirect = readPendingResultRedirect();
-
   // Tela de abertura
-  if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult && !hasPendingResultRedirect) {
+  if (currentStep === 0 && Object.keys(responses).length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full">
@@ -493,10 +286,7 @@ export default function Quiz() {
               Leva menos de 2 minutos e pode te ajudar a enxergar com mais clareza a fase espiritual que você está vivendo agora.
             </p>
             <Button
-              onClick={() => {
-                setHasStarted(true);
-                setCurrentStep(1);
-              }}
+              onClick={() => setCurrentStep(1)}
               className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
             >
               Quero começar meu diagnóstico
@@ -508,18 +298,15 @@ export default function Quiz() {
   }
 
   // Tela de processamento
-  if (isProcessing || isNavigatingToResult || hasPendingResultRedirect) {
-    const visibleProcessingStep = (isNavigatingToResult || hasPendingResultRedirect)
-      ? PROCESSING_MESSAGES.length - 1
-      : processingStep;
-    const progress = ((visibleProcessingStep + 1) / PROCESSING_MESSAGES.length) * 100;
+  if (isProcessing) {
+    const progress = ((processingStep + 1) / PROCESSING_MESSAGES.length) * 100;
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-foreground">
-              {PROCESSING_MESSAGES[visibleProcessingStep]}
+              {PROCESSING_MESSAGES[processingStep]}
             </h2>
             <p className="text-foreground/60">
               Processando seu diagnóstico espiritual...
@@ -546,7 +333,7 @@ export default function Quiz() {
               <div
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  i <= visibleProcessingStep ? 'bg-primary' : 'bg-muted'
+                  i <= processingStep ? 'bg-primary' : 'bg-muted'
                 }`}
               />
             ))}
@@ -579,7 +366,7 @@ export default function Quiz() {
                 <Input
                   id="whatsapp"
                   type="tel"
-                  placeholder="+55 (11) 99999-9999"
+                  placeholder="(11) 99999-9999"
                   value={leadData.whatsapp}
                   onChange={(e) => setLeadData({ ...leadData, whatsapp: formatWhatsApp(e.target.value) })}
                   className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3"
@@ -648,35 +435,20 @@ export default function Quiz() {
               {step.question}
             </h2>
 
-            {/* Options or Text Input */}
-            {step.options.length > 0 ? (
-              <div className="space-y-3">
-                {step.options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSelectOption(option)}
-                    className={`quiz-button ${
-                      responses[currentStep - 1] === option ? 'selected' : ''
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <textarea
-                placeholder={currentStep === 1 ? 'Digite seu nome aqui...' : 'Escreva aqui o que você queira acrescentar ou desabafar...'}
-                value={responses[currentStep - 1] || ''}
-                onChange={(e) => {
-                  setResponses((prev) => ({
-                    ...prev,
-                    [currentStep - 1]: e.target.value,
-                  }));
-                  setHasStarted(true);
-                }}
-                className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 w-full min-h-[100px] resize-none"
-              />
-            )}
+            {/* Options */}
+            <div className="space-y-3">
+              {step.options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSelectOption(option)}
+                  className={`quiz-button ${
+                    responses[currentStep - 1] === option ? 'selected' : ''
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Navigation */}

@@ -1,4 +1,0 @@
-Achados da reprodução no navegador até agora:
-- A rota /quiz abre corretamente a tela de abertura interna do quiz.
-- Ao clicar em "Quero começar meu diagnóstico", o passo 1 do quiz aparece normalmente.
-- O bug relatado pelo usuário ocorre ao final do fluxo, durante a transição para /result, e ainda precisa ser reproduzido após a última correção que trocou window.location.replace por navegação SPA com setLocation('/result').
