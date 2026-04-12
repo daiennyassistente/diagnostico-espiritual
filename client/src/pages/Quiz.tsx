@@ -446,7 +446,13 @@ export default function Quiz() {
 
         // Generate diagnostic using AI
         try {
-          const responsesMap = Object.fromEntries(responses.map((r, i) => [`step${i + 1}`, r]));
+          // Convert Record<number, string> to Record<string, string> for API
+          const responsesMap: Record<string, string> = {};
+          Object.entries(responses).forEach(([key, value]) => {
+            const stepNum = parseInt(key, 10) + 1;
+            responsesMap[`step${stepNum}`] = value;
+          });
+          
           await trpc.aiResult.generateFromResponses.mutate({
             responses: responsesMap,
             leadId: leadResult.leadId,
