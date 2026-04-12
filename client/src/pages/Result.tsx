@@ -352,8 +352,8 @@ export default function Result() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-700 font-medium">Gerando seu diagnóstico espiritual...</p>
+          <Loader2 className="w-12 h-12 animate-spin #0B1F3A mx-auto mb-4" />
+          <p className="#2B2B2B font-medium">Gerando seu diagnóstico espiritual...</p>
         </div>
       </div>
     );
@@ -363,62 +363,62 @@ export default function Result() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
-          <p className="text-gray-700 font-medium">Resultado não disponível</p>
+          <p className="#2B2B2B font-medium">Resultado não disponível</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br #FFFFFF py-8 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-4 text-sm text-gray-600">
+        <div className="mb-4 text-sm #2B2B2B">
           Não esqueça de rolar até o final da página
         </div>
 
         {/* Seção Principal */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
           {/* Título Dinâmico */}
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-indigo-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-center #0B1F3A mb-4">
             {formatProfileHeadline(result.profileName)}
           </h1>
 
           {/* Subtítulo Dinâmico */}
-          <p className="text-center text-gray-700 mb-6 text-lg leading-relaxed">
+          <p className="text-center #2B2B2B mb-6 text-lg leading-relaxed">
             {memoizedIntroductoryMessage}
           </p>
 
-          <p className="text-center text-gray-600 mb-8">
-            E a boa notícia? <span className="font-semibold text-indigo-600">Isso tem solução.</span>
+          <p className="text-center #2B2B2B mb-8">
+            E a boa notícia? <span className="font-semibold #0B1F3A">Isso tem solução.</span>
           </p>
 
           {/* Caixa de Resultado */}
-          <div className="bg-indigo-50 border-l-4 border-indigo-600 p-6 mb-8 rounded">
-            <p className="text-gray-700 mb-4">
+          <div className="#F5F1E8 border-l-4 #C9A24A p-6 mb-8 rounded">
+            <p className="#2B2B2B mb-4">
               Seu resultado mostra com precisão o que está acontecendo na sua vida espiritual neste momento. Não é coincidência você estar aqui. Deus sabe exatamente o que você precisa.
             </p>
-            <p className="text-gray-700">
-              <span className="font-semibold text-indigo-900">Seu diagnóstico:</span> {result.profileDescription}
+            <p className="#2B2B2B">
+              <span className="font-semibold #0B1F3A">Seu diagnóstico:</span> {result.profileDescription}
             </p>
           </div>
 
           {/* Seção de Dor/Consequência */}
-          <div className="bg-red-50 border-l-4 border-red-600 p-6 mb-8 rounded">
-            <h3 className="text-xl font-bold text-red-900 mb-4">Se você continuar assim, o que vai acontecer?</h3>
-            <p className="text-gray-700 mb-4">
+          <div className="#FFE8E8 border-l-4 border-red-600 p-6 mb-8 rounded">
+            <h3 className="text-xl font-bold #0B1F3A mb-4">Se você continuar assim, o que vai acontecer?</h3>
+            <p className="#2B2B2B mb-4">
               {memoizedConsequenceMessage}
             </p>
-            <p className="text-red-900 font-semibold">
+            <p className="#0B1F3A font-semibold">
               Mas aqui está o ponto: você NÃO precisa deixar isso acontecer.
             </p>
           </div>
 
           {/* Seção de Desafios */}
-          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 mb-8 rounded">
-            <h3 className="text-xl font-bold text-blue-900 mb-4">Você reconhece isso na sua vida?</h3>
+          <div className="#F5F1E8 border-l-4 #C9A24A p-6 mb-8 rounded">
+            <h3 className="text-xl font-bold #0B1F3A mb-4">Você reconhece isso na sua vida?</h3>
             <ul className="space-y-2">
               {result.challenges.map((challenge, index) => (
-                <li key={index} className="flex items-start text-gray-700">
+                <li key={index} className="flex items-start #2B2B2B">
                   <span className="text-blue-600 font-bold mr-3">✓</span>
                   <span>{challenge}</span>
                 </li>
@@ -427,11 +427,11 @@ export default function Result() {
           </div>
 
           {/* Seção de Recomendações */}
-          <div className="bg-green-50 border-l-4 border-green-600 p-6 mb-8 rounded">
-            <h3 className="text-xl font-bold text-green-900 mb-4">O caminho para voltar é mais simples do que você pensa:</h3>
+          <div className="#F5F1E8 border-l-4 #C9A24A p-6 mb-8 rounded">
+            <h3 className="text-xl font-bold #0B1F3A mb-4">O caminho para voltar é mais simples do que você pensa:</h3>
             <ul className="space-y-2">
               {result.recommendations.map((recommendation, index) => (
-                <li key={index} className="flex items-start text-gray-700">
+                <li key={index} className="flex items-start #2B2B2B">
                   <CheckCircle2 className="w-5 h-5 text-green-600 mr-3 flex-shrink-0 mt-0.5" />
                   <span>{recommendation}</span>
                 </li>
@@ -471,90 +471,90 @@ export default function Result() {
         </div>
 
         {/* Seção de Oferta */}
-        <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg shadow-lg p-8 text-white">
+        <div className="bg-white rounded-lg shadow-lg p-8 text-[#0B1F3A]">
           <div className="flex items-start gap-3 mb-6">
             <Zap className="w-6 h-6 flex-shrink-0 mt-1" />
             <h2 className="text-2xl md:text-3xl font-bold">MAS AQUI ESTÁ O SEGREDO: Você não precisa fazer isso sozinho</h2>
           </div>
 
-          <p className="text-indigo-100 mb-6 text-lg">
+          <p className="#8B7D6B mb-6 text-lg">
             Sabe aquele sentimento de estar perdido espiritualmente? De não saber por onde começar? De querer voltar para Deus, mas não saber como?
           </p>
 
-          <p className="text-indigo-100 mb-8 text-lg font-semibold">
+          <p className="#8B7D6B mb-8 text-lg font-semibold">
             Existe um caminho. E ele foi criado especialmente para você.
           </p>
 
           {/* Oferta */}
-          <div className="bg-white bg-opacity-10 rounded-lg p-8 mb-8 border border-white border-opacity-20">
+          <div className="bg-[#F5F1E8] rounded-lg p-8 mb-8 border border-[#C9A24A]">
             <h3 className="text-2xl font-bold mb-2">Um Plano Espiritual Guiado de 7 Dias Para Restaurar Sua Vida Com Deus</h3>
-            <p className="text-indigo-100 mb-6">Seu Guia Pessoal Para Voltar a Sentir a Presença de Deus</p>
+            <p className="#8B7D6B mb-6">Seu Guia Pessoal Para Voltar a Sentir a Presença de Deus</p>
 
-            <p className="text-indigo-100 mb-6">
+            <p className="#8B7D6B mb-6">
               Este não é um devocional comum. É um plano criado especialmente para <span className="font-bold">VOCÊ</span>, baseado no seu diagnóstico espiritual. Cada dia foi pensado para levar você de volta à presença de Deus, passo a passo, sem pressa, sem julgamento.
             </p>
 
-            <p className="text-indigo-100 mb-8">
+            <p className="#8B7D6B mb-8">
               Você vai descobrir como reconectar com Deus de forma profunda e real. Como sentir aquela paz que você sente falta. Como voltar a ter constância e propósito na sua vida espiritual.
             </p>
 
-            <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded p-4 mb-8">
-              <p className="text-white font-semibold mb-4">⚠️ Este devocional foi criado especialmente para você</p>
-              <ul className="space-y-3 text-indigo-100">
+            <div className="bg-[#F5F1E8] border border-[#C9A24A] rounded p-4 mb-8">
+              <p className="text-[#0B1F3A] font-semibold mb-4">⚠️ Este devocional foi criado especialmente para você</p>
+              <ul className="space-y-3 #8B7D6B">
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-white">✨</span>
+                  <span className="font-bold text-[#0B1F3A]">✨</span>
                   <span><span className="font-semibold">Saiba exatamente o que fazer cada dia</span> — sem dúvidas, sem culpa, sem se sentir perdido</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-white">💎</span>
+                  <span className="font-bold text-[#0B1F3A]">💎</span>
                   <span><span className="font-semibold">Sinta a presença de Deus voltando</span> — aquela paz que você sente falta vai voltar</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-white">🙏</span>
+                  <span className="font-bold text-[#0B1F3A]">🙏</span>
                   <span><span className="font-semibold">Tenha uma rotina espiritual que funciona</span> — constância que você sempre quis</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-white">📖</span>
+                  <span className="font-bold text-[#0B1F3A]">📖</span>
                   <span><span className="font-semibold">Versículos que falam direto com seu coração</span> — não genéricos, mas para VOCÊ</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-white">⚡</span>
+                  <span className="font-bold text-[#0B1F3A]">⚡</span>
                   <span><span className="font-semibold">Transformação real em 7 dias</span> — não promessas vazias, mas mudança que você vai sentir</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-red-500 bg-opacity-20 border border-red-300 border-opacity-30 rounded p-4 mb-8">
-              <p className="text-white font-bold mb-2">⚠️ Seu diagnóstico é único e pode expirar em {formatTimeLeft(timeLeft)}</p>
-              <p className="text-indigo-100">
+            <div className="#FFE8E80 bg-opacity-20 border border-red-300 border-opacity-30 rounded p-4 mb-8">
+              <p className="text-[#0B1F3A] font-bold mb-2">⚠️ Seu diagnóstico é único e pode expirar em {formatTimeLeft(timeLeft)}</p>
+              <p className="#8B7D6B">
                 Se você sair agora, pode perder esse direcionamento espiritual que foi criado especialmente para você. Deus está falando com você AGORA.
               </p>
             </div>
 
-            <p className="text-indigo-100 mb-8 text-lg italic">
+            <p className="#8B7D6B mb-8 text-lg italic">
               Imagine como seria acordar amanhã com clareza. Sentir Deus perto de você novamente. Ter uma direção, um propósito, uma paz que você não sente há tempo.
             </p>
 
-            <p className="text-white font-bold text-lg mb-8">
+            <p className="text-[#0B1F3A] font-bold text-lg mb-8">
               Isso pode começar hoje.
             </p>
 
             <Button
               onClick={handleBuyDevocional}
               disabled={isBuyingGuide}
-              className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-6 text-lg rounded-lg flex items-center justify-center gap-2"
+              className="w-full #C9A24A #B8932A text-gray-900 font-bold py-6 text-lg rounded-lg flex items-center justify-center gap-2"
             >
               {isBuyingGuide ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
               Quero Voltar a Sentir a Presença de Deus
             </Button>
 
-            <p className="text-center text-indigo-100 mt-4 font-semibold">
+            <p className="text-center #8B7D6B mt-4 font-semibold">
               R$ 12,90 — Menos que um café ☕
             </p>
           </div>
 
           <div className="text-center">
-            <p className="text-indigo-100 mb-2">⏳ Seu resultado personalizado estará disponível por mais:</p>
+            <p className="#8B7D6B mb-2">⏳ Seu resultado personalizado estará disponível por mais:</p>
             <p className="text-3xl font-bold text-yellow-300">{formatTimeLeft(timeLeft)}</p>
           </div>
         </div>
