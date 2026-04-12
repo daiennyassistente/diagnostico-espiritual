@@ -444,6 +444,18 @@ export default function Quiz() {
 
         await submitResponsesMutation.mutateAsync(responsesData);
 
+        // Generate diagnostic using AI
+        try {
+          const responsesMap = Object.fromEntries(responses.map((r, i) => [`step${i + 1}`, r]));
+          await trpc.aiResult.generateFromResponses.mutate({
+            responses: responsesMap,
+            leadId: leadResult.leadId,
+          });
+        } catch (error) {
+          console.error('Error generating diagnostic:', error);
+          // Continue anyway, fallback will be used
+        }
+
         localStorage.setItem('quizResponses', JSON.stringify(responses));
         localStorage.setItem('quizLeadId', String(leadResult.leadId));
         localStorage.setItem('leadData', JSON.stringify({
