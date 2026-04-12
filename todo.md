@@ -683,10 +683,7 @@
 - [x] Validar índice de aprovação no Mercado Pago (testado com pagamento real - Pix funcionando, cartão recusado em teste)
 
 
-## Restauração de Paleta de Cores (2026-04-11)
-- [ ] Restaurar cores originais (rosa/coral/vermelho) na página de resultado
-- [ ] Restaurar cores nos títulos (vermelho/bordeaux)
-- [ ] Restaurar cores nos botões (rosa/coral)
-- [ ] Restaurar cores nos textos (vermelho/bordeaux)
-- [ ] Validar paleta em toda a página
-- [ ] Testar fluxo completo com cores restauradas
+## Restauração da Paleta de Cores (2026-04-11)
+- [x] Restaurar cores originais (marrom/bege/creme) no arquivo Result.tsx
+- [x] Validar paleta em toda a página (Testado e validado com sucesso)
+- [x] Testar fluxo completo com cores restauradas
