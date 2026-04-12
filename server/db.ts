@@ -1,8 +1,20 @@
-import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, leads, quizResponses, InsertLead, InsertQuizResponse } from "../drizzle/schema";
-import { ENV } from './_core/env';
-import { sql } from "drizzle-orm";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
+import {
+  InsertDiagnosticHistory,
+  InsertLead,
+  InsertQuizResponse,
+  InsertUser,
+  diagnosticHistory,
+  leads,
+  payments,
+  quizResponses,
+  users,
+  admins,
+} from "../drizzle/schema";
+import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -57,8 +69,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = user.role;
       updateSet.role = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+      values.role = "admin";
+      updateSet.role = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -96,27 +108,26 @@ export async function createLead(lead: InsertLead) {
     throw new Error("Database not available");
   }
 
-  // Inserir o lead e obter o resultado
-  const result = await db.insert(leads).values(lead);
-  
-  // O resultado do insert do Drizzle com mysql2 é um array
-  // onde o primeiro elemento é o ResultSetHeader com insertId
-  if (Array.isArray(result) && result.length > 0) {
-    const header = result[0] as any;
-    if (header && header.insertId) {
-      return { id: Number(header.insertId) };
-    }
-  }
-  
-  // Fallback: tentar acessar insertId diretamente
-  if (result && typeof result === 'object') {
-    const insertId = (result as any).insertId;
+  try {
+    const result = await db.insert(leads).values(lead);
+
+    // Drizzle-orm retorna um objeto com insertId
+    const insertId = (result as any).insertId || (result as any)[0]?.insertId;
     if (insertId) {
       return { id: Number(insertId) };
     }
+
+    // Se não conseguir o insertId, tenta buscar o lead mais recente
+    const latestLead = await db.select().from(leads).orderBy(desc(leads.id)).limit(1);
+    if (latestLead && latestLead.length > 0) {
+      return { id: latestLead[0].id };
+    }
+
+    throw new Error("Failed to retrieve inserted lead ID");
+  } catch (error) {
+    console.error("Error creating lead:", error);
+    throw error;
   }
-  
-  throw new Error("Failed to retrieve inserted lead ID from insert result");
 }
 
 export async function createQuizResponse(response: InsertQuizResponse) {
@@ -125,7 +136,35 @@ export async function createQuizResponse(response: InsertQuizResponse) {
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(quizResponses).values(response);
+  try {
+    const result = await db.insert(quizResponses).values(response);
+
+    // Drizzle-orm retorna um objeto com insertId
+    const insertId = (result as any).insertId || (result as any)[0]?.insertId;
+    if (insertId) {
+      return { id: Number(insertId) };
+    }
+
+    // Se não conseguir o insertId, tenta buscar a resposta mais recente
+    const latestResponse = await db.select().from(quizResponses).orderBy(desc(quizResponses.id)).limit(1);
+    if (latestResponse && latestResponse.length > 0) {
+      return { id: latestResponse[0].id };
+    }
+
+    throw new Error("Failed to retrieve inserted quiz response ID");
+  } catch (error) {
+    console.error("Error creating quiz response:", error);
+    throw error;
+  }
+}
+
+export async function createDiagnosticHistoryEntry(entry: InsertDiagnosticHistory) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(diagnosticHistory).values(entry);
   return result;
 }
 
@@ -148,7 +187,6 @@ export async function getQuizResponseByLeadId(leadId: number) {
   const result = await db.select().from(quizResponses).where(eq(quizResponses.leadId, leadId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
-
 
 export async function getAllQuizResponses() {
   const db = await getDb();
@@ -181,14 +219,8 @@ export async function getAllQuizResponses() {
 }
 
 export async function getResponseStatistics() {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
   const allResponses = await getAllQuizResponses();
 
-  // Contar respostas por etapa
   const stats: Record<string, any> = {
     totalRespostas: allResponses.length,
     step1: {} as Record<string, number>,
@@ -201,19 +233,685 @@ export async function getResponseStatistics() {
     step8: {} as Record<string, number>,
     step9: {} as Record<string, number>,
     step10: {} as Record<string, number>,
-  }
+  };
 
   allResponses.forEach((response) => {
-    for (let i = 1; i <= 10; i++) {
-      const stepKey = `step${i}` as 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8' | 'step9' | 'step10';
+    for (let i = 1; i <= 10; i += 1) {
+      const stepKey = `step${i}` as
+        | "step1"
+        | "step2"
+        | "step3"
+        | "step4"
+        | "step5"
+        | "step6"
+        | "step7"
+        | "step8"
+        | "step9"
+        | "step10";
       const answer = response[stepKey];
       if (answer) {
-        const statsKey = `step${i}` as 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8' | 'step9' | 'step10';
-        const stepStats = stats[statsKey] as Record<string, number>;
+        const stepStats = stats[stepKey] as Record<string, number>;
         stepStats[answer] = (stepStats[answer] || 0) + 1;
       }
     }
   });
 
   return stats;
+}
+
+const formatDateKey = (date: Date) =>
+  new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+  }).format(date);
+
+const safeNumber = (value: unknown) => Number(value || 0);
+
+export async function getAdminUsers() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Get all leads that have quiz responses (people who took the quiz)
+  const records = await db
+    .selectDistinct({
+      id: leads.id,
+      name: sql`SUBSTRING_INDEX(${leads.email}, '@', 1)`.as("name"),
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      createdAt: leads.createdAt,
+      updatedAt: leads.updatedAt,
+      openId: sql`NULL`.as("openId"),
+      loginMethod: sql`'quiz'`.as("loginMethod"),
+      role: sql`'user'`.as("role"),
+      lastSignedIn: leads.updatedAt,
+    })
+    .from(leads)
+    .innerJoin(quizResponses, eq(leads.id, quizResponses.leadId))
+    .orderBy(desc(leads.updatedAt), desc(leads.createdAt));
+
+  return records;
+}
+
+export async function getAdminBuyers() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const records = await db
+    .select({
+      id: payments.id,
+      leadId: payments.leadId,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      amount: payments.amount,
+      currency: payments.currency,
+      status: payments.status,
+      productName: payments.productName,
+      stripePaymentIntentId: payments.stripePaymentIntentId,
+      stripeCustomerId: payments.stripeCustomerId,
+      createdAt: payments.createdAt,
+      updatedAt: payments.updatedAt,
+    })
+    .from(payments)
+    .innerJoin(leads, eq(payments.leadId, leads.id))
+    .orderBy(desc(payments.createdAt));
+
+  return records;
+}
+
+export async function getAdminDiagnosticResults() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const records = await db
+    .select({
+      id: diagnosticHistory.id,
+      leadId: diagnosticHistory.leadId,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      profileName: diagnosticHistory.profileName,
+      profileDescription: diagnosticHistory.profileDescription,
+      strengths: diagnosticHistory.strengths,
+      challenges: diagnosticHistory.challenges,
+      recommendations: diagnosticHistory.recommendations,
+      nextSteps: diagnosticHistory.nextSteps,
+      createdAt: diagnosticHistory.createdAt,
+    })
+    .from(diagnosticHistory)
+    .innerJoin(leads, eq(diagnosticHistory.leadId, leads.id))
+    .orderBy(desc(diagnosticHistory.createdAt));
+
+  return records.map((record) => ({
+    ...record,
+    strengths: JSON.parse(record.strengths || "[]") as string[],
+    challenges: JSON.parse(record.challenges || "[]") as string[],
+    recommendations: JSON.parse(record.recommendations || "[]") as string[],
+    nextSteps: JSON.parse(record.nextSteps || "[]") as string[],
+  }));
+}
+
+export async function getAdminDashboardSummary() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [userTotals] = await db.select({ total: sql<number>`count(*)` }).from(users);
+  const [leadTotals] = await db.select({ total: sql<number>`count(*)` }).from(leads);
+  const [paymentTotals] = await db.select({ total: sql<number>`count(*)` }).from(payments);
+  const [diagnosticTotals] = await db.select({ total: sql<number>`count(*)` }).from(diagnosticHistory);
+  const [successfulPayments] = await db
+    .select({ total: sql<number>`count(*)`, revenue: sql<number>`coalesce(sum(${payments.amount}), 0)` })
+    .from(payments)
+    .where(eq(payments.status, "succeeded"));
+
+  const [recentUsers] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(users)
+    .where(gte(users.createdAt, thirtyDaysAgo));
+  const [recentLeads] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(leads)
+    .where(gte(leads.createdAt, thirtyDaysAgo));
+  const [recentDiagnostics] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(diagnosticHistory)
+    .where(gte(diagnosticHistory.createdAt, thirtyDaysAgo));
+
+  const recentLeadRows = await db
+    .select({ createdAt: leads.createdAt })
+    .from(leads)
+    .where(gte(leads.createdAt, thirtyDaysAgo))
+    .orderBy(leads.createdAt);
+
+  const recentPaymentRows = await db
+    .select({ createdAt: payments.createdAt, amount: payments.amount, status: payments.status })
+    .from(payments)
+    .where(gte(payments.createdAt, thirtyDaysAgo))
+    .orderBy(payments.createdAt);
+
+  const profileRows = await db
+    .select({ profileName: diagnosticHistory.profileName, total: sql<number>`count(*)` })
+    .from(diagnosticHistory)
+    .groupBy(diagnosticHistory.profileName)
+    .orderBy(desc(sql<number>`count(*)`));
+
+  const leadsByDayMap = new Map<string, number>();
+  recentLeadRows.forEach((row) => {
+    const key = formatDateKey(new Date(row.createdAt));
+    leadsByDayMap.set(key, (leadsByDayMap.get(key) || 0) + 1);
+  });
+
+  const paymentsByDayMap = new Map<string, { count: number; revenue: number }>();
+  recentPaymentRows.forEach((row) => {
+    const key = formatDateKey(new Date(row.createdAt));
+    const current = paymentsByDayMap.get(key) || { count: 0, revenue: 0 };
+    paymentsByDayMap.set(key, {
+      count: current.count + (row.status === "succeeded" ? 1 : 0),
+      revenue: current.revenue + (row.status === "succeeded" ? safeNumber(row.amount) : 0),
+    });
+  });
+
+  const timelineLabels = Array.from(
+    new Set(
+      Array.from(leadsByDayMap.keys()).concat(Array.from(paymentsByDayMap.keys())),
+    ),
+  );
+
+  const timeline = timelineLabels.map((date) => ({
+    date,
+    leads: leadsByDayMap.get(date) || 0,
+    pagamentos: paymentsByDayMap.get(date)?.count || 0,
+    receita: paymentsByDayMap.get(date)?.revenue || 0,
+  }));
+
+  const conversionRate = safeNumber(leadTotals?.total)
+    ? (safeNumber(successfulPayments?.total) / safeNumber(leadTotals?.total)) * 100
+    : 0;
+
+  return {
+    kpis: {
+      totalUsuarios: safeNumber(userTotals?.total),
+      novosUsuarios30Dias: safeNumber(recentUsers?.total),
+      totalLeads: safeNumber(leadTotals?.total),
+      leads30Dias: safeNumber(recentLeads?.total),
+      totalCompras: safeNumber(paymentTotals?.total),
+      comprasAprovadas: safeNumber(successfulPayments?.total),
+      receitaTotal: safeNumber(successfulPayments?.revenue),
+      totalDiagnosticos: safeNumber(diagnosticTotals?.total),
+      diagnosticos30Dias: safeNumber(recentDiagnostics?.total),
+      taxaConversao: Number(conversionRate.toFixed(1)),
+    },
+    timeline,
+    perfilDistribuicao: profileRows.map((row) => ({
+      name: row.profileName,
+      value: safeNumber(row.total),
+    })),
+  };
+}
+
+export async function getAdminSnapshot() {
+  const [summary, usersList, buyers, diagnostics] = await Promise.all([
+    getAdminDashboardSummary(),
+    getAdminUsers(),
+    getAdminBuyers(),
+    getAdminDiagnosticResults(),
+  ]);
+
+  return {
+    summary,
+    users: usersList,
+    buyers,
+    diagnostics,
+  };
+}
+
+
+// ============= PASSWORD AUTHENTICATION =============
+
+/**
+ * Simple password hashing using SHA-256 + salt
+ * For production, consider using bcrypt or argon2
+ */
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha256").toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(password: string, hash: string): boolean {
+  try {
+    // Check if it's a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+    if (hash.startsWith("$2a$") || hash.startsWith("$2b$") || hash.startsWith("$2y$")) {
+      return bcrypt.compareSync(password, hash);
+    }
+    
+    // Otherwise, assume it's PBKDF2 format (salt:hash)
+    const [salt, storedHash] = hash.split(":");
+    const computed = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha256").toString("hex");
+    return computed === storedHash;
+  } catch {
+    return false;
+  }
+}
+
+export async function getUserByName(name: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select().from(users).where(eq(users.name, name)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createOrUpdateAdminUser(name: string, password: string, email?: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const passwordHash = hashPassword(password);
+  const openId = `admin-${name}-${Date.now()}`;
+  const adminEmail = email || `${name.toLowerCase()}@example.com`;
+
+  // Try to find by email first, then by name
+  let existingUser: typeof users.$inferSelect | undefined = email ? await db.select().from(users).where(eq(users.email, email)).limit(1).then(r => r[0]) : undefined;
+  if (!existingUser) {
+    existingUser = await getUserByName(name);
+  }
+  
+  if (existingUser) {
+    // Update existing user
+    await db
+      .update(users)
+      .set({
+        passwordHash,
+        role: "admin",
+        email: adminEmail,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, existingUser.id));
+    return existingUser;
+  } else {
+    // Create new admin user
+    const result = await db.insert(users).values({
+      openId,
+      name,
+      email: adminEmail,
+      passwordHash,
+      role: "admin",
+      loginMethod: "password",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastSignedIn: new Date(),
+    });
+    
+    return await db.select().from(users).where(eq(users.email, adminEmail)).limit(1).then(r => r[0]);
+  }
+}
+
+export async function authenticateUser(email: string, password: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const user = result.length > 0 ? result[0] : undefined;
+  
+  if (!user || !user.passwordHash) {
+    return null;
+  }
+
+  if (verifyPassword(password, user.passwordHash)) {
+    // Update lastSignedIn
+    const db = await getDb();
+    if (db) {
+      await db
+        .update(users)
+        .set({ lastSignedIn: new Date() })
+        .where(eq(users.id, user.id));
+    }
+    return user;
+  }
+
+  return null;
+}
+
+// ============= SEARCH/FILTER FUNCTIONS =============
+
+export async function searchLeads(query: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const searchPattern = `%${query}%`;
+  const results = await db
+    .select({
+      id: leads.id,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      createdAt: leads.createdAt,
+      hasQuizResponse: sql<boolean>`EXISTS(SELECT 1 FROM ${quizResponses} WHERE ${quizResponses.leadId} = ${leads.id})`,
+    })
+    .from(leads)
+    .where(
+      sql`${leads.email} LIKE ${searchPattern} OR ${leads.whatsapp} LIKE ${searchPattern}`
+    )
+    .orderBy(desc(leads.createdAt));
+
+  return results;
+}
+
+export async function getAllLeadsWithQuizStatus() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const results = await db
+    .select({
+      id: leads.id,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      createdAt: leads.createdAt,
+      hasQuizResponse: sql<boolean>`EXISTS(SELECT 1 FROM ${quizResponses} WHERE ${quizResponses.leadId} = ${leads.id})`,
+      hasDiagnostic: sql<boolean>`EXISTS(SELECT 1 FROM ${diagnosticHistory} WHERE ${diagnosticHistory.leadId} = ${leads.id})`,
+      hasPayment: sql<boolean>`EXISTS(SELECT 1 FROM ${payments} WHERE ${payments.leadId} = ${leads.id})`,
+    })
+    .from(leads)
+    .orderBy(desc(leads.createdAt));
+
+  return results;
+}
+
+export async function getPaymentWithDiagnostic(paymentId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const payment = await db
+    .select({
+      id: payments.id,
+      leadId: payments.leadId,
+      email: leads.email,
+      whatsapp: leads.whatsapp,
+      amount: payments.amount,
+      currency: payments.currency,
+      status: payments.status,
+      productName: payments.productName,
+      createdAt: payments.createdAt,
+    })
+    .from(payments)
+    .innerJoin(leads, eq(payments.leadId, leads.id))
+    .where(eq(payments.id, paymentId))
+    .limit(1);
+
+  if (payment.length === 0) return null;
+
+  const diagnostic = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, payment[0].leadId))
+    .limit(1);
+
+  return {
+    ...payment[0],
+    diagnostic: diagnostic.length > 0 ? diagnostic[0] : null,
+  };
+}
+
+
+export async function unlockAccessForLead(leadId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Mark the lead as having access granted
+    // This can be used to track manual access grants
+    await db
+      .update(leads)
+      .set({ 
+        updatedAt: new Date(),
+      })
+      .where(eq(leads.id, leadId));
+    
+    return true;
+  } catch (error) {
+    console.error("Error unlocking access:", error);
+    return false;
+  }
+}
+
+export async function getLeadWithDiagnostic(leadId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const lead = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.id, leadId))
+    .limit(1);
+
+  if (lead.length === 0) return null;
+
+  const diagnostic = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, leadId))
+    .limit(1);
+
+  if (diagnostic.length === 0) return null;
+
+  return {
+    ...lead[0],
+    diagnostic: diagnostic[0],
+  };
+}
+
+
+// Quiz Questions Management
+export async function getAllQuizQuestions() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  const questions = await db.select().from(quizQuestions).orderBy(quizQuestions.step);
+  return questions.map(q => ({
+    ...q,
+    options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+  }));
+}
+
+export async function updateQuizQuestion(id: number, question: string, options: string[]) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  await db.update(quizQuestions)
+    .set({ 
+      question, 
+      options: JSON.stringify(options),
+      updatedAt: new Date()
+    })
+    .where(eq(quizQuestions.id, id));
+  return { success: true };
+}
+
+export async function createQuizQuestion(step: number, question: string, options: string[]) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  await db.insert(quizQuestions).values({
+    step,
+    question,
+    options: JSON.stringify(options)
+  });
+  return { success: true };
+}
+
+export async function deleteQuizQuestion(id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const { quizQuestions } = await import("../drizzle/schema");
+  await db.delete(quizQuestions).where(eq(quizQuestions.id, id));
+  return { success: true };
+}
+
+
+export async function getPaymentByToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.downloadToken, token))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getDiagnosticByLeadId(leadId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, leadId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+
+export async function getAdminByUsername(username: string) {
+  const db = await getDb();
+  if (!db) {
+    return null;
+  }
+
+  try {
+    const result = await db.select().from(admins).where(eq(admins.username, username));
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("Error getting admin by username:", error);
+    return null;
+  }
+}
+
+
+export async function getLeadWithDiagnosticByToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const payment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.downloadToken, token))
+    .limit(1);
+
+  if (!payment || payment.length === 0) {
+    return null;
+  }
+
+  const diagnostic = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.leadId, payment[0].leadId))
+    .limit(1);
+
+  if (!diagnostic || diagnostic.length === 0) {
+    return null;
+  }
+
+  const lead = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.id, payment[0].leadId))
+    .limit(1);
+
+  if (!lead || lead.length === 0) {
+    return null;
+  }
+
+  const quizResponse = await db
+    .select()
+    .from(quizResponses)
+    .where(eq(quizResponses.leadId, payment[0].leadId))
+    .limit(1);
+
+  try {
+    return {
+      profileName: diagnostic[0].profileName,
+      profileDescription: diagnostic[0].profileDescription,
+      strengths: Array.isArray(diagnostic[0].strengths) ? diagnostic[0].strengths : JSON.parse(diagnostic[0].strengths || '[]'),
+      challenges: Array.isArray(diagnostic[0].challenges) ? diagnostic[0].challenges : JSON.parse(diagnostic[0].challenges || '[]'),
+      recommendations: Array.isArray(diagnostic[0].recommendations) ? diagnostic[0].recommendations : JSON.parse(diagnostic[0].recommendations || '[]'),
+      nextSteps: Array.isArray(diagnostic[0].nextSteps) ? diagnostic[0].nextSteps : JSON.parse(diagnostic[0].nextSteps || '[]'),
+      userResponses: quizResponse?.[0] || null,
+    };
+  } catch (error) {
+    console.error('Error parsing diagnostic data:', error);
+    console.error('Diagnostic data:', diagnostic[0]);
+    throw error;
+  }
+}
+
+export async function updatePaymentDownloadToken(leadId: number, token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const payment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.leadId, leadId))
+    .limit(1);
+
+  if (!payment || payment.length === 0) {
+    // Create a new payment record if it doesn't exist
+    await db.insert(payments).values({
+      leadId,
+      amount: 0,
+      currency: "brl",
+      status: "pending",
+      productName: "Diagnóstico Espiritual",
+      downloadToken: token,
+    });
+  } else {
+    await db
+      .update(payments)
+      .set({ downloadToken: token })
+      .where(eq(payments.id, payment[0].id));
+  }
 }

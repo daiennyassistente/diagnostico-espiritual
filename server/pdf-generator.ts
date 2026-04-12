@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import PDFDocument from "pdfkit";
 
 export interface DiagnosticData {
   profileName: string;
@@ -10,283 +10,185 @@ export interface DiagnosticData {
   responses: Record<string, string>;
 }
 
-// Paleta de cores do quiz
-const COLORS = {
-  background: rgb(0.96, 0.94, 0.92), // #F5F1EA
-  dark: rgb(0.24, 0.20, 0.15), // #3E342C
-  medium: rgb(0.29, 0.25, 0.21), // #4A3F35
-  accent: rgb(0.58, 0.47, 0.36), // #956F5C (accent color)
-  white: rgb(1, 1, 1), // #FFFFFF
-};
-
-// Remove emojis and non-ASCII characters that WinAnsi cannot encode
-function sanitizeText(text: string): string {
+export function normalizePdfText(text: string): string {
   return text
-    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '') // Remove emoji pairs
-    .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
-    .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "")
+    .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-export async function generateDiagnosticPDF(diagnosticData: DiagnosticData): Promise<Buffer> {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4 size
-  const { width, height } = page.getSize();
+export async function generateDiagnosticPDF(
+  data: DiagnosticData
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ size: "A4", margin: 40 });
+      const chunks: Buffer[] = [];
 
-  const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-  const timesRomanBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+      doc.on("data", (chunk) => chunks.push(chunk));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
+      doc.on("error", reject);
 
-  let yPosition = height - 50;
+      // Título
+      doc.fontSize(20).font("Helvetica-Bold").text("Seu Diagnóstico Espiritual");
+      doc.moveDown(0.3);
 
-  // Decorative header with background
-  page.drawRectangle({
-    x: 0,
-    y: yPosition - 80,
-    width: width,
-    height: 80,
-    color: COLORS.background,
-  });
+      // Nome do perfil
+      doc.fontSize(16).font("Helvetica-Bold").text(normalizePdfText(data.profileName));
+      doc.moveDown(0.5);
 
-  // Draw decorative line
-  page.drawLine({
-    start: { x: 50, y: yPosition - 85 },
-    end: { x: width - 50, y: yPosition - 85 },
-    thickness: 2,
-    color: COLORS.accent,
-  });
-
-  // Title
-  page.drawText("+ DIAGNÓSTICO ESPIRITUAL +", {
-    x: 50,
-    y: yPosition - 40,
-    size: 20,
-    font: timesRomanBoldFont,
-    color: COLORS.dark,
-  });
-
-  yPosition -= 100;
-
-  // Profile Section with background
-  page.drawRectangle({
-    x: 40,
-    y: yPosition - 100,
-    width: width - 80,
-    height: 100,
-    color: COLORS.background,
-    borderColor: COLORS.accent,
-    borderWidth: 1,
-  });
-
-  page.drawText("Seu Perfil Espiritual", {
-    x: 60,
-    y: yPosition - 20,
-    size: 14,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 40;
-
-  page.drawText(sanitizeText(diagnosticData.profileName), {
-    x: 60,
-    y: yPosition,
-    size: 16,
-    font: timesRomanBoldFont,
-    color: COLORS.dark,
-  });
-
-  yPosition -= 25;
-
-  // Wrap description text
-  const descriptionLines = wrapText(sanitizeText(diagnosticData.profileDescription), 80);
-  descriptionLines.forEach((line) => {
-    page.drawText(line, {
-      x: 60,
-      y: yPosition,
-      size: 10,
-      font: timesRomanFont,
-      color: COLORS.medium,
-    });
-    yPosition -= 12;
-  });
-
-  yPosition -= 25;
-
-  // Strengths Section
-  page.drawText("* Seus Pontos Fortes", {
-    x: 50,
-    y: yPosition,
-    size: 12,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 18;
-
-  diagnosticData.strengths.forEach((strength) => {
-      const strengthLines = wrapText(sanitizeText(strength), 75);
-    strengthLines.forEach((line, index) => {
-      page.drawText(index === 0 ? `- ${line}` : `  ${line}`, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
+      // Descrição
+      doc.fontSize(11).font("Helvetica").text(normalizePdfText(data.profileDescription), {
+        align: "justify",
       });
-      yPosition -= 12;
-    });
-  });
+      doc.moveDown(0.5);
 
-  yPosition -= 12;
-
-  // Challenges Section
-  page.drawText("• Desafios a Trabalhar", {
-    x: 50,
-    y: yPosition,
-    size: 12,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 18;
-
-  diagnosticData.challenges.forEach((challenge) => {
-      const challengeLines = wrapText(sanitizeText(challenge), 75);
-    challengeLines.forEach((line, index) => {
-      page.drawText(index === 0 ? `- ${line}` : `  ${line}`, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
+      // Seus Pontos Fortes
+      doc.fontSize(12).font("Helvetica-Bold").text("Seus Pontos Fortes");
+      doc.moveDown(0.2);
+      data.strengths.forEach((strength) => {
+        doc.fontSize(11).font("Helvetica").text(`• ${normalizePdfText(strength)}`);
       });
-      yPosition -= 12;
-    });
-  });
+      doc.moveDown(0.5);
 
-  yPosition -= 12;
-
-  // Recommendations Section
-  page.drawText(">> Recomendações", {
-    x: 50,
-    y: yPosition,
-    size: 12,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  yPosition -= 18;
-
-  diagnosticData.recommendations.forEach((rec, index) => {
-    const recLines = wrapText(sanitizeText(rec), 75);
-    recLines.forEach((line, lineIndex) => {
-      const prefix = lineIndex === 0 ? `${index + 1}. ` : "   ";
-      page.drawText(prefix + line, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
+      // Desafios a Trabalhar
+      doc.fontSize(12).font("Helvetica-Bold").text("Desafios a Trabalhar");
+      doc.moveDown(0.2);
+      data.challenges.forEach((challenge) => {
+        doc.fontSize(11).font("Helvetica").text(`• ${normalizePdfText(challenge)}`);
       });
-      yPosition -= 12;
-    });
-  });
+      doc.moveDown(0.5);
 
-  yPosition -= 12;
-
-  // Next Steps Section with emphasis
-  page.drawRectangle({
-    x: 40,
-    y: yPosition - 50,
-    width: width - 80,
-    height: 50,
-    color: COLORS.background,
-    borderColor: COLORS.accent,
-    borderWidth: 1,
-  });
-
-  page.drawText(">> Próximo Passo", {
-    x: 60,
-    y: yPosition - 10,
-    size: 11,
-    font: timesRomanBoldFont,
-    color: COLORS.dark,
-  });
-
-  yPosition -= 28;
-
-  diagnosticData.nextSteps.forEach((step) => {
-    const stepLines = wrapText(sanitizeText(step), 75);
-    stepLines.forEach((line) => {
-      page.drawText(`"${line}"`, {
-        x: 60,
-        y: yPosition,
-        size: 10,
-        font: timesRomanFont,
-        color: COLORS.medium,
+      // Recomendações
+      doc.fontSize(12).font("Helvetica-Bold").text("Recomendações");
+      doc.moveDown(0.2);
+      data.recommendations.forEach((rec, index) => {
+        doc.fontSize(11).font("Helvetica").text(`${index + 1}. ${normalizePdfText(rec)}`);
       });
-      yPosition -= 12;
-    });
-  });
+      doc.moveDown(0.5);
 
-  yPosition -= 20;
+      // Próximo Passo
+      doc.fontSize(12).font("Helvetica-Bold").text("Próximo Passo");
+      doc.moveDown(0.2);
+      data.nextSteps.forEach((step) => {
+        doc.fontSize(11).font("Helvetica").text(normalizePdfText(step), {
+          align: "justify",
+        });
+      });
+      doc.moveDown(1);
 
-  // Footer with decorative line
-  page.drawLine({
-    start: { x: 50, y: yPosition },
-    end: { x: width - 50, y: yPosition },
-    thickness: 1,
-    color: COLORS.accent,
-  });
+      // Rodapé
+      doc.fontSize(9).font("Helvetica").text(
+        "Este diagnóstico é uma ferramenta de reflexão espiritual. Para orientação profunda, busque um conselheiro ou pastor de sua comunidade.",
+        {
+          align: "center",
+        }
+      );
 
-  yPosition -= 15;
-
-  page.drawText("Este diagnóstico é uma ferramenta de reflexão espiritual.", {
-    x: 50,
-    y: yPosition,
-    size: 8,
-    font: timesRomanFont,
-    color: COLORS.medium,
-  });
-
-  yPosition -= 10;
-
-  page.drawText("Para orientação profunda, busque um conselheiro ou pastor de sua comunidade.", {
-    x: 50,
-    y: yPosition,
-    size: 8,
-    font: timesRomanFont,
-    color: COLORS.medium,
-  });
-
-  yPosition -= 15;
-
-  page.drawText("+ Que a paz de Deus esteja com você +", {
-    x: 50,
-    y: yPosition,
-    size: 9,
-    font: timesRomanBoldFont,
-    color: COLORS.accent,
-  });
-
-  const pdfBytes = await pdfDoc.save();
-  return Buffer.from(pdfBytes);
-}
-
-function wrapText(text: string, maxCharsPerLine: number): string[] {
-  const words = text.split(" ");
-  const lines: string[] = [];
-  let currentLine = "";
-
-  words.forEach((word) => {
-    if ((currentLine + word).length > maxCharsPerLine) {
-      if (currentLine) lines.push(currentLine.trim());
-      currentLine = word;
-    } else {
-      currentLine += (currentLine ? " " : "") + word;
+      doc.end();
+    } catch (error) {
+      reject(error);
     }
   });
+}
 
-  if (currentLine) lines.push(currentLine.trim());
-  return lines;
+
+export interface DevocionalData {
+  profileName: string;
+  profileDescription: string;
+  challenges: string[];
+  recommendations: string[];
+  nextSteps: string[];
+  userResponses?: Record<string, any> | null;
+}
+
+export async function generateDevocionalPDF(
+  data: DevocionalData
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ size: "A4", margin: 40 });
+      const chunks: Buffer[] = [];
+
+      doc.on("data", (chunk) => chunks.push(chunk));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
+      doc.on("error", reject);
+
+      // Título
+      doc.fontSize(20).font("Helvetica-Bold").text("Seu Devocional Personalizado");
+      doc.moveDown(0.3);
+
+      // Nome do perfil
+      doc.fontSize(16).font("Helvetica-Bold").text(normalizePdfText(data.profileName));
+      doc.moveDown(0.5);
+
+      // Introdução baseada no diagnóstico
+      doc.fontSize(11).font("Helvetica").text(normalizePdfText(data.profileDescription), {
+        align: "justify",
+      });
+      doc.moveDown(0.5);
+
+      // Seção de Reflexão Bíblica
+      doc.fontSize(12).font("Helvetica-Bold").text("Reflexão Bíblica para Sua Jornada");
+      doc.moveDown(0.2);
+      doc.fontSize(11).font("Helvetica").text(
+        "A Bíblia nos oferece orientação e conforto em cada fase da vida espiritual. Aqui estão passagens e reflexões especialmente selecionadas para sua situação atual:",
+        { align: "justify" }
+      );
+      doc.moveDown(0.5);
+
+      // Desafios e Respostas Bíblicas
+      doc.fontSize(12).font("Helvetica-Bold").text("Seus Desafios e Respostas Bíblicas");
+      doc.moveDown(0.2);
+      data.challenges.forEach((challenge, index) => {
+        doc.fontSize(11).font("Helvetica-Bold").text(`${index + 1}. ${normalizePdfText(challenge)}`);
+        doc.fontSize(10).font("Helvetica").text(
+          "Deus está com você neste desafio. Busque força na oração e na Palavra.",
+          { align: "justify" }
+        );
+        doc.moveDown(0.3);
+      });
+      doc.moveDown(0.3);
+
+      // Recomendações Práticas
+      doc.fontSize(12).font("Helvetica-Bold").text("Passos Práticos para Sua Caminhada");
+      doc.moveDown(0.2);
+      data.recommendations.forEach((rec, index) => {
+        doc.fontSize(11).font("Helvetica").text(`${index + 1}. ${normalizePdfText(rec)}`);
+      });
+      doc.moveDown(0.5);
+
+      // Próximo Passo
+      doc.fontSize(12).font("Helvetica-Bold").text("Seu Próximo Passo com Deus");
+      doc.moveDown(0.2);
+      data.nextSteps.forEach((step) => {
+        doc.fontSize(11).font("Helvetica").text(normalizePdfText(step), {
+          align: "justify",
+        });
+      });
+      doc.moveDown(1);
+
+      // Oração de Encerramento
+      doc.fontSize(12).font("Helvetica-Bold").text("Oração para Hoje");
+      doc.moveDown(0.2);
+      doc.fontSize(10).font("Helvetica-Oblique").text(
+        '"Senhor, obrigado por conhecer cada detalhe da minha vida. Ajuda-me a confiar em Ti nesta fase. Que eu possa experimentar Tua presença, Teu conforto e Tua direção. Em Jesus, Amém."',
+        { align: "center" }
+      );
+      doc.moveDown(1);
+
+      // Rodapé
+      doc.fontSize(9).font("Helvetica").text(
+        "Este devocional foi criado especialmente para você, baseado em suas respostas e em fundamentos bíblicos cristãos evangélicos. Que Deus abençoe sua caminhada.",
+        {
+          align: "center",
+        }
+      );
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
 }

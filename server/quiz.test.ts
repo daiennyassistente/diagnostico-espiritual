@@ -77,7 +77,7 @@ describe("quiz validation", () => {
     it("should accept valid quiz responses", () => {
       const result = submitResponsesSchema.safeParse({
         leadId: 1,
-        step1: "próxima de Deus, mas inconstante",
+        step1: "Próxima de Deus",
         step2: "distrações",
         step3: "frequente e profunda",
         step4: "sincera, mas instável",
@@ -95,7 +95,7 @@ describe("quiz validation", () => {
     it("should accept partial responses", () => {
       const result = submitResponsesSchema.safeParse({
         leadId: 1,
-        step1: "próxima de Deus, mas inconstante",
+        step1: "Próxima de Deus",
         step2: "distrações",
       });
 
@@ -104,7 +104,7 @@ describe("quiz validation", () => {
 
     it("should require leadId", () => {
       const result = submitResponsesSchema.safeParse({
-        step1: "próxima de Deus, mas inconstante",
+        step1: "Próxima de Deus",
       });
 
       expect(result.success).toBe(false);

@@ -48,7 +48,7 @@ describe('Quiz Integration Tests', () => {
 
     const result = await createQuizResponse({
       leadId: leadResult.id,
-      step1: 'Próxima de Deus, mas inconstante',
+      step1: 'Próxima de Deus',
       step2: 'Falta de disciplina',
       step3: 'Leitura ocasional',
       step4: 'Superficial',
@@ -65,7 +65,7 @@ describe('Quiz Integration Tests', () => {
     const response = await getQuizResponseByLeadId(leadResult.id);
     expect(response).toBeDefined();
     expect(response?.leadId).toBe(leadResult.id);
-    expect(response?.step1).toBe('Próxima de Deus, mas inconstante');
+    expect(response?.step1).toBe('Próxima de Deus');
   });
 
   it('should create different responses for different leads', async () => {
@@ -81,7 +81,7 @@ describe('Quiz Integration Tests', () => {
 
     await createQuizResponse({
       leadId: lead1Result.id,
-      step1: 'Próxima de Deus, mas inconstante',
+      step1: 'Próxima de Deus',
       step2: 'Falta de disciplina',
       step3: 'Leitura ocasional',
       step4: 'Superficial',
@@ -110,7 +110,7 @@ describe('Quiz Integration Tests', () => {
     const response1 = await getQuizResponseByLeadId(lead1Result.id);
     const response2 = await getQuizResponseByLeadId(lead2Result.id);
 
-    expect(response1?.step1).toBe('Próxima de Deus, mas inconstante');
+    expect(response1?.step1).toBe('Próxima de Deus');
     expect(response2?.step1).toBe('Distante e querendo voltar');
     expect(response1?.leadId).not.toBe(response2?.leadId);
   });

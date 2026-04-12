@@ -8,7 +8,11 @@ import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import Resultado from "./pages/Resultado";
 import Result from "./pages/Result";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Admin from "./pages/Admin";
+import { AdminDashboard } from "./pages/AdminDashboard";
+import { AdminLogin } from "./pages/AdminLogin";
+import SharePage from "./pages/SharePage";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -18,7 +22,11 @@ function Router() {
       <Route path={"/quiz"} component={Quiz} />
       <Route path={"/resultado"} component={Resultado} />
       <Route path={"/result"} component={Result} />
-      <Route path={"/admin"} component={Admin} />
+      <Route path={"/checkout-success"} component={CheckoutSuccess} />
+      <Route path={"/share"} component={SharePage} />
+      <Route path={"/admin-login"} component={AdminLogin} />
+      <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/admin-legacy"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
