@@ -29,13 +29,7 @@ const formatProfileHeadline = (profileName: string) => {
 };
 
 const generateIntroductoryMessage = (profileName: string) => {
-  const messages = [
-    "Você não está sozinho nesse sentimento. Muitos cristãos passam por exatamente o que você está vivendo agora.",
-    "Essa é uma realidade que muitos cristãos enfrentam em algum momento da vida.",
-    "Você não é o único que sente isso. Muitos irmãos na fé passam por situações semelhantes.",
-    "Essa é uma jornada que muitos cristãos vivem, e a boa notícia é que tem solução.",
-  ];
-  return messages[Math.floor(Math.random() * messages.length)];
+  return "Você não está sozinho nesse sentimento. Muitos cristãos passam por exatamente o que você está vivendo agora.";
 };
 
 const generateConsequenceMessage = (profileName: string, challenges: string[]) => {
@@ -114,19 +108,15 @@ export default function Result() {
         const result = await trpc.quiz.getResult.query();
         if (result) {
           setResult(result);
-        } else {
-          const fallback = buildFallbackResult(storedResponses ? JSON.parse(storedResponses) : {});
-          setResult(fallback);
-          
-          fallbackTimeoutRef.current = setTimeout(() => {
-            setResult(fallback);
-          }, 3000);
+          return;
         }
       } catch (error) {
         console.error("Error fetching result:", error);
-        const fallback = buildFallbackResult(storedResponses ? JSON.parse(storedResponses) : {});
-        setResult(fallback);
       }
+      
+      // Only set fallback if API failed
+      const fallback = buildFallbackResult(storedResponses ? JSON.parse(storedResponses) : {});
+      setResult(fallback);
     };
 
     fetchResult();
@@ -323,9 +313,6 @@ export default function Result() {
           <h3 className="text-xl font-bold text-center mb-2" style={{ color: "#0B5FD3" }}>
             Um Plano Espiritual Guiado de 7 Dias Para Restaurar Sua Vida Com Deus
           </h3>
-          <p className="text-center mb-4" style={{ color: "#C9A24A" }}>
-            <span className="font-semibold">Seu Guia Pessoal Para Voltar a Sentir a Presença de Deus</span>
-          </p>
           <p className="text-gray-700 text-center text-sm">
             Este não é um devocional comum. É um plano criado especialmente para <span className="font-bold">VOCÊ</span>, baseado no seu diagnóstico espiritual. Cada dia foi pensado para levar você de volta à presença de Deus, passo a passo, sem pressa, sem julgamento.
           </p>
