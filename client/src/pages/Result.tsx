@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Share2, RotateCcw, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { generateSpiritualPageCopy } from "@/lib/spiritualCopy";
+import { generateDeepSpiritualDiagnosis } from "@/lib/deepSpiritualDiagnosis";
 
 interface AIResult {
   profileName: string;
@@ -128,97 +128,125 @@ export default function Result() {
 
   if (!result) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#0B5FD3" }} />
-          <p className="text-gray-700 font-medium">Gerando seu diagnóstico personalizado...</p>
+      <div className="min-h-screen flex items-center justify-center spiritual-background">
+        <div className="text-center relative z-10">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#3E342C" }} />
+          <p className="text-foreground font-medium">Gerando seu diagnóstico personalizado...</p>
         </div>
       </div>
     );
   }
 
-  const copy = generateSpiritualPageCopy(
+  const diagnosis = generateDeepSpiritualDiagnosis(
     result.profileName,
-    result.profileDescription,
     result.challenges,
     userName
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white px-4 py-12">
-      <div className="max-w-3xl mx-auto">
-        {/* SEÇÃO 1: ABERTURA */}
+    <div className="min-h-screen spiritual-background relative">
+      <div className="max-w-2xl mx-auto px-4 py-12 relative z-10">
+        {/* SEÇÃO 1: ABERTURA INTIMISTA */}
         <section className="mb-12 text-center">
-          <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line font-medium mb-6">
-            {copy.opening}
+          <div className="text-lg leading-relaxed text-foreground whitespace-pre-line font-medium mb-6">
+            {diagnosis.opening}
           </div>
         </section>
 
-        {/* SEÇÃO 2: IDENTIFICAÇÃO */}
-        <section className="mb-12 bg-white rounded-lg p-8 shadow-sm border border-gray-200">
-          <h2 className="text-xl font-bold mb-4" style={{ color: "#0B5FD3" }}>Você não está sozinho</h2>
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
-            {copy.identification}
+        {/* SEÇÃO 2: EXPLICAÇÃO PROFUNDA */}
+        <section className="quiz-card mb-12">
+          <h2 className="text-2xl font-semibold mb-6 text-primary">Sua situação espiritual</h2>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
+            {diagnosis.deepExplanation.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
         </section>
 
-        {/* SEÇÃO 3: DIAGNÓSTICO */}
-        <section className="mb-12 bg-white rounded-lg p-8 shadow-sm border-l-4" style={{ borderLeftColor: "#C9A24A" }}>
-          <h2 className="text-xl font-bold mb-4" style={{ color: "#0B5FD3" }}>Seu diagnóstico</h2>
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
-            {copy.revelation}
+        {/* SEÇÃO 3: RAIZ DO PROBLEMA */}
+        <section className="quiz-card mb-12 border-l-4" style={{ borderLeftColor: "#3E342C" }}>
+          <h2 className="text-2xl font-semibold mb-6 text-primary">A raiz do problema</h2>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
+            {diagnosis.rootOfProblem.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
         </section>
 
-        {/* SEÇÃO 4: CONFRONTO COM AMOR */}
-        <section className="mb-12 bg-red-50 rounded-lg p-8 border-l-4 border-red-400">
-          <h2 className="text-xl font-bold mb-4" style={{ color: "#991B1B" }}>A verdade que importa</h2>
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line" style={{ color: "#7F1D1D" }}>
-            {copy.truthWithLove}
+        {/* SEÇÃO 4: CONSEQUÊNCIA REAL */}
+        <section className="quiz-card mb-12" style={{ backgroundColor: "#FAF6F1" }}>
+          <h2 className="text-2xl font-semibold mb-6 text-primary">O impacto real</h2>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
+            {diagnosis.realConsequence.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
         </section>
 
-        {/* SEÇÃO 5: VERDADE BÍBLICA */}
-        <section className="mb-12 bg-blue-50 rounded-lg p-8 border-l-4 border-blue-400">
-          <div className="text-base leading-relaxed font-semibold" style={{ color: "#0B5FD3" }}>
-            <div className="whitespace-pre-line">{copy.biblicalTruth}</div>
+        {/* SEÇÃO 5: CONEXÃO EMOCIONAL */}
+        <section className="quiz-card mb-12" style={{ backgroundColor: "#F9F5F0" }}>
+          <h2 className="text-2xl font-semibold mb-6 text-primary">Você não está sozinho</h2>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
+            {diagnosis.emotionalConnection.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
         </section>
 
-        {/* SEÇÃO 6: ESPERANÇA */}
-        <section className="mb-12 text-center bg-white rounded-lg p-8 shadow-sm border border-gray-200">
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line italic">
-            {copy.hope}
+        {/* SEÇÃO 6: ACOLHIMENTO */}
+        <section className="quiz-card text-center mb-12">
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4 italic">
+            {diagnosis.acceptance.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
           </div>
         </section>
 
-        {/* SEÇÃO 7: SOLUÇÃO */}
-        <section className="mb-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-8 border border-blue-200">
-          <h2 className="text-xl font-bold mb-6" style={{ color: "#0B5FD3" }}>Seu plano personalizado</h2>
+        {/* SEÇÃO 7: TRANSIÇÃO PARA SOLUÇÃO */}
+        <section className="quiz-card mb-12 bg-gradient-to-br" style={{ backgroundColor: "#F5F1EA" }}>
+          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4 font-medium">
+            {diagnosis.transitionToSolution.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="mb-4">{paragraph}</p>
+            ))}
+          </div>
+        </section>
+
+        {/* SEÇÃO 8: SOLUÇÃO - PLANO PERSONALIZADO */}
+        <section className="quiz-card mb-12">
+          <h2 className="text-2xl font-semibold mb-6 text-primary">Seu plano de transformação</h2>
           
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line mb-8">
-            {copy.solutionIntro}
+          <div className="text-base leading-relaxed text-foreground mb-8">
+            <p className="mb-4">Um plano simples de 7 dias. Não é um devocional comum. É um caminho de volta. Feito especialmente para você.</p>
+            <p>Para sua situação. Para sua alma. Para sua transformação.</p>
           </div>
 
           {/* BENEFÍCIOS */}
-          <div className="mb-8 bg-white rounded-lg p-6">
-            <h3 className="font-bold mb-4" style={{ color: "#0B5FD3" }}>O que você vai conseguir:</h3>
+          <div className="mb-8 bg-secondary/30 rounded-lg p-6">
+            <h3 className="font-semibold mb-4 text-primary">O que você vai conseguir:</h3>
             <div className="space-y-3">
-              {copy.benefits.map((benefit, idx) => (
+              {[
+                "Clareza sobre sua vida espiritual",
+                "Sentir a presença de Deus voltando",
+                "Criar uma rotina que funciona",
+                "Voltar a ter direção",
+                "Transformação real em 7 dias"
+              ].map((benefit, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <span style={{ color: "#C9A24A" }} className="text-lg flex-shrink-0 mt-1">
-                    ✔
+                  <span style={{ color: "#3E342C" }} className="text-lg flex-shrink-0 mt-1 font-bold">
+                    ✓
                   </span>
-                  <span className="text-sm text-gray-700">{benefit}</span>
+                  <span className="text-sm text-foreground">{benefit}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* CHAMADO INTERNO */}
-          <div className="rounded-lg p-6 mb-8 bg-white border-l-4" style={{ borderLeftColor: "#C9A24A" }}>
-            <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line italic">
-              {copy.internalCall}
+          <div className="rounded-lg p-6 mb-8 bg-muted/20 border-l-4" style={{ borderLeftColor: "#3E342C" }}>
+            <div className="text-sm leading-relaxed text-foreground italic">
+              <p className="mb-3">Talvez esse seja o momento. O momento em que você para de ignorar o que sente.</p>
+              <p className="mb-3">O momento em que você decide voltar.</p>
+              <p className="font-semibold">Não ignore isso dentro de você. Esse chamado que você está sentindo… é real.</p>
             </div>
           </div>
 
@@ -228,29 +256,32 @@ export default function Result() {
               const checkoutUrl = `${window.location.origin}/checkout`;
               window.open(checkoutUrl, "_blank");
             }}
-            className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 mb-4 flex items-center justify-center gap-2"
-            style={{ backgroundColor: "#FFD700", color: "#000" }}
+            className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 mb-4 flex items-center justify-center gap-2 text-primary-foreground"
+            style={{ backgroundColor: "#3E342C" }}
           >
             <Zap size={20} />
-            {copy.ctaPrimary}
+            Quero recomeçar com Deus
           </button>
 
           {/* PREÇO */}
-          <div className="text-center bg-white rounded-lg p-4">
-            <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line font-semibold">
-              {copy.priceMessage}
+          <div className="text-center bg-secondary/40 rounded-lg p-4">
+            <p className="text-sm leading-relaxed text-foreground font-medium">
+              R$ 12,90<br />
+              Menos que um café. Mas que pode mudar tudo.
             </p>
           </div>
         </section>
 
-        {/* SEÇÃO 8: REFLEXÃO FINAL */}
-        <section className="mb-12 text-center bg-white rounded-lg p-8 shadow-sm border border-gray-200">
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line italic">
-            {copy.closingReflection}
+        {/* SEÇÃO 9: REFLEXÃO FINAL */}
+        <section className="quiz-card text-center mb-12">
+          <div className="text-base leading-relaxed text-foreground italic">
+            <p className="font-semibold">Você merece estar perto de Deus.</p>
+            <p className="mt-2">Você merece sentir paz.</p>
+            <p className="mt-2">Você merece voltar.</p>
           </div>
         </section>
 
-        {/* SEÇÃO 9: AÇÕES SECUNDÁRIAS */}
+        {/* SEÇÃO 10: AÇÕES SECUNDÁRIAS */}
         <section className="mb-12">
           <div className="flex gap-3 flex-wrap justify-center">
             <Button
@@ -258,7 +289,7 @@ export default function Result() {
               disabled={isGeneratingPDF}
               variant="outline"
               className="border-2"
-              style={{ borderColor: "#0B5FD3", color: "#0B5FD3" }}
+              style={{ borderColor: "#3E342C", color: "#3E342C" }}
             >
               <Download size={18} className="mr-2" />
               {isGeneratingPDF ? "Baixando..." : "Baixar Resultado"}
@@ -267,7 +298,7 @@ export default function Result() {
               onClick={handleShare}
               variant="outline"
               className="border-2"
-              style={{ borderColor: "#0B5FD3", color: "#0B5FD3" }}
+              style={{ borderColor: "#3E342C", color: "#3E342C" }}
             >
               <Share2 size={18} className="mr-2" />
               Compartilhar
@@ -276,7 +307,7 @@ export default function Result() {
               onClick={handleRetake}
               variant="outline"
               className="border-2"
-              style={{ borderColor: "#0B5FD3", color: "#0B5FD3" }}
+              style={{ borderColor: "#3E342C", color: "#3E342C" }}
             >
               <RotateCcw size={18} className="mr-2" />
               Refazer Quiz
@@ -284,10 +315,10 @@ export default function Result() {
           </div>
         </section>
 
-        {/* SEÇÃO 10: TIMER */}
-        <section className="text-center bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <p className="text-gray-600 text-sm mb-2">⏳ Seu resultado estará disponível por mais:</p>
-          <p style={{ color: "#C9A24A" }} className="font-bold text-2xl">
+        {/* SEÇÃO 11: TIMER */}
+        <section className="quiz-card text-center">
+          <p className="text-foreground/60 text-sm mb-2">⏳ Seu resultado estará disponível por mais:</p>
+          <p style={{ color: "#3E342C" }} className="font-bold text-2xl">
             {formatTimeLeft(timeLeft)}
           </p>
         </section>
