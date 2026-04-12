@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Share2, RotateCcw, Zap, AlertCircle } from "lucide-react";
+import { Download, Loader2, Share2, RotateCcw, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { generateIntimatePageCopy } from "@/lib/intimateCopy";
+import { generateSpiritualPageCopy } from "@/lib/spiritualCopy";
 
 interface AIResult {
   profileName: string;
@@ -25,24 +25,20 @@ const formatTimeLeft = (seconds: number) => {
 };
 
 const buildFallbackResult = (responses: Record<string, string>): AIResult => {
-  const profileName = "em busca de profundidade espiritual";
   return {
-    profileName,
-    profileDescription: "Você está vivendo uma fase espiritualmente marcada por uma sede profunda, porém sem direção clara. Há um anseio real de reencontro com Deus.",
+    profileName: "em busca de profundidade espiritual",
+    profileDescription: "Você está vivendo uma fase espiritualmente marcada por uma sede profunda, porém sem direção clara.",
     strengths: [
       "Reconhecimento genuíno da necessidade de Deus",
-      "Desejo sincero de mudança e transformação",
+      "Desejo sincero de mudança",
       "Abertura para receber orientação espiritual",
     ],
     challenges: [
-      "Falta de disciplina que impede a constância na Palavra e oração",
-      "Sensação de ausência de direção espiritual clara",
-      "Dificuldade para manter a sensibilidade espiritual ativa",
+      "Falta de disciplina na Palavra e oração",
+      "Sensação de ausência de direção espiritual",
+      "Dificuldade para manter a sensibilidade espiritual",
     ],
-    recommendations: [
-      "Estruture uma rotina diária simples de 15 minutos focados na leitura bíblica e oração, priorizando qualidade sobre quantidade",
-      "Busque orar pedindo especificamente por direção do Espírito Santo, reconhecendo que Deus guia os corações que se entregam",
-    ],
+    recommendations: [],
     nextSteps: [],
   };
 };
@@ -60,7 +56,6 @@ export default function Result() {
   const [userName, setUserName] = useState<string>("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [timeLeft, setTimeLeft] = useState(86400);
-  const fallbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const storedUserName = sessionStorage.getItem("userName");
@@ -85,13 +80,6 @@ export default function Result() {
     };
 
     fetchResult();
-
-    return () => {
-      if (fallbackTimeoutRef.current) {
-        clearTimeout(fallbackTimeoutRef.current);
-        fallbackTimeoutRef.current = null;
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -124,7 +112,7 @@ export default function Result() {
   };
 
   const handleShare = () => {
-    const text = `Fiz meu diagnóstico espiritual e descobri coisas importantes sobre minha vida com Deus! Você também deveria fazer: ${window.location.origin}`;
+    const text = `Fiz meu diagnóstico espiritual e descobri coisas importantes sobre minha jornada com Deus! Você também deveria fazer: ${window.location.origin}`;
     if (navigator.share) {
       navigator.share({ title: "Diagnóstico Espiritual", text });
     } else {
@@ -144,14 +132,13 @@ export default function Result() {
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#0B5FD3" }} />
           <p className="text-gray-700 font-medium">Gerando seu diagnóstico personalizado...</p>
-          <p className="text-sm text-gray-500 mt-2">Se a análise inteligente demorar, mostraremos um resultado padrão.</p>
         </div>
       </div>
     );
   }
 
-  // Gerar copywriting íntimo
-  const copy = generateIntimatePageCopy(
+  // Gerar copywriting espiritual
+  const copy = generateSpiritualPageCopy(
     result.profileName,
     result.profileDescription,
     result.challenges,
@@ -160,56 +147,56 @@ export default function Result() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-12 spiritual-background">
-      <div className="max-w-2xl mx-auto">
-        {/* 🔴 1. ABERTURA (CONEXÃO FORTE) */}
-        <div className="mb-12 text-center">
-          <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* 🔴 ABERTURA */}
+        <div className="text-center space-y-4">
+          <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line font-medium">
             {copy.opening}
           </div>
         </div>
 
-        {/* 🟡 2. IDENTIFICAÇÃO PROFUNDA */}
-        <div className="mb-12 text-center">
+        {/* 🟡 IDENTIFICAÇÃO */}
+        <div className="text-center space-y-4">
           <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
             {copy.identification}
           </div>
         </div>
 
-        {/* 🔵 3. REVELAÇÃO */}
-        <div className="mb-12 bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#C9A24A" }}>
+        {/* 🔵 REVELAÇÃO */}
+        <div className="bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#C9A24A" }}>
           <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
             {copy.revelation}
           </div>
         </div>
 
-        {/* 🟠 4. DOR REAL (SEM EXAGERO) */}
-        <div className="mb-12 rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#DC2626", backgroundColor: "#FEE2E2" }}>
+        {/* 🟠 CONFRONTO COM AMOR */}
+        <div className="rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#DC2626", backgroundColor: "#FEE2E2" }}>
           <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line" style={{ color: "#991B1B" }}>
-            {copy.painReality}
+            {copy.truthWithLove}
           </div>
         </div>
 
-        {/* 🟢 5. ACOLHIMENTO */}
-        <div className="mb-12 text-center">
-          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
-            {copy.comfort}
-          </div>
-        </div>
-
-        {/* 🟣 6. VIRADA (ESPERANÇA) */}
-        <div className="mb-12 text-center">
+        {/* 🟢 VERDADE BÍBLICA */}
+        <div className="text-center space-y-4">
           <div className="text-base leading-relaxed font-semibold" style={{ color: "#0B5FD3" }}>
-            <div className="whitespace-pre-line">{copy.hope}</div>
+            <div className="whitespace-pre-line">{copy.biblicalTruth}</div>
           </div>
         </div>
 
-        {/* 🟤 7. APRESENTAÇÃO DA SOLUÇÃO */}
-        <div className="mb-12 bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#0B5FD3" }}>
+        {/* 🟣 ESPERANÇA */}
+        <div className="text-center space-y-4">
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line italic">
+            {copy.hope}
+          </div>
+        </div>
+
+        {/* 🟤 SOLUÇÃO */}
+        <div className="bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#0B5FD3" }}>
           <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line mb-8">
             {copy.solutionIntro}
           </div>
 
-          {/* ⚫ 8. BENEFÍCIOS (SENTIMENTO, NÃO TÉCNICO) */}
+          {/* BENEFÍCIOS */}
           <div className="mb-8">
             <div className="text-sm leading-relaxed space-y-3">
               {copy.benefits.map((benefit, idx) => (
@@ -223,14 +210,14 @@ export default function Result() {
             </div>
           </div>
 
-          {/* 🔴 9. URGÊNCIA SUAVE + EMOCIONAL */}
+          {/* CHAMADO INTERNO */}
           <div className="rounded-lg p-6 mb-8" style={{ backgroundColor: "#F5F1E8" }}>
             <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line italic">
-              {copy.urgency}
+              {copy.internalCall}
             </div>
           </div>
 
-          {/* 🟡 10. CTA */}
+          {/* CTA */}
           <button
             onClick={() => {
               const checkoutUrl = `${window.location.origin}/checkout`;
@@ -243,21 +230,21 @@ export default function Result() {
             {copy.ctaPrimary}
           </button>
 
-          {/* 🟢 11. PREÇO */}
+          {/* PREÇO */}
           <p className="text-center text-sm leading-relaxed text-gray-700 whitespace-pre-line">
             {copy.priceMessage}
           </p>
         </div>
 
-        {/* PENSAMENTO DE FECHAMENTO */}
-        <div className="mb-12 text-center">
+        {/* REFLEXÃO DE FECHAMENTO */}
+        <div className="text-center space-y-4">
           <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line italic">
-            {copy.closingThought}
+            {copy.closingReflection}
           </div>
         </div>
 
         {/* AÇÕES SECUNDÁRIAS */}
-        <div className="flex gap-3 mb-8 flex-wrap justify-center">
+        <div className="flex gap-3 flex-wrap justify-center">
           <Button
             onClick={handleDownloadPDF}
             disabled={isGeneratingPDF}
@@ -288,9 +275,9 @@ export default function Result() {
           </Button>
         </div>
 
-        {/* TIMER FINAL */}
+        {/* TIMER */}
         <div className="text-center text-gray-600 text-sm">
-          <p className="mb-2">⏳ Seu resultado personalizado estará disponível por mais:</p>
+          <p className="mb-2">⏳ Seu resultado estará disponível por mais:</p>
           <p style={{ color: "#C9A24A" }} className="font-bold text-lg">
             {formatTimeLeft(timeLeft)}
           </p>
