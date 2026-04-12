@@ -43,11 +43,11 @@ export function generateDeepSpiritualDiagnosis(
 
 function generateOverwhelmedDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado precisa de atenção.
+    opening: `${userName}, você está fazendo tudo certo.
 
-E não é porque você esteja fazendo algo errado.
+Mas está tudo errado.
 
-É porque você está fazendo TUDO.`,
+Porque você está fazendo TUDO.`,
 
     deepExplanation: `Você está vivendo uma fase onde a vida espiritual se tornou mais uma obrigação do que um encontro.
 
@@ -119,11 +119,11 @@ Precisa de permissão para parar. Permissão para descansar. Permissão para ser
 
 function generateDistantDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado é algo que você já sente faz tempo.
+    opening: `${userName}, Deus está em silêncio.
 
-Aquela sensação de que Deus está em silêncio.
+E você não sabe por quê.
 
-E você não sabe por quê.`,
+Mas você sente que algo está errado.`,
 
     deepExplanation: `Você tenta se aproximar de Deus. Tenta orar. Tenta buscar Sua presença.
 
@@ -199,11 +199,11 @@ Precisa apenas de um passo. Um pequeno passo em direção a Deus novamente.`,
 
 function generateConfusedDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado reflete algo que você já sente faz tempo.
+    opening: `${userName}, você está preso.
 
-Você não sabe qual caminho seguir.
+Não sabe qual caminho seguir.
 
-E isso está te paralisando.`,
+E cada dia que passa, a paralisia aumenta.`,
 
     deepExplanation: `Você tenta seguir Deus. Tenta obedecer. Tenta fazer o certo.
 
@@ -273,11 +273,11 @@ Precisa apenas de clareza sobre o que realmente importa. E de coragem para agir 
 
 function generateWeakDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado é algo que você já sente faz tempo.
+    opening: `${userName}, você perdeu sua força.
 
-Você perdeu aquela força que tinha.
+E cada dia fica mais fraco.
 
-E não sabe como recuperar.`,
+Mas você não sabe por quê.`,
 
     deepExplanation: `Você tenta manter a fé. Tenta ser forte. Tenta acreditar.
 
@@ -347,11 +347,11 @@ Precisa apenas de um passo. Um pequeno passo em direção a uma fé autêntica.`
 
 function generateLostDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado é algo que você já sente faz tempo.
+    opening: `${userName}, você está perdido.
 
-Você se perdeu em algum lugar.
+Muito perdido.
 
-E não sabe como voltar.`,
+E não sabe como voltar para casa.`,
 
     deepExplanation: `Você tenta encontrar seu caminho. Tenta seguir Deus. Tenta viver a fé.
 
@@ -419,11 +419,11 @@ Precisa apenas de um passo. Um pequeno passo em direção a casa.`,
 
 function generateDryDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado é algo que você já sente faz tempo.
+    opening: `${userName}, você está vazio.
 
-Você sente um vazio espiritual.
+Sua fé secou.
 
-E não sabe como preenchê-lo.`,
+E você não sabe como regar novamente.`,
 
     deepExplanation: `Você tenta se conectar com Deus. Tenta sentir Sua presença. Tenta viver a fé.
 
@@ -489,11 +489,11 @@ Precisa apenas de um passo. Um pequeno passo em direção à água viva.`,
 
 function generateGeneralDiagnosis(challenges: string[], userName: string): DeepDiagnosis {
   return {
-    opening: `${userName}, o que apareceu no seu resultado precisa de atenção.
+    opening: `${userName}, algo não está bem.
 
-Porque você está vivendo uma fase espiritual que pede reflexão.
+Você sente isso.
 
-E você já sente isso.`,
+Mas não sabe exatamente o quê.`,
 
     deepExplanation: `Você tenta viver a fé. Tenta seguir Deus. Tenta fazer o certo.
 
