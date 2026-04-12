@@ -52,11 +52,16 @@ const clearQuizSessionState = () => {
 
 export default function Result() {
   const [, setLocation] = useLocation();
-  const [result, setResult] = useState<AIResult | null>(null);
   const [responses, setResponses] = useState<Record<string, string> | null>(null);
   const [userName, setUserName] = useState<string>("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [timeLeft, setTimeLeft] = useState(86400);
+
+  // Fetch result using tRPC hook
+  const { data: trpcResult, isLoading } = trpc.quiz.getResult.useQuery();
+
+  // Get result from tRPC or fallback
+  const result = trpcResult || null;
 
   useEffect(() => {
     const storedUserName = sessionStorage.getItem("userName");
@@ -64,33 +69,24 @@ export default function Result() {
 
     if (storedUserName) setUserName(storedUserName);
     if (storedResponses) setResponses(JSON.parse(storedResponses));
-
-    const fetchResult = async () => {
-      try {
-        const result = await trpc.quiz.getResult.query();
-        if (result) {
-          setResult(result);
-          return;
-        }
-      } catch (error) {
-        console.error("Error fetching result:", error);
-      }
-      
-      const fallback = buildFallbackResult(storedResponses ? JSON.parse(storedResponses) : {});
-      setResult(fallback);
-    };
-
-    fetchResult();
-  }, []);
-
-  useEffect(() => {
+  }, []);  useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1));
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
+  // Show loading state while fetching
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p>Carregando seu diagnóstico...</p>
+        </div>
+      </div>
+    );
+  }
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
