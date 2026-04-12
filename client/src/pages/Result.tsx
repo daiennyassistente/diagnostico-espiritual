@@ -56,9 +56,22 @@ export default function Result() {
   const [userName, setUserName] = useState<string>("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [timeLeft, setTimeLeft] = useState(86400);
+  const [leadId, setLeadId] = useState<number | null>(null);
 
-  // Fetch result using tRPC hook
-  const { data: trpcResult, isLoading } = trpc.quiz.getResult.useQuery();
+  // Get leadId from URL query string
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('leadId');
+    if (id) {
+      setLeadId(parseInt(id, 10));
+    }
+  }, []);
+
+  // Fetch result using tRPC hook (only when leadId is available)
+  const { data: trpcResult, isLoading } = trpc.quiz.getResult.useQuery(
+    leadId ? { leadId } : undefined,
+    { enabled: !!leadId }
+  );
 
   // Get result from tRPC or fallback
   const result = trpcResult || null;

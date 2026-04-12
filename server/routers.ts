@@ -574,6 +574,47 @@ export const appRouter = router({
         }
       }),
 
+    getResult: publicProcedure
+      .input(z.object({ leadId: z.number() }))
+      .query(async ({ input }) => {
+        try {
+          const { getLeadById, getQuizResponseByLeadId, getDiagnosticByLeadId } = await import('./db');
+          
+          const lead = await getLeadById(input.leadId);
+          if (!lead) {
+            throw new Error('Lead not found');
+          }
+          
+          const quizResponse = await getQuizResponseByLeadId(input.leadId);
+          if (!quizResponse) {
+            throw new Error('Quiz response not found');
+          }
+          
+          const diagnostic = await getDiagnosticByLeadId(input.leadId);
+          if (!diagnostic) {
+            throw new Error('Diagnostic not found');
+          }
+          
+          // Converter diagnostic JSON strings para objetos
+          const parsedDiagnostic = {
+            ...diagnostic,
+            strengths: typeof diagnostic.strengths === 'string' ? JSON.parse(diagnostic.strengths) : diagnostic.strengths,
+            challenges: typeof diagnostic.challenges === 'string' ? JSON.parse(diagnostic.challenges) : diagnostic.challenges,
+            recommendations: typeof diagnostic.recommendations === 'string' ? JSON.parse(diagnostic.recommendations) : diagnostic.recommendations,
+            nextSteps: typeof diagnostic.nextSteps === 'string' ? JSON.parse(diagnostic.nextSteps) : diagnostic.nextSteps,
+          };
+          
+          return {
+            lead,
+            quizResponse,
+            diagnostic: parsedDiagnostic,
+          };
+        } catch (error: any) {
+          console.error('Get result error:', error);
+          throw new Error(`Erro ao buscar resultado: ${error.message}`);
+        }
+      }),
+
     processSecureFieldsPayment: publicProcedure
       .input(
         z.object({

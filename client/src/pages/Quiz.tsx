@@ -277,7 +277,12 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizNavigationStartedAt', String(Date.now()));
 
     const redirectTimer = window.setTimeout(() => {
-      setLocation('/result');
+      const leadId = localStorage.getItem('quizLeadId');
+      if (leadId) {
+        setLocation(`/result?leadId=${leadId}`);
+      } else {
+        setLocation('/result');
+      }
     }, 0);
 
     return () => {
@@ -457,7 +462,12 @@ export default function Quiz() {
         redirectedToResult = true;
         setIsNavigatingToResult(true);
         toast.success('Diagnóstico enviado com sucesso!');
-        setLocation('/result');
+        const leadId = leadResult.leadId;
+        if (leadId) {
+          setLocation(`/result?leadId=${leadId}`);
+        } else {
+          setLocation('/result');
+        }
         return;
       }
 
