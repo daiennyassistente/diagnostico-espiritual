@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Share2, RotateCcw, CheckCircle2, Zap, AlertCircle, Heart } from "lucide-react";
+import { Download, Loader2, Share2, RotateCcw, Zap, AlertCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { generateConversionCopy } from "@/lib/conversionCopy";
+import { generateIntimatePageCopy } from "@/lib/intimateCopy";
 
 interface AIResult {
   profileName: string;
@@ -150,8 +150,8 @@ export default function Result() {
     );
   }
 
-  // Gerar copywriting personalizado
-  const copy = generateConversionCopy(
+  // Gerar copywriting íntimo
+  const copy = generateIntimatePageCopy(
     result.profileName,
     result.profileDescription,
     result.challenges,
@@ -159,112 +159,84 @@ export default function Result() {
   );
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8 spiritual-background">
+    <div className="min-h-screen bg-background px-4 py-12 spiritual-background">
       <div className="max-w-2xl mx-auto">
-        {/* 🔴 1. HEADLINE FORTE E DIRETA */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#0B5FD3" }}>
-            {copy.headline}
-          </h1>
-          <p className="text-sm text-gray-600">
-            Seu diagnóstico espiritual personalizado está aqui
-          </p>
+        {/* 🔴 1. ABERTURA (CONEXÃO FORTE) */}
+        <div className="mb-12 text-center">
+          <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
+            {copy.opening}
+          </div>
         </div>
 
-        {/* 🟡 2. IDENTIFICAÇÃO + VALIDAÇÃO */}
-        <div className="mb-8 bg-white rounded-lg p-6 border-l-4" style={{ borderLeftColor: "#0B5FD3" }}>
-          <p className="text-gray-700 text-center leading-relaxed">
+        {/* 🟡 2. IDENTIFICAÇÃO PROFUNDA */}
+        <div className="mb-12 text-center">
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
             {copy.identification}
-          </p>
+          </div>
         </div>
 
-        {/* 🔵 3. REVELAÇÃO DO DIAGNÓSTICO */}
-        <div className="mb-8 bg-white rounded-lg p-6 border-l-4" style={{ borderLeftColor: "#C9A24A" }}>
-          <div className="flex items-start gap-3 mb-3">
-            <Heart size={24} style={{ color: "#C9A24A", flexShrink: 0 }} />
-            <div>
-              <h3 className="font-bold text-lg mb-2" style={{ color: "#0B5FD3" }}>
-                Seu diagnóstico é único
-              </h3>
-              <p className="text-gray-700 text-sm">
-                {result.profileDescription}
-              </p>
+        {/* 🔵 3. REVELAÇÃO */}
+        <div className="mb-12 bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#C9A24A" }}>
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
+            {copy.revelation}
+          </div>
+        </div>
+
+        {/* 🟠 4. DOR REAL (SEM EXAGERO) */}
+        <div className="mb-12 rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#DC2626", backgroundColor: "#FEE2E2" }}>
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line" style={{ color: "#991B1B" }}>
+            {copy.painReality}
+          </div>
+        </div>
+
+        {/* 🟢 5. ACOLHIMENTO */}
+        <div className="mb-12 text-center">
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
+            {copy.comfort}
+          </div>
+        </div>
+
+        {/* 🟣 6. VIRADA (ESPERANÇA) */}
+        <div className="mb-12 text-center">
+          <div className="text-base leading-relaxed font-semibold" style={{ color: "#0B5FD3" }}>
+            <div className="whitespace-pre-line">{copy.hope}</div>
+          </div>
+        </div>
+
+        {/* 🟤 7. APRESENTAÇÃO DA SOLUÇÃO */}
+        <div className="mb-12 bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#0B5FD3" }}>
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line mb-8">
+            {copy.solutionIntro}
+          </div>
+
+          {/* ⚫ 8. BENEFÍCIOS (SENTIMENTO, NÃO TÉCNICO) */}
+          <div className="mb-8">
+            <div className="text-sm leading-relaxed space-y-3">
+              {copy.benefits.map((benefit, idx) => (
+                <div key={idx} className="flex items-start gap-3 text-gray-700">
+                  <span style={{ color: "#C9A24A" }} className="text-lg flex-shrink-0 mt-1">
+                    ✔
+                  </span>
+                  <span className="text-sm">{benefit}</span>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* 🟠 4. ESCALADA DE DOR (IMPORTANTE) */}
-        <div className="mb-8 rounded-lg p-6 border-l-4" style={{ borderLeftColor: "#DC2626", backgroundColor: "#FEE2E2" }}>
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: "#DC2626" }}>
-            <AlertCircle size={20} />
-            Se você continuar assim...
-          </h2>
-          <p className="text-gray-700 text-sm leading-relaxed">
-            {copy.painEscalation}
-          </p>
-        </div>
-
-        {/* 🟢 5. VIRADA (ESPERANÇA) */}
-        <div className="mb-8 text-center">
-          <p className="text-lg font-bold" style={{ color: "#0B5FD3" }}>
-            {copy.hope}
-          </p>
-        </div>
-
-        {/* 🟣 6. APRESENTAÇÃO DO PRODUTO */}
-        <div className="mb-8 bg-white rounded-lg p-8 border-l-4" style={{ borderLeftColor: "#0B5FD3" }}>
-          <h3 className="text-2xl font-bold text-center mb-4" style={{ color: "#0B5FD3" }}>
-            {copy.productTitle}
-          </h3>
-          <p className="text-gray-700 text-center text-sm leading-relaxed mb-4">
-            {copy.productDescription}
-          </p>
-
-          {/* 🟤 7. BENEFÍCIOS (EM BULLET POINTS) */}
-          <h4 className="font-bold text-lg mb-4 text-center" style={{ color: "#0B5FD3" }}>
-            O que você vai ganhar:
-          </h4>
-          <ul className="space-y-3 mb-6">
-            {copy.benefits.map((benefit, idx) => (
-              <li key={idx} className="flex items-start gap-3 text-gray-700 text-sm">
-                <span style={{ color: "#C9A24A" }} className="text-lg flex-shrink-0">
-                  {benefit.split(" ")[0]}
-                </span>
-                <span>{benefit.substring(benefit.indexOf(" ") + 1)}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* 🔴 8. PROVA SOCIAL */}
-          <div className="text-center mb-6 p-4 rounded-lg" style={{ backgroundColor: "#F5F1E8" }}>
-            <p className="text-sm font-semibold" style={{ color: "#0B5FD3" }}>
-              ✨ {copy.socialProof}
-            </p>
+          {/* 🔴 9. URGÊNCIA SUAVE + EMOCIONAL */}
+          <div className="rounded-lg p-6 mb-8" style={{ backgroundColor: "#F5F1E8" }}>
+            <div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line italic">
+              {copy.urgency}
+            </div>
           </div>
 
-          {/* ⚫ 9. URGÊNCIA FORTE */}
-          <div className="rounded-lg p-4 mb-6" style={{ borderLeftColor: "#DC2626", backgroundColor: "#FEE2E2", borderLeft: "4px solid #DC2626" }}>
-            <h4 className="font-bold mb-2 flex items-center gap-2" style={{ color: "#DC2626" }}>
-              <Zap size={18} />
-              Atenção: Seu resultado expira em {formatTimeLeft(timeLeft)}
-            </h4>
-            <p style={{ color: "#DC2626" }} className="text-xs leading-relaxed">
-              {copy.urgencyMessage}
-            </p>
-          </div>
-
-          {/* 🟢 11. FECHAMENTO EMOCIONAL */}
-          <p className="text-gray-700 text-center text-sm leading-relaxed mb-6 italic">
-            "{copy.closingStatement}"
-          </p>
-
-          {/* 🟡 10. CTA (BOTÃO) */}
+          {/* 🟡 10. CTA */}
           <button
             onClick={() => {
               const checkoutUrl = `${window.location.origin}/checkout`;
               window.open(checkoutUrl, "_blank");
             }}
-            className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 mb-2"
+            className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 mb-4"
             style={{ backgroundColor: "#FFD700", color: "#000" }}
           >
             <Zap size={20} className="inline mr-2" />
@@ -272,9 +244,16 @@ export default function Result() {
           </button>
 
           {/* 🟢 11. PREÇO */}
-          <p className="text-center font-semibold" style={{ color: "#C9A24A" }}>
-            R$ 12,90 — Menos que um café ☕
+          <p className="text-center text-sm leading-relaxed text-gray-700 whitespace-pre-line">
+            {copy.priceMessage}
           </p>
+        </div>
+
+        {/* PENSAMENTO DE FECHAMENTO */}
+        <div className="mb-12 text-center">
+          <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line italic">
+            {copy.closingThought}
+          </div>
         </div>
 
         {/* AÇÕES SECUNDÁRIAS */}
