@@ -288,9 +288,9 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 8: APRESENTAÇÃO DA SOLUÇÃO */}
-        <section className="quiz-card mb-12 text-slate-900" style={{ backgroundColor: "#D0E8FF" }}>
+        <section className="quiz-card mb-12 text-slate-900" style={{ backgroundColor: "#F5EFE0" }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>✨ Seu plano de transformação</h2>
-          <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8">
+          <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8 text-center">
             {spiritualCopy.solutionIntro.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}

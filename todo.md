@@ -698,3 +698,5 @@
 - [x] Mudar a cor do título principal para o mesmo azul dos subtítulos
 - [x] Inserir aviso "não esqueça de rolar até o final" no topo da página de resultado
 - [x] Mudar o card da oferta para um tom de azul mais claro
+- [x] Mudar cor de fundo do card "Seu plano de transformação" para bege claro
+- [x] Centralizar o texto "Por isso existe..." ao card da oferta
