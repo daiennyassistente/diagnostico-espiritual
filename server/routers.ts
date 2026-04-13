@@ -856,6 +856,57 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
       }),
   }),
 
+  payment: router({
+    verifyMercadoPagoPayment: publicProcedure
+      .input(z.object({ externalReference: z.string() }))
+      .query(async ({ input }) => {
+        try {
+          const { verifyMercadoPagoPayment } = await import("./_core/mercadopago");
+          const paymentInfo = await verifyMercadoPagoPayment(input.externalReference);
+          
+          if (paymentInfo && paymentInfo.approved) {
+            const db = await getDb();
+            if (db && paymentInfo.payer_email) {
+              const leadData = await db
+                .select()
+                .from(leads)
+                .where(eq(leads.email, paymentInfo.payer_email))
+                .limit(1);
+
+              if (leadData.length > 0) {
+                const leadId = leadData[0].id;
+                const downloadToken = Buffer.from(`${leadId}-${paymentInfo.id}-${Date.now()}`).toString('base64');
+                
+                const existing = await db
+                  .select()
+                  .from(payments)
+                  .where(eq(payments.mercadopagoPaymentId, paymentInfo.id.toString()))
+                  .limit(1);
+
+                if (existing.length === 0) {
+                  await db.insert(payments).values({
+                    leadId: leadId,
+                    mercadopagoPaymentId: paymentInfo.id.toString(),
+                    amount: Math.round(paymentInfo.amount),
+                    status: "succeeded",
+                    productName: "Devocional: 7 Dias para se Aproximar de Deus",
+                    downloadToken: downloadToken,
+                  });
+
+                  console.log(`[Verify Payment] Payment recorded for lead ${leadId}`);
+                }
+              }
+            }
+          }
+          
+          return paymentInfo;
+        } catch (error: any) {
+          console.error("Verify payment error:", error);
+          throw new Error("Erro ao verificar pagamento");
+        }
+      }),
+  }),
+
   download: router({
     downloadResult: publicProcedure
       .input(z.object({ token: z.string() }))

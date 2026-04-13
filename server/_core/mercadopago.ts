@@ -52,7 +52,7 @@ export async function createMercadoPagoPreference(options: {
           failure: options.failureUrl,
           pending: options.pendingUrl,
         },
-        auto_return: "approved",
+        auto_return: "all",
         payment_methods: {
           excluded_payment_types: [
             {
@@ -84,4 +84,37 @@ export function getMercadoPagoInitPoint(preference: any): string | null {
   
   // Fallback para init_point se wallet_purchase não existir
   return initPoint;
+}
+
+export async function verifyMercadoPagoPayment(externalReference: string): Promise<any> {
+  try {
+    const { MercadoPagoConfig, Payment } = await import("mercadopago");
+    
+    const client = new MercadoPagoConfig({
+      accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "",
+    });
+
+    const paymentClient = new Payment(client);
+    
+    // Buscar pagamentos com a referência externa
+    const response = await paymentClient.search({
+      external_reference: externalReference,
+    } as any);
+
+    if (response && response.results && response.results.length > 0) {
+      const payment = response.results[0];
+      return {
+        id: payment.id,
+        status: payment.status,
+        amount: payment.transaction_amount,
+        payer_email: payment.payer?.email,
+        approved: payment.status === "approved",
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("[Mercado Pago] Error verifying payment:", error);
+    throw error;
+  }
 }
