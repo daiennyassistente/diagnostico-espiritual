@@ -129,6 +129,26 @@ describe('generateSpiritualPageCopy - Verdade Bíblica + Graça + Esperança', (
       expect(copy.hope).toContain('pode mudar');
       expect(copy.hope).toContain('Deus');
     });
+
+    it('should provide Result-page fields as non-empty strings safe for split rendering', () => {
+      const copy = generateSpiritualPageCopy(
+        'você está confuso',
+        'Você está em confusão',
+        mockChallenges,
+        'Test'
+      );
+
+      expect(typeof copy.hope).toBe('string');
+      expect(typeof copy.solutionIntro).toBe('string');
+      expect(typeof copy.internalCall).toBe('string');
+      expect(typeof copy.ctaPrimary).toBe('string');
+      expect(typeof copy.priceMessage).toBe('string');
+      expect(typeof copy.closingReflection).toBe('string');
+
+      expect(copy.hope.split('\n\n').length).toBeGreaterThan(0);
+      expect(copy.solutionIntro.split('\n\n').length).toBeGreaterThan(0);
+      expect(copy.closingReflection.split('\n\n').length).toBeGreaterThan(0);
+    });
   });
 
   describe('Perfil: Overwhelmed (Sobrecarregado)', () => {

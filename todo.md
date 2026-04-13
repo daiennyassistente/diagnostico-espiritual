@@ -692,3 +692,4 @@
 - [x] Corrigir fallback de leadId para usar parâmetro da URL ou quizLeadId persistido
 - [x] Adicionar teste unitário para a lógica de recuperação de leadId e respostas persistidas
 - [x] Localizar erro estrutural entre Result.tsx e deepSpiritualDiagnosis.ts (campos como hope/solution/finalReflection não existem no objeto retornado)
+- [x] Corrigir erro runtime em /result causado por uso de propriedades indefinidas com split em Result.tsx

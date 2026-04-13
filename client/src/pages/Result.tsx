@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { generateDeepSpiritualDiagnosis } from "@/lib/deepSpiritualDiagnosis";
 import { generatePersonalizedTitle } from "@/lib/personalizedTitles";
+import { generateSpiritualPageCopy } from "@/lib/spiritualCopy";
 import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState";
 
 interface AIResult {
@@ -160,6 +161,13 @@ export default function Result() {
     userName
   );
 
+  const spiritualCopy = generateSpiritualPageCopy(
+    result.profileName,
+    result.profileDescription,
+    result.challenges,
+    userName
+  );
+
   // Cores
   const AZUL_PROFUNDO = "#1E40AF";
   const OURO = "#D4AF37";
@@ -256,7 +264,7 @@ export default function Result() {
         <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Há esperança</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.hope.split('\n\n').map((paragraph, idx) => (
+            {spiritualCopy.hope.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}
           </div>
@@ -276,7 +284,7 @@ export default function Result() {
         <section className="quiz-card mb-12 text-white" style={{ backgroundColor: AZUL_PROFUNDO }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: OURO }}>✨ Seu plano de transformação</h2>
           <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8">
-            {diagnosis.solution.split('\n\n').map((paragraph, idx) => (
+            {spiritualCopy.solutionIntro.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}
           </div>
@@ -285,7 +293,7 @@ export default function Result() {
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-4">O que você vai conseguir:</h3>
             <ul className="space-y-3">
-              {diagnosis.benefits.map((benefit, idx) => (
+              {spiritualCopy.benefits.map((benefit, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span style={{ color: OURO }} className="text-xl">✔</span>
                   <span>{benefit}</span>
@@ -297,7 +305,7 @@ export default function Result() {
           {/* Chamado interno */}
           <div className="bg-white bg-opacity-10 p-6 rounded-lg border border-white border-opacity-20 mb-8">
             <p className="text-center text-lg font-medium">
-              {diagnosis.internalCall}
+              {spiritualCopy.internalCall}
             </p>
           </div>
 
@@ -308,12 +316,12 @@ export default function Result() {
             style={{ backgroundColor: OURO, color: "#000" }}
           >
             <Zap className="w-5 h-5 mr-2" />
-            {diagnosis.cta}
+            {spiritualCopy.ctaPrimary}
           </Button>
 
           {/* Preço */}
           <p className="text-center text-sm mt-4 text-gray-300">
-            {diagnosis.price}
+            {spiritualCopy.priceMessage}
           </p>
         </section>
 
@@ -321,7 +329,7 @@ export default function Result() {
         <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Você merece</h2>
           <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.finalReflection.split('\n\n').map((paragraph, idx) => (
+            {spiritualCopy.closingReflection.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
             ))}
           </div>
