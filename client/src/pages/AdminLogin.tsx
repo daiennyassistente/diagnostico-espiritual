@@ -43,7 +43,7 @@ export function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg bg-white">
+      <Card className="w-full max-w-md shadow-lg">
         <div className="p-8">
           <h1 className="text-2xl font-bold text-center mb-2 text-amber-900">
             Área Administrativa

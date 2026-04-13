@@ -721,3 +721,4 @@
 - [x] Deixar o card "Diagnóstico" (seu perfil...) com fundo branco também
 - [x] Deixar o fundo de todos os cards de todas as páginas brancos (#ffffff), exceto o card "Comece por aqui"
 - [x] Mudar todas as caixas de texto para branco, exceto "Comece por aqui" que permanece azul
+- [x] Deixar APENAS as caixas de texto "dai, seu perfil atual aponta para..." e "Seu devocional de 7 dias foi pensado..." com fundo branco, reverter as demais

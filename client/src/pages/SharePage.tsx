@@ -103,7 +103,7 @@ export default function SharePage() {
   if (loading) {
     return (
       <div className="spiritual-background min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center bg-white">
+        <Card className="w-full max-w-md p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="mt-4 text-muted-foreground">Carregando...</p>
         </Card>
@@ -113,7 +113,7 @@ export default function SharePage() {
 
   return (
     <div className="spiritual-background min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 bg-white">
+      <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Seus Documentos

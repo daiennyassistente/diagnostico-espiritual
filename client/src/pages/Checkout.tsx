@@ -131,7 +131,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
             {/* Opção 1: Secure Fields */}
             <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C] bg-white">
               <div onClick={() => setPaymentMethod("secure-fields")} className="space-y-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#ffffff" }}>
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
                   <CreditCard className="w-6 h-6" style={{ color: "#3E342C" }} />
                 </div>
                 <h2 className="text-xl font-semibold" style={{ color: "#4A3F35" }}>
@@ -158,7 +158,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
             {/* Opção 2: Mercado Pago Preference */}
             <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C] bg-white">
               <div onClick={() => setPaymentMethod("preference")} className="space-y-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#ffffff" }}>
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
                   <Zap className="w-6 h-6" style={{ color: "#3E342C" }} />
                 </div>
                 <h2 className="text-xl font-semibold" style={{ color: "#4A3F35" }}>
