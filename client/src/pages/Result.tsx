@@ -329,7 +329,7 @@ export default function Result() {
   return (
     <div className="spiritual-background min-h-screen py-10 px-4">
       <div className="container max-w-5xl">
-        <section className="quiz-card mb-8 border border-accent/40 bg-[#FAF4E7] backdrop-blur">
+        <section className="quiz-card mb-8 border border-accent/40 bg-white backdrop-blur">
           <div className="flex items-start gap-3 mb-4">
             <Sparkles className="w-6 h-6 text-primary mt-1" />
             <div>
