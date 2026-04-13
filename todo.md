@@ -720,3 +720,4 @@
 - [x] Ajustar cores finais: cards maiores com fundo bege/barro (#FAF4E7), cards "Diagnóstico", "Pontos de Força" e "Bloqueios" com fundo branco
 - [x] Deixar o card "Diagnóstico" (seu perfil...) com fundo branco também
 - [x] Deixar o fundo de todos os cards de todas as páginas brancos (#ffffff), exceto o card "Comece por aqui"
+- [x] Mudar todas as caixas de texto para branco, exceto "Comece por aqui" que permanece azul

@@ -592,7 +592,7 @@ export default function Quiz() {
                   placeholder="+55 (11) 99999-9999"
                   value={leadData.whatsapp}
                   onChange={(e) => setLeadData({ ...leadData, whatsapp: formatWhatsApp(e.target.value) })}
-                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 bg-card/90"
+                   className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 bg-white"
                 />
               </div>
 
@@ -618,9 +618,7 @@ export default function Quiz() {
               </div>
 
               <Button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
-              >
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold resize-none bg-white"          >
                 Ver meu diagnóstico espiritual
               </Button>
 
@@ -684,7 +682,7 @@ export default function Quiz() {
                   }));
                   setHasStarted(true);
                 }}
-                className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 w-full min-h-[100px] resize-none bg-card/90"
+                className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 w-full min-h-[100px] resize-none bg-white"
               />
             )}
           </div>

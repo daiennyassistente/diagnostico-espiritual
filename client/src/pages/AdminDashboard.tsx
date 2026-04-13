@@ -117,7 +117,7 @@ function SectionHeading({
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <Card className="rounded-[28px] border border-dashed border-border/80 bg-white/80 p-10 text-center shadow-sm">
+    <Card className="rounded-[28px] border border-dashed border-border/80 bg-white p-10 text-center shadow-sm">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
         <BookHeart className="h-6 w-6" />
       </div>
@@ -141,7 +141,7 @@ function MetricCard({
   helper: string;
 }) {
   return (
-    <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-sm">
+    <Card className="rounded-[28px] border border-border/60 bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
@@ -280,7 +280,7 @@ export function AdminDashboard() {
           {Array.from({ length: 4 }).map((_, index) => (
             <Card
               key={index}
-              className="h-36 animate-pulse rounded-[28px] border border-border/60 bg-white/85 shadow-sm"
+              className="h-36 animate-pulse rounded-[28px] border border-border/60 bg-white shadow-sm"
             />
           ))}
         </div>
@@ -311,7 +311,7 @@ export function AdminDashboard() {
               placeholder="Buscar por nome, email ou telefone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-muted-foreground">Data de Início</label>
@@ -319,7 +319,7 @@ export function AdminDashboard() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -328,7 +328,7 @@ export function AdminDashboard() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             {(startDate || endDate) && (
@@ -337,7 +337,7 @@ export function AdminDashboard() {
                   setStartDate("");
                   setEndDate("");
                 }}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground hover:bg-muted transition-colors"
               >
                 Limpar datas
               </button>
@@ -374,7 +374,7 @@ export function AdminDashboard() {
               description="Assim que pessoas responderem o quiz, elas aparecerão aqui com suas informações de contato e data de resposta."
             />
           ) : (
-            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white/90 shadow-lg">
+            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white shadow-lg">
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead className="bg-secondary/70 text-left">
@@ -514,7 +514,7 @@ export function AdminDashboard() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -523,7 +523,7 @@ export function AdminDashboard() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             {(startDate || endDate) && (
@@ -532,7 +532,7 @@ export function AdminDashboard() {
                   setStartDate("");
                   setEndDate("");
                 }}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground hover:bg-muted transition-colors"
               >
                 Limpar datas
               </button>
@@ -566,7 +566,7 @@ export function AdminDashboard() {
               description="Assim que alguém completar a compra do devocional, os dados aparecerão aqui com status de pagamento e informações de transação."
             />
           ) : (
-            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white/90 shadow-lg">
+            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white shadow-lg">
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead className="bg-secondary/70 text-left">
@@ -646,7 +646,7 @@ export function AdminDashboard() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -655,7 +655,7 @@ export function AdminDashboard() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           {(startDate || endDate) && (
@@ -664,7 +664,7 @@ export function AdminDashboard() {
                 setStartDate("");
                 setEndDate("");
               }}
-              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+              className="px-4 py-2 rounded-lg border border-border/60 bg-white text-foreground hover:bg-muted transition-colors"
             >
               Limpar datas
             </button>
@@ -706,7 +706,7 @@ export function AdminDashboard() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+          <Card className="rounded-[28px] border border-border/60 bg-white p-6 shadow-lg">
             <h3 className="mb-4 text-lg font-semibold text-foreground">Leads e compras por dia</h3>
             <p className="mb-4 text-sm text-muted-foreground">Evolução do funil com base nas entradas reais dos últimos 30 dias.</p>
             <ResponsiveContainer width="100%" height={300}>
@@ -722,7 +722,7 @@ export function AdminDashboard() {
             </ResponsiveContainer>
           </Card>
 
-          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+          <Card className="rounded-[28px] border border-border/60 bg-white p-6 shadow-lg">
             <h3 className="mb-4 text-lg font-semibold text-foreground">Distribuição de perfis</h3>
             <p className="mb-4 text-sm text-muted-foreground">Perfis espirituais mais recorrentes entre os diagnósticos salvos.</p>
             {(!summary?.perfilDistribuicao || summary.perfilDistribuicao.length === 0) ? (
@@ -753,7 +753,7 @@ export function AdminDashboard() {
           </Card>
         </div>
 
-        <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+        <Card className="rounded-[28px] border border-border/60 bg-white p-6 shadow-lg">
           <h3 className="mb-4 text-lg font-semibold text-foreground">Receita diária confirmada</h3>
           <p className="mb-4 text-sm text-muted-foreground">Valores aprovados no checkout do devocional, ligados aos compradores reais.</p>
           <ResponsiveContainer width="100%" height={300}>
@@ -778,7 +778,7 @@ export function AdminDashboard() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {latestDiagnostics.map((diag) => (
-                <Card key={diag.id} className="rounded-[28px] border border-border/60 bg-white/90 p-5 shadow-sm">
+                <Card key={diag.id} className="rounded-[28px] border border-border/60 bg-white p-5 shadow-sm">
                   <p className="font-semibold text-foreground">{diag.profileName}</p>
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{diag.profileDescription}</p>
                   <p className="mt-3 text-xs text-muted-foreground">{formatDateTime(diag.createdAt)}</p>

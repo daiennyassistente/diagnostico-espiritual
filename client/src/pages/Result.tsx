@@ -352,7 +352,7 @@ export default function Result() {
             <h2 className="text-2xl font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
             <ul className="space-y-3 text-[#27405F]">
               {result.strengths.map((item, index) => (
-                <li key={index} className="rounded-lg bg-white/85 px-4 py-3 border border-[#E5D5B1]">
+                <li key={index} className="rounded-lg bg-white px-4 py-3 border border-[#E5D5B1]">
                   {item}
                 </li>
               ))}
@@ -363,7 +363,7 @@ export default function Result() {
             <h2 className="text-2xl font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
             <ul className="space-y-3 text-[#27405F]">
               {result.challenges.map((item, index) => (
-                <li key={index} className="rounded-lg bg-white/85 px-4 py-3 border border-[#E5D5B1]">
+                <li key={index} className="rounded-lg bg-white px-4 py-3 border border-[#E5D5B1]">
                   {item}
                 </li>
               ))}
@@ -389,9 +389,9 @@ export default function Result() {
           </p>
 
           <div className="grid gap-3 md:grid-cols-3 mb-8 text-sm">
-            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Textos e reflexões conectados ao seu perfil espiritual atual.</div>
-            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Aplicações práticas baseadas nas dificuldades que você relatou.</div>
-            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Um caminho simples para voltar à constância sem sobrecarga espiritual.</div>
+            <div className="rounded-xl bg-white border border-[#E6D4AE] px-4 py-4">Textos e reflexões conectados ao seu perfil espiritual atual.</div>
+            <div className="rounded-xl bg-white border border-[#E6D4AE] px-4 py-4">Aplicações práticas baseadas nas dificuldades que você relatou.</div>
+            <div className="rounded-xl bg-white border border-[#E6D4AE] px-4 py-4">Um caminho simples para voltar à constância sem sobrecarga espiritual.</div>
           </div>
 
           <Button
