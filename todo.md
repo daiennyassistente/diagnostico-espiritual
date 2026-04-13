@@ -681,3 +681,14 @@
 - [x] Implementar Secure Fields para captura de cartão
 - [x] Testar integração com novos requisitos
 - [x] Validar índice de aprovação no Mercado Pago (testado com pagamento real - Pix funcionando, cartão recusado em teste)
+
+## Bug Atual - Página de resultado não carrega
+- [ ] Investigar por que a página /result não está carregando, sem alterar design nem geração de conteúdo
+- [ ] Corrigir o fluxo de carregamento da página de resultado sem mexer no layout, cores ou copy
+- [ ] Validar no navegador que a página /result volta a carregar corretamente
+
+## Investigação da Página de Resultado (Abr/2026)
+- [x] Localizar incompatibilidade entre o storage usado no Quiz (localStorage) e o storage lido em Result.tsx
+- [x] Corrigir fallback de leadId para usar parâmetro da URL ou quizLeadId persistido
+- [x] Adicionar teste unitário para a lógica de recuperação de leadId e respostas persistidas
+- [x] Localizar erro estrutural entre Result.tsx e deepSpiritualDiagnosis.ts (campos como hope/solution/finalReflection não existem no objeto retornado)

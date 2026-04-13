@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { generateDeepSpiritualDiagnosis } from "@/lib/deepSpiritualDiagnosis";
 import { generatePersonalizedTitle } from "@/lib/personalizedTitles";
+import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState";
 
 interface AIResult {
   profileName: string;
@@ -40,22 +41,34 @@ export default function Result() {
   const [leadId, setLeadId] = useState<number | null>(null);
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
 
-  // Get leadId from URL query string
+  // Get leadId from URL query string, with localStorage fallback
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('leadId');
-    if (id) {
-      setLeadId(parseInt(id, 10));
+    const resolvedLeadId = resolveLeadIdFromSources(
+      window.location.search,
+      window.localStorage.getItem('quizLeadId')
+    );
+
+    if (resolvedLeadId) {
+      setLeadId(resolvedLeadId);
     }
   }, []);
 
-  // Get stored data
+  // Get stored data from the latest persisted source
   useEffect(() => {
-    const storedUserName = sessionStorage.getItem("userName");
-    const storedResponses = sessionStorage.getItem("quizResponses");
+    const storedQuizState = readStoredQuizState({
+      sessionUserName: window.sessionStorage.getItem("userName"),
+      localUserName: window.localStorage.getItem("userName"),
+      localResponses: window.localStorage.getItem("quizResponses"),
+      sessionResponses: window.sessionStorage.getItem("quizResponses"),
+    });
 
-    if (storedUserName) setUserName(storedUserName);
-    if (storedResponses) setResponses(JSON.parse(storedResponses));
+    if (storedQuizState.userName) {
+      setUserName(storedQuizState.userName);
+    }
+
+    if (storedQuizState.responses) {
+      setResponses(storedQuizState.responses);
+    }
   }, []);
 
   // Timer
@@ -111,6 +124,17 @@ export default function Result() {
   }, [trpcResult, isGeneratingDiagnosis, responses, leadId, generateDiagnosisMutation, refetch]);
 
   // Show loading state while fetching
+  if (!leadId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center spiritual-background">
+        <div className="text-center relative z-10">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#1E40AF" }} />
+          <p className="text-foreground font-medium">Preparando seu resultado...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading || !trpcResult || !trpcResult.diagnostic || isGeneratingDiagnosis) {
     return (
       <div className="min-h-screen flex items-center justify-center spiritual-background">
