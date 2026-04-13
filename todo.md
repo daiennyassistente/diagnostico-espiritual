@@ -714,3 +714,4 @@
 - [x] Investigar e corrigir a falta de personalização dos resultados do quiz
 - [x] Ajustar a paleta visual para azul e dourado, com caixas de texto bege/brancas e títulos azuis
 - [x] Corrigir o redesign excessivo e ajustar somente o fundo para um bege claro, preservando o restante do padrão visual
+- [x] Remover os cards "O que revelou no quiz" e "O que faz sentido para sua próxima semana" da página de resultado
