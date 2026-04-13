@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { handleStripeWebhook } from "../stripe-webhook";
 import { handleMercadoPagoWebhook } from "../mercadopago-webhook";
 import { testMercadoPagoWebhook } from "../test-webhook";
 import { createOrUpdateAdminUser } from "../db";
@@ -41,6 +42,14 @@ async function startServer() {
 
   const app = express();
   const server = createServer(app);
+  
+  // Stripe webhook must be registered BEFORE express.json() to access raw body
+  app.post(
+    "/api/stripe/webhook",
+    express.raw({ type: "application/json" }),
+    handleStripeWebhook
+  );
+
   // Mercado Pago webhook
   app.post(
     "/api/mercadopago/webhook",
