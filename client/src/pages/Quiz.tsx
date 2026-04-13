@@ -493,7 +493,7 @@ export default function Quiz() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full">
           <div className="text-center space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+            <h1 className="text-4xl md:text-5xl font-bold text-primary">
               Diagnóstico Espiritual
             </h1>
             <p className="text-lg text-foreground/80 leading-relaxed">
@@ -528,7 +528,7 @@ export default function Quiz() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
         <div className="quiz-card max-w-2xl w-full text-center space-y-8">
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold text-foreground">
+            <h2 className="text-3xl font-bold text-primary">
               {PROCESSING_MESSAGES[visibleProcessingStep]}
             </h2>
             <p className="text-foreground/60">
@@ -573,7 +573,7 @@ export default function Quiz() {
         <div className="quiz-card max-w-2xl w-full">
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-2">
+              <h2 className="text-3xl font-bold text-primary mb-2">
                 Seu diagnóstico está pronto
               </h2>
               <p className="text-foreground/80">
@@ -592,7 +592,7 @@ export default function Quiz() {
                   placeholder="+55 (11) 99999-9999"
                   value={leadData.whatsapp}
                   onChange={(e) => setLeadData({ ...leadData, whatsapp: formatWhatsApp(e.target.value) })}
-                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3"
+                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 bg-card/90"
                 />
               </div>
 
@@ -606,7 +606,7 @@ export default function Quiz() {
                   placeholder="seu@email.com"
                   value={leadData.email}
                   onChange={(e) => setLeadData({ ...leadData, email: e.target.value })}
-                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3"
+                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 bg-card/90"
                 />
               </div>
 
@@ -654,7 +654,7 @@ export default function Quiz() {
 
           {/* Question */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6">
+            <h2 className="text-2xl font-bold text-primary mb-6">
               {step.question}
             </h2>
 
@@ -684,7 +684,7 @@ export default function Quiz() {
                   }));
                   setHasStarted(true);
                 }}
-                className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 w-full min-h-[100px] resize-none"
+                className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 w-full min-h-[100px] resize-none bg-card/90"
               />
             )}
           </div>
@@ -695,7 +695,7 @@ export default function Quiz() {
               onClick={handlePrevious}
               disabled={currentStep === 1}
               variant="outline"
-              className="flex-1"
+              className="flex-1 border-primary/30 text-primary hover:bg-primary/8"
             >
               ← Voltar
             </Button>

@@ -46,60 +46,60 @@
 
 :root {
   /* Paleta Diagnóstico Espiritual */
-  --primary: #3E342C;
-  --primary-foreground: #FFFFFF;
-  --background: #F5F1EA;
-  --foreground: #4A3F35;
-  --card: #FFFFFF;
-  --card-foreground: #4A3F35;
-  --popover: #FFFFFF;
-  --popover-foreground: #4A3F35;
-  --secondary: #E8E1D8;
-  --secondary-foreground: #4A3F35;
-  --muted: #D4C9BD;
-  --muted-foreground: #7A6F65;
-  --accent: #3E342C;
-  --accent-foreground: #FFFFFF;
+  --primary: #1E4E8C;
+  --primary-foreground: #FDFBF4;
+  --background: #F7F2E8;
+  --foreground: #27405F;
+  --card: #FFFDF8;
+  --card-foreground: #27405F;
+  --popover: #FFFDF8;
+  --popover-foreground: #27405F;
+  --secondary: #EED9A1;
+  --secondary-foreground: #4C3A15;
+  --muted: #E8DCC7;
+  --muted-foreground: #6E6250;
+  --accent: #C9A54C;
+  --accent-foreground: #1D2F45;
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #D4C9BD;
-  --input: #F5F1EA;
-  --ring: #3E342C;
+  --border: #DCCBAE;
+  --input: #FFF9EF;
+  --ring: #1E4E8C;
   --radius: 0.875rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #4A3F35;
-  --sidebar-accent: #3E342C;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #D4C9BD;
-  --sidebar-ring: #3E342C;
+  --sidebar: #FFFDF8;
+  --sidebar-foreground: #27405F;
+  --sidebar-accent: #1E4E8C;
+  --sidebar-accent-foreground: #FDFBF4;
+  --sidebar-border: #DCCBAE;
+  --sidebar-ring: #1E4E8C;
 }
 
 .dark {
-  --primary: #3E342C;
-  --primary-foreground: #FFFFFF;
-  --background: #F5F1EA;
-  --foreground: #4A3F35;
-  --card: #FFFFFF;
-  --card-foreground: #4A3F35;
-  --popover: #FFFFFF;
-  --popover-foreground: #4A3F35;
-  --secondary: #E8E1D8;
-  --secondary-foreground: #4A3F35;
-  --muted: #D4C9BD;
-  --muted-foreground: #7A6F65;
-  --accent: #3E342C;
-  --accent-foreground: #FFFFFF;
+  --primary: #1E4E8C;
+  --primary-foreground: #FDFBF4;
+  --background: #F7F2E8;
+  --foreground: #27405F;
+  --card: #FFFDF8;
+  --card-foreground: #27405F;
+  --popover: #FFFDF8;
+  --popover-foreground: #27405F;
+  --secondary: #EED9A1;
+  --secondary-foreground: #4C3A15;
+  --muted: #E8DCC7;
+  --muted-foreground: #6E6250;
+  --accent: #C9A54C;
+  --accent-foreground: #1D2F45;
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #D4C9BD;
-  --input: #F5F1EA;
-  --ring: #3E342C;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #4A3F35;
-  --sidebar-accent: #3E342C;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #D4C9BD;
-  --sidebar-ring: #3E342C;
+  --border: #DCCBAE;
+  --input: #FFF9EF;
+  --ring: #1E4E8C;
+  --sidebar: #FFFDF8;
+  --sidebar-foreground: #27405F;
+  --sidebar-accent: #1E4E8C;
+  --sidebar-accent-foreground: #FDFBF4;
+  --sidebar-border: #DCCBAE;
+  --sidebar-ring: #1E4E8C;
 }
 
 @layer base {
@@ -173,8 +173,10 @@
   
   /* Quiz Card Styling */
   .quiz-card {
-    @apply bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-2xl mx-auto relative;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 245, 240, 0.98) 100%);
+    @apply rounded-2xl shadow-lg p-6 md:p-8 max-w-2xl mx-auto relative;
+    background: linear-gradient(135deg, rgba(255, 253, 248, 0.98) 0%, rgba(247, 242, 232, 0.98) 100%);
+    border: 1px solid rgba(201, 165, 76, 0.28);
+    box-shadow: 0 24px 60px rgba(30, 78, 140, 0.12);
   }
   
   .quiz-card::before {
@@ -195,9 +197,9 @@
     padding: 1rem !important;
     padding-right: 3rem !important;
     border-radius: 0.875rem !important;
-    border: 2px solid #D4C9BD !important;
-    background-color: #FFFFFF !important;
-    color: #4A3F35 !important;
+    border: 2px solid #DCCBAE !important;
+    background-color: #FFFDF8 !important;
+    color: #27405F !important;
     font-weight: 500 !important;
     font-size: 1rem !important;
     text-align: center !important;
@@ -208,26 +210,26 @@
   }
   
   .quiz-button:hover:not(.selected) {
-    background-color: #F0E8E0 !important;
-    border-color: #8B7355 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    background-color: #F7F1E4 !important;
+    border-color: #C9A54C !important;
+    box-shadow: 0 8px 22px rgba(30, 78, 140, 0.12) !important;
   }
   
   .quiz-button.selected {
-    background-color: #2A1F1A !important;
-    color: #FFFFFF !important;
-    border-color: #2A1F1A !important;
+    background: linear-gradient(135deg, #1E4E8C 0%, #2F6FB4 100%) !important;
+    color: #FDFBF4 !important;
+    border-color: #1E4E8C !important;
     border-width: 2px !important;
     border-style: solid !important;
-    box-shadow: 0 8px 20px rgba(42, 31, 26, 0.3) !important;
+    box-shadow: 0 12px 28px rgba(30, 78, 140, 0.26) !important;
     font-weight: bold !important;
     transform: scale(1.03) !important;
   }
   
   .quiz-button.selected:hover {
-    background-color: #1A0F0A !important;
-    border-color: #1A0F0A !important;
-    box-shadow: 0 10px 25px rgba(42, 31, 26, 0.4) !important;
+    background: linear-gradient(135deg, #163B6C 0%, #255C97 100%) !important;
+    border-color: #163B6C !important;
+    box-shadow: 0 14px 32px rgba(22, 59, 108, 0.3) !important;
   }
   
   .quiz-button.selected::after {
@@ -269,7 +271,7 @@
   /* Page Background with Decorative Elements */
   .spiritual-background {
     position: relative;
-    background: linear-gradient(135deg, #F5F1EA 0%, #F9F7F3 100%);
+    background: linear-gradient(135deg, #F7F2E8 0%, #FFF9EF 55%, #F4E5BD 100%);
     overflow: hidden;
   }
   
@@ -283,7 +285,7 @@
     font-size: 120px;
     opacity: 0.08;
     font-weight: bold;
-    color: #4A3F35;
+    color: #1E4E8C;
     pointer-events: none;
     z-index: 0;
     line-height: 2.2;

@@ -329,12 +329,12 @@ export default function Result() {
   return (
     <div className="spiritual-background min-h-screen py-10 px-4">
       <div className="container max-w-5xl">
-        <section className="quiz-card mb-8 border border-primary/20 bg-white/95 backdrop-blur">
+        <section className="quiz-card mb-8 border border-accent/40 bg-card/95 backdrop-blur">
           <div className="flex items-start gap-3 mb-4">
             <Sparkles className="w-6 h-6 text-primary mt-1" />
             <div>
               <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-primary mt-2">
                 {displayName}, seu perfil atual aponta para <span className="text-primary">{result.profileName}</span>
               </h1>
             </div>
@@ -346,7 +346,7 @@ export default function Result() {
         </section>
 
         {quizInsights.length > 0 && (
-          <section className="quiz-card mb-8 bg-slate-950 text-white border-slate-800">
+          <section className="quiz-card mb-8 border border-primary/25 bg-[linear-gradient(135deg,#1E4E8C_0%,#2C6FB0_100%)] text-primary-foreground">
             <h2 className="text-2xl font-semibold mb-4">O que você revelou no quiz</h2>
             <p className="text-slate-300 mb-6">
               Este resumo foi montado com base nas suas respostas reais, para que o resultado fique conectado ao que você contou.
@@ -362,22 +362,22 @@ export default function Result() {
         )}
 
         <section className="grid gap-6 md:grid-cols-2 mb-8">
-          <Card className="p-6 border-emerald-200 bg-emerald-50/70">
-            <h2 className="text-2xl font-semibold text-emerald-900 mb-4">Pontos de força que apareceram em você</h2>
-            <ul className="space-y-3 text-emerald-950">
+          <Card className="p-6 border-[#D7C08A] bg-[#FFF9EE]">
+            <h2 className="text-2xl font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
+            <ul className="space-y-3 text-[#27405F]">
               {result.strengths.map((item, index) => (
-                <li key={index} className="rounded-lg bg-white/80 px-4 py-3 border border-emerald-100">
+                <li key={index} className="rounded-lg bg-white/85 px-4 py-3 border border-[#E5D5B1]">
                   {item}
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card className="p-6 border-amber-200 bg-amber-50/80">
-            <h2 className="text-2xl font-semibold text-amber-950 mb-4">Bloqueios que mais pesam hoje</h2>
-            <ul className="space-y-3 text-amber-950">
+          <Card className="p-6 border-[#D7C08A] bg-[#F8F1E0]">
+            <h2 className="text-2xl font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
+            <ul className="space-y-3 text-[#27405F]">
               {result.challenges.map((item, index) => (
-                <li key={index} className="rounded-lg bg-white/80 px-4 py-3 border border-amber-100">
+                <li key={index} className="rounded-lg bg-white/85 px-4 py-3 border border-[#E5D5B1]">
                   {item}
                 </li>
               ))}
@@ -385,11 +385,11 @@ export default function Result() {
           </Card>
         </section>
 
-        <section className="quiz-card mb-8 bg-white border-primary/20">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-4">O que faz sentido para sua próxima semana</h2>
+        <section className="quiz-card mb-8 bg-card border-accent/35">
+          <h2 className="text-2xl font-semibold text-primary mb-4">O que faz sentido para sua próxima semana</h2>
           <div className="space-y-3">
             {result.recommendations.map((item, index) => (
-              <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-slate-700 leading-7">
+              <div key={index} className="rounded-xl border border-[#E2D2AD] bg-[#FFF9EF] px-4 py-4 text-[#35506F] leading-7">
                 {item}
               </div>
             ))}
@@ -397,30 +397,30 @@ export default function Result() {
         </section>
 
         {result.nextSteps.length > 0 && (
-          <section className="quiz-card mb-8 bg-primary text-primary-foreground border-primary">
+          <section className="quiz-card mb-8 border border-accent/40 bg-[linear-gradient(135deg,#1E4E8C_0%,#17406F_100%)] text-primary-foreground">
             <p className="text-sm uppercase tracking-[0.25em] text-primary-foreground/70 mb-3">Seu próximo passo</p>
             <h2 className="text-2xl font-semibold mb-4">Comece por aqui</h2>
             <p className="text-lg leading-8">{result.nextSteps[0]}</p>
           </section>
         )}
 
-        <section className="quiz-card mb-10 bg-[#F5EFE0] border-[#E7D8B8] text-slate-900">
-          <h2 className="text-2xl font-semibold mb-4">Seu devocional de 7 dias foi pensado para este momento</h2>
+        <section className="quiz-card mb-10 bg-[#FAF4E7] border-[#D7C08A] text-[#27405F]">
+          <h2 className="text-2xl font-semibold text-primary mb-4">Seu devocional de 7 dias foi pensado para este momento</h2>
           <p className="text-base leading-7 mb-6">
             Em vez de um material genérico, o próximo passo é receber um plano devocional alinhado ao seu perfil atual,
             aos bloqueios que surgiram e ao ritmo que você disse conseguir manter agora.
           </p>
 
           <div className="grid gap-3 md:grid-cols-3 mb-8 text-sm">
-            <div className="rounded-xl bg-white/80 border border-white px-4 py-4">Textos e reflexões conectados ao seu perfil espiritual atual.</div>
-            <div className="rounded-xl bg-white/80 border border-white px-4 py-4">Aplicações práticas baseadas nas dificuldades que você relatou.</div>
-            <div className="rounded-xl bg-white/80 border border-white px-4 py-4">Um caminho simples para voltar à constância sem sobrecarga espiritual.</div>
+            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Textos e reflexões conectados ao seu perfil espiritual atual.</div>
+            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Aplicações práticas baseadas nas dificuldades que você relatou.</div>
+            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Um caminho simples para voltar à constância sem sobrecarga espiritual.</div>
           </div>
 
           <Button
             size="lg"
             className="w-full text-lg font-bold"
-            style={{ backgroundColor: "#FFC107", color: "#1a1a1a" }}
+            style={{ backgroundColor: "#C9A54C", color: "#17395F" }}
             onClick={handleCheckout}
             disabled={isCheckingOut}
           >
