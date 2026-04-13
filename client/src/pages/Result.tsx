@@ -176,7 +176,7 @@ export default function Result() {
 
   // Cores
   const AZUL_PROFUNDO = "#1E40AF";
-  const OURO = "#D4AF37";
+  const OURO = "#FFC107";
   const OURO_CLARO = "#F4E4C1";
   const AZUL_CLARO = "#EFF6FF";
 
@@ -320,7 +320,7 @@ export default function Result() {
           <Button 
             size="lg" 
             className="w-full text-lg font-bold"
-            style={{ backgroundColor: OURO, color: "#000" }}
+            style={{ backgroundColor: OURO, color: "#1a1a1a" }}
           >
             <Zap className="w-5 h-5 mr-2" />
             {spiritualCopy.ctaPrimary}

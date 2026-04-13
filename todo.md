@@ -700,3 +700,5 @@
 - [x] Mudar o card da oferta para um tom de azul mais claro
 - [x] Mudar cor de fundo do card "Seu plano de transformação" para bege claro
 - [x] Centralizar o texto "Por isso existe..." ao card da oferta
+- [x] Substituir texto do botão de compra de "recomeçar" para "me reconectar"
+- [x] Mudar cor do botão de compra para um amarelo mais forte

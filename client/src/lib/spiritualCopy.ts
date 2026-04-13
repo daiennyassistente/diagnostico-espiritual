@@ -221,7 +221,7 @@ const getCtaPrimary = (profileType: string): string => {
     weak: "Quero recuperar minha força espiritual",
     lost: "Quero encontrar meu caminho com Deus",
     dry: "Quero beber da água viva novamente",
-    general: "Quero recomeçar com Deus",
+    general: "Quero me reconectar com Deus",
   };
   
   return ctas[profileType] || ctas.general;
