@@ -44,6 +44,7 @@ export default function Result() {
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { data: user } = trpc.auth.me.useQuery();
+  const checkoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
 
   // Get leadId from URL query string, with localStorage fallback
   useEffect(() => {
@@ -223,7 +224,6 @@ export default function Result() {
     
     setIsCheckingOut(true);
     try {
-      const checkoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
       const result = await checkoutMutation.mutateAsync({
         email: "user@example.com",
         profileName: trpcResult.diagnostic.profileName,
