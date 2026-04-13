@@ -147,7 +147,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
                 </ul>
                 <Button
                   className="w-full"
-                  style={{ backgroundColor: "#FFD700" }}
+                  style={{ backgroundColor: "#FFC700" }}
                   onClick={() => setPaymentMethod("secure-fields")}
                 >
                   Pagar com Cartão
@@ -174,7 +174,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
                 </ul>
                 <Button
                   className="w-full"
-                  style={{ backgroundColor: "#FFD700" }}
+                  style={{ backgroundColor: "#FFC700" }}
                   onClick={() => setPaymentMethod("preference")}
                 >
                   Pagar com Mercado Pago
