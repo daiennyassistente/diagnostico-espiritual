@@ -220,8 +220,9 @@ export default function Result() {
     <div className="min-h-screen spiritual-background relative">
       <div className="max-w-2xl mx-auto px-4 py-12 relative z-10">
         {/* SEÇÃO 1: ABERTURA INTIMISTA */}
-        <section className="mb-12 text-center">
-          <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground mb-6">
+        <section className="mb-4 text-center">
+          <p className="text-sm font-medium mb-6" style={{ color: AZUL_PROFUNDO }}>👇 Não esqueça de rolar até o final</p>
+          <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-6" style={{ color: AZUL_PROFUNDO }}>
             {resultHeadline}
           </h1>
         </section>
@@ -287,7 +288,7 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 8: APRESENTAÇÃO DA SOLUÇÃO */}
-        <section className="quiz-card mb-12 text-slate-900" style={{ backgroundColor: AZUL_CLARO }}>
+        <section className="quiz-card mb-12 text-slate-900" style={{ backgroundColor: "#D0E8FF" }}>
           <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>✨ Seu plano de transformação</h2>
           <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8">
             {spiritualCopy.solutionIntro.split('\n\n').map((paragraph, idx) => (

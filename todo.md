@@ -695,3 +695,6 @@
 - [x] Corrigir erro runtime em /result causado por uso de propriedades indefinidas com split em Result.tsx
 - [x] Substituir a frase do topo da página de resultado por um título direto e personalizado conforme as respostas do quiz
 - [x] Alterar o fundo da oferta na página de resultado para um azul claro coerente com o restante da interface
+- [x] Mudar a cor do título principal para o mesmo azul dos subtítulos
+- [x] Inserir aviso "não esqueça de rolar até o final" no topo da página de resultado
+- [x] Mudar o card da oferta para um tom de azul mais claro
