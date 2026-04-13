@@ -25,11 +25,6 @@ import {
   createQuizQuestion,
   deleteQuizQuestion,
 } from "./db";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-04-10",
-});
 
 export interface DiagnosticResult {
   profileName: string;
@@ -478,52 +473,10 @@ export const appRouter = router({
     }),
 
     getStatistics: publicProcedure.query(async () => {
-      return await getResponseStatistics();
+      return await getAllQuizResponses();
     }),
 
-    createDevocionalCheckout: publicProcedure
-      .input(
-        z.object({
-          email: z.string().email(),
-          profileName: z.string(),
-        }),
-      )
-      .mutation(async ({ input, ctx }) => {
-        try {
-          const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            line_items: [
-              {
-                price_data: {
-                  currency: "brl",
-                  product_data: {
-                    name: "Devocional: 7 Dias para se Aproximar de Deus",
-                    description: `Guia devocional personalizado baseado em seu perfil: ${input.profileName}`,
-                  },
-                  unit_amount: 1290,
-                },
-                quantity: 1,
-              },
-            ],
-            mode: "payment",
-            success_url: `${ctx.req.headers.origin}/checkout-success`,
-            cancel_url: `${ctx.req.headers.origin}/result`,
-            customer_email: input.email,
-            metadata: {
-              profileName: input.profileName,
-              email: input.email,
-            },
-          });
-
-          return { success: true, checkoutUrl: session.url };
-        } catch (error: any) {
-          console.error("Stripe checkout error:", error);
-          throw new Error("Erro ao criar sessão de pagamento");
-        }
-      }),
-
-    createMercadoPagoCheckout: publicProcedure
-      .input(
+    createMercadoPagoCheckout: publicProcedure.input(
         z.object({
           email: z.string().email(),
           profileName: z.string(),

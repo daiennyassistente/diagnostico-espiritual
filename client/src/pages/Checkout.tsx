@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, CreditCard, Zap } from "lucide-react";
+import { Loader2, QrCode } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { MercadoPagoSecureFields } from "@/components/MercadoPagoSecureFields";
 import { parseStoredLeadData } from "@/lib/leadStorage";
+import { useEffect, useState } from "react";
 
 interface CheckoutProps {
   profileName?: string;
@@ -14,11 +13,9 @@ interface CheckoutProps {
 
 export default function Checkout({ profileName }: CheckoutProps) {
   const [, setLocation] = useLocation();
-  const [paymentMethod, setPaymentMethod] = useState<"preference" | "secure-fields" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [leadId, setLeadId] = useState<number | null>(null);
 
-  const processSecureFieldsPaymentMutation = trpc.quiz.processSecureFieldsPayment.useMutation();
   const createMercadoPagoCheckoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
 
   useEffect(() => {
@@ -32,46 +29,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
     setLeadId(leadData.leadId);
   }, [setLocation]);
 
-  const handleSecureFieldsPayment = async (cardToken: string) => {
-    if (!leadId) {
-      toast.error("Lead ID não encontrado");
-      return;
-    }
-
-    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
-    if (!leadData?.email) {
-      toast.error("Dados não encontrados");
-      return;
-    }
-
-    const { email } = leadData;
-
-    setIsProcessing(true);
-
-    try {
-      const result = await processSecureFieldsPaymentMutation.mutateAsync({
-        cardToken,
-        email,
-        profileName: profileName || "Diagnóstico Espiritual",
-        leadId,
-      });
-
-      if (result.success) {
-        toast.success("Pagamento processado com sucesso!");
-        // Redirecionar para página de sucesso
-        setLocation(`/checkout-success?leadId=${leadId}`);
-      } else {
-        toast.error("Erro ao processar pagamento");
-      }
-    } catch (error: any) {
-      console.error("Erro ao processar pagamento:", error);
-      toast.error(error.message || "Erro ao processar pagamento");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleMercadoPagoPreference = async () => {
+  const handleMercadoPagoPixPayment = async () => {
     const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
     if (!leadData?.email) {
       toast.error("Email não encontrado");
@@ -118,128 +76,57 @@ export default function Checkout({ profileName }: CheckoutProps) {
 
   return (
     <div className="spiritual-background min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-2" style={{ color: "#4A3F35" }}>
-          Escolha seu Método de Pagamento
+          Pagamento via PIX
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Selecione a forma mais segura e conveniente para você
+          Escaneie o QR Code com seu smartphone para realizar o pagamento
         </p>
 
-        {paymentMethod === null && (
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {/* Opção 1: Secure Fields */}
-            <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C] bg-white">
-              <div onClick={() => setPaymentMethod("secure-fields")} className="space-y-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
-                  <CreditCard className="w-6 h-6" style={{ color: "#3E342C" }} />
-                </div>
-                <h2 className="text-xl font-semibold" style={{ color: "#4A3F35" }}>
-                  Cartão de Crédito Seguro
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  Pague diretamente com seu cartão usando nossa tecnologia segura com criptografia SSL/TLS.
-                </p>
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li>✓ Campos seguros (Secure Fields)</li>
-                  <li>✓ PCI Compliance</li>
-                  <li>✓ Processamento imediato</li>
-                </ul>
-                <Button
-                  className="w-full"
-                  style={{ backgroundColor: "#FFC700" }}
-                  onClick={() => setPaymentMethod("secure-fields")}
-                >
-                  Pagar com Cartão
-                </Button>
-              </div>
-            </Card>
-
-            {/* Opção 2: Mercado Pago Preference */}
-            <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C] bg-white">
-              <div onClick={() => setPaymentMethod("preference")} className="space-y-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
-                  <Zap className="w-6 h-6" style={{ color: "#3E342C" }} />
-                </div>
-                <h2 className="text-xl font-semibold" style={{ color: "#4A3F35" }}>
-                  Mercado Pago
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  Pague com sua conta do Mercado Pago ou escolha entre várias opções de pagamento.
-                </p>
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li>✓ Múltiplos métodos</li>
-                  <li>✓ Pix, Cartão, Boleto</li>
-                  <li>✓ Parcelamento disponível</li>
-                </ul>
-                <Button
-                  className="w-full"
-                  style={{ backgroundColor: "#FFC700" }}
-                  onClick={() => setPaymentMethod("preference")}
-                >
-                  Pagar com Mercado Pago
-                </Button>
-              </div>
-            </Card>
+        <Card className="p-8 bg-white space-y-6">
+          <div className="flex justify-center">
+            <div className="flex items-center justify-center w-16 h-16 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
+              <QrCode className="w-10 h-10" style={{ color: "#3E342C" }} />
+            </div>
           </div>
-        )}
 
-        {/* Secure Fields Form */}
-        {paymentMethod === "secure-fields" && (
-          <div className="space-y-4">
-            <Button
-              variant="outline"
-              onClick={() => setPaymentMethod(null)}
-              disabled={isProcessing}
-              className="mb-4"
-            >
-              ← Voltar
-            </Button>
-            <MercadoPagoSecureFields
-              publicKey={process.env.VITE_MERCADOPAGO_PUBLIC_KEY || ""}
-              onPaymentReady={handleSecureFieldsPayment}
-              onError={(error) => toast.error(error)}
-              isLoading={isProcessing}
-            />
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-semibold" style={{ color: "#4A3F35" }}>
+              Devocional: 7 Dias para se Aproximar de Deus
+            </h2>
+            <p className="text-gray-600">
+              Valor: <span className="text-2xl font-bold" style={{ color: "#1E3A8A" }}>R$ 12,90</span>
+            </p>
           </div>
-        )}
 
-        {/* Mercado Pago Preference Button */}
-        {paymentMethod === "preference" && (
-          <div className="space-y-4">
-            <Button
-              variant="outline"
-              onClick={() => setPaymentMethod(null)}
-              disabled={isProcessing}
-              className="mb-4"
-            >
-              ← Voltar
-            </Button>
-            <Card className="p-8 text-center space-y-4 bg-white">
-              <h2 className="text-xl font-semibold" style={{ color: "#4A3F35" }}>
-                Você será redirecionado para o Mercado Pago
-              </h2>
-              <p className="text-gray-600">
-                Clique no botão abaixo para prosseguir com o pagamento seguro.
-              </p>
-              <Button
-                onClick={handleMercadoPagoPreference}
-                disabled={isProcessing}
-                className="w-full"
-                style={{ backgroundColor: "#3E342C" }}
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processando...
-                  </>
-                ) : (
-                  "Ir para Mercado Pago"
-                )}
-              </Button>
-            </Card>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p className="text-sm text-gray-700">
+              <strong>Como funciona:</strong> Clique no botão abaixo para gerar o QR Code do PIX. 
+              Escaneie com seu smartphone e confirme o pagamento. Você receberá seu devocional personalizado por email.
+            </p>
           </div>
-        )}
+
+          <Button
+            onClick={handleMercadoPagoPixPayment}
+            disabled={isProcessing}
+            className="w-full py-6 text-lg font-semibold"
+            style={{ backgroundColor: "#FFC700", color: "#000" }}
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Gerando QR Code...
+              </>
+            ) : (
+              "Gerar QR Code PIX"
+            )}
+          </Button>
+
+          <p className="text-xs text-gray-500 text-center">
+            Você será redirecionado para o Mercado Pago para escanear o QR Code do PIX
+          </p>
+        </Card>
 
         {/* Informações de Segurança */}
         <Card className="mt-8 p-6 bg-white">
@@ -247,10 +134,10 @@ export default function Checkout({ profileName }: CheckoutProps) {
             🔒 Segurança Garantida
           </h3>
           <ul className="text-sm text-gray-700 space-y-2">
-            <li>✓ Certificado SSL/TLS 1.2+</li>
-            <li>✓ Criptografia de dados de pagamento</li>
-            <li>✓ Conformidade com PCI DSS</li>
+            <li>✓ PIX é um método de pagamento seguro do Banco Central</li>
+            <li>✓ Transação instantânea e sem intermediários</li>
             <li>✓ Seus dados nunca são armazenados em nossos servidores</li>
+            <li>✓ Conformidade com PCI DSS</li>
           </ul>
         </Card>
       </div>
