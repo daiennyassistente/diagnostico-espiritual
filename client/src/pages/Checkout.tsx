@@ -6,6 +6,7 @@ import { Loader2, CreditCard, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { MercadoPagoSecureFields } from "@/components/MercadoPagoSecureFields";
+import { parseStoredLeadData } from "@/lib/leadStorage";
 
 interface CheckoutProps {
   profileName?: string;
@@ -21,15 +22,14 @@ export default function Checkout({ profileName }: CheckoutProps) {
   const createMercadoPagoCheckoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
 
   useEffect(() => {
-    const leadData = localStorage.getItem("leadData");
-    if (!leadData) {
+    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    if (!leadData?.leadId) {
       toast.error("Dados não encontrados. Redirecionando...");
       setLocation("/quiz");
       return;
     }
 
-    const { id } = JSON.parse(leadData);
-    setLeadId(id);
+    setLeadId(leadData.leadId);
   }, [setLocation]);
 
   const handleSecureFieldsPayment = async (cardToken: string) => {
@@ -38,13 +38,13 @@ export default function Checkout({ profileName }: CheckoutProps) {
       return;
     }
 
-    const leadData = localStorage.getItem("leadData");
-    if (!leadData) {
+    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    if (!leadData?.email) {
       toast.error("Dados não encontrados");
       return;
     }
 
-    const { email } = JSON.parse(leadData);
+    const { email } = leadData;
 
     setIsProcessing(true);
 
@@ -72,13 +72,13 @@ export default function Checkout({ profileName }: CheckoutProps) {
   };
 
   const handleMercadoPagoPreference = async () => {
-    const leadData = localStorage.getItem("leadData");
-    if (!leadData) {
+    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    if (!leadData?.email) {
       toast.error("Email não encontrado");
       return;
     }
 
-    const { email } = JSON.parse(leadData);
+    const { email, whatsapp } = leadData;
 
     setIsProcessing(true);
 
@@ -86,6 +86,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
       {
         email,
         profileName: profileName || "Diagnóstico Espiritual",
+        userPhone: whatsapp,
       },
       {
         onSuccess: (data) => {

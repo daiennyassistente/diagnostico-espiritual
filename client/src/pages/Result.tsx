@@ -1,16 +1,13 @@
-'use client';
-
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Share2, RotateCcw, Zap } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Download, Loader2, RotateCcw, Share2, Sparkles, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { generateDeepSpiritualDiagnosis } from "@/lib/deepSpiritualDiagnosis";
-import { generatePersonalizedTitle } from "@/lib/personalizedTitles";
-import { generateSpiritualPageCopy } from "@/lib/spiritualCopy";
 import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState";
-import { buildResultHeadline } from "@/lib/resultHeadline";
+import { extractQuizInsights } from "@/lib/resultPersonalization";
+import { parseStoredLeadData } from "@/lib/leadStorage";
 
 interface AIResult {
   profileName: string;
@@ -21,17 +18,61 @@ interface AIResult {
   nextSteps: string[];
 }
 
-const formatTimeLeft = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-};
-
 const clearQuizSessionState = () => {
   sessionStorage.removeItem("quizStep");
   sessionStorage.removeItem("quizResponses");
+  sessionStorage.removeItem("quizCurrentStep");
+  sessionStorage.removeItem("quizResponsesDraft");
+  sessionStorage.removeItem("quizShowLeadForm");
+  sessionStorage.removeItem("quizLeadDraft");
+  sessionStorage.removeItem("quizHasStarted");
   sessionStorage.removeItem("quizPendingResultRedirect");
+};
+
+const formatTimeLeft = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  return `${hours}h ${minutes}min`;
+};
+
+const ensureArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      return ensureArray(parsed);
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+};
+
+const buildResponsesMap = (responses: Record<string, string>) => {
+  const mapped: Record<string, string> = {};
+
+  Object.entries(responses).forEach(([key, value]) => {
+    if (!value) {
+      return;
+    }
+
+    if (key.startsWith("step")) {
+      mapped[key] = value;
+      return;
+    }
+
+    const stepNumber = Number.parseInt(key, 10);
+    if (!Number.isNaN(stepNumber)) {
+      mapped[`step${stepNumber + 1}`] = value;
+    }
+  });
+
+  return mapped;
 };
 
 export default function Result() {
@@ -45,12 +86,12 @@ export default function Result() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { data: user } = trpc.auth.me.useQuery();
   const checkoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
+  const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
 
-  // Get leadId from URL query string, with localStorage fallback
   useEffect(() => {
     const resolvedLeadId = resolveLeadIdFromSources(
       window.location.search,
-      window.localStorage.getItem('quizLeadId')
+      window.localStorage.getItem("quizLeadId"),
     );
 
     if (resolvedLeadId) {
@@ -58,7 +99,6 @@ export default function Result() {
     }
   }, []);
 
-  // Get stored data from the latest persisted source
   useEffect(() => {
     const storedQuizState = readStoredQuizState({
       sessionUserName: window.sessionStorage.getItem("userName"),
@@ -76,338 +116,347 @@ export default function Result() {
     }
   }, []);
 
-  // Timer
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
+
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch result using tRPC hook (only when leadId is available)
   const { data: trpcResult, isLoading, refetch } = trpc.quiz.getResult.useQuery(
-    leadId ? { leadId } : undefined,
-    { enabled: !!leadId }
+    { leadId: leadId || 0 },
+    {
+      enabled: !!leadId,
+      retry: false,
+    },
   );
 
-  // Generate diagnosis mutation
-  const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
-
-  // Generate diagnosis if needed
   useEffect(() => {
-    if (trpcResult && !trpcResult.diagnostic && !isGeneratingDiagnosis && responses && leadId) {
-      setIsGeneratingDiagnosis(true);
-      
-      // Convert responses to the format expected by the API
-      const responsesMap: Record<string, string> = {};
-      Object.entries(responses).forEach(([key, value]) => {
-        const stepNum = parseInt(key, 10) + 1;
-        responsesMap[`step${stepNum}`] = value;
-      });
-      
-      generateDiagnosisMutation.mutate(
-        {
-          responses: responsesMap,
-          leadId: leadId,
-        },
-        {
-          onSuccess: () => {
-            // Refetch the result after generating diagnosis
-            setTimeout(() => {
-              refetch();
-              setIsGeneratingDiagnosis(false);
-            }, 2000);
-          },
-          onError: (error) => {
-            console.error('Error generating diagnosis:', error);
-            setIsGeneratingDiagnosis(false);
-            toast.error('Erro ao gerar diagnóstico');
-          },
-        }
-      );
+    if (!trpcResult || trpcResult.diagnostic || !responses || !leadId || isGeneratingDiagnosis) {
+      return;
     }
-  }, [trpcResult, isGeneratingDiagnosis, responses, leadId, generateDiagnosisMutation, refetch]);
 
-  // Show loading state while fetching
+    setIsGeneratingDiagnosis(true);
+
+    generateDiagnosisMutation.mutate(
+      {
+        responses: buildResponsesMap(responses),
+        leadId,
+      },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+        onError: () => {
+          toast.error("Não foi possível gerar seu diagnóstico agora.");
+        },
+        onSettled: () => {
+          setIsGeneratingDiagnosis(false);
+        },
+      },
+    );
+  }, [generateDiagnosisMutation, isGeneratingDiagnosis, leadId, refetch, responses, trpcResult]);
+
+  const result: AIResult | null = useMemo(() => {
+    if (!trpcResult?.diagnostic) {
+      return null;
+    }
+
+    return {
+      profileName: trpcResult.diagnostic.profileName,
+      profileDescription: trpcResult.diagnostic.profileDescription,
+      strengths: ensureArray(trpcResult.diagnostic.strengths),
+      challenges: ensureArray(trpcResult.diagnostic.challenges),
+      recommendations: ensureArray(trpcResult.diagnostic.recommendations),
+      nextSteps: ensureArray(trpcResult.diagnostic.nextSteps),
+    };
+  }, [trpcResult]);
+
+  const displayName = userName || user?.name || trpcResult?.lead?.name || "você";
+  const quizInsights = useMemo(() => extractQuizInsights(responses), [responses]);
+
+  useEffect(() => {
+    if (!trpcResult?.diagnostic) {
+      return;
+    }
+
+    localStorage.setItem("quizResult", JSON.stringify(result));
+
+    if (trpcResult.lead?.whatsapp) {
+      localStorage.setItem("userWhatsapp", trpcResult.lead.whatsapp);
+    }
+  }, [result, trpcResult]);
+
   if (!leadId) {
     return (
       <div className="min-h-screen flex items-center justify-center spiritual-background">
         <div className="text-center relative z-10">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#1E40AF" }} />
-          <p className="text-foreground font-medium">Preparando seu resultado...</p>
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-foreground text-lg">Carregando seu diagnóstico...</p>
         </div>
       </div>
     );
   }
 
-  if (isLoading || !trpcResult || !trpcResult.diagnostic || isGeneratingDiagnosis) {
+  if (isLoading || isGeneratingDiagnosis) {
     return (
       <div className="min-h-screen flex items-center justify-center spiritual-background">
-        <div className="text-center relative z-10">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: "#1E40AF" }} />
-          <p className="text-foreground font-medium">Gerando seu diagnóstico personalizado...</p>
-        </div>
+        <Card className="max-w-md mx-auto p-8 text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          <h2 className="text-2xl font-semibold mb-2">Estamos preparando seu resultado</h2>
+          <p className="text-muted-foreground">
+            Estamos cruzando suas respostas para montar um diagnóstico coerente com o que você viveu no quiz.
+          </p>
+        </Card>
       </div>
     );
   }
 
-  const result = trpcResult.diagnostic;
-
-  const diagnosis = generateDeepSpiritualDiagnosis(
-    result.profileName,
-    result.challenges,
-    userName
-  );
-
-  const personalizedTitle = generatePersonalizedTitle(
-    result.profileName,
-    result.challenges,
-    userName
-  );
-
-  const spiritualCopy = generateSpiritualPageCopy(
-    result.profileName,
-    result.profileDescription,
-    result.challenges,
-    userName
-  );
-
-  const resultHeadline = buildResultHeadline({
-    profileName: result.profileName,
-    personalizedTitle,
-  });
-
-  // Cores
-  const AZUL_PROFUNDO = "#1E40AF";
-  const OURO = "#FFC107";
-  const OURO_CLARO = "#F4E4C1";
-  const AZUL_CLARO = "#EFF6FF";
+  if (!trpcResult || !result) {
+    return (
+      <div className="min-h-screen flex items-center justify-center spiritual-background p-4">
+        <Card className="max-w-md mx-auto p-8 text-center">
+          <h2 className="text-2xl font-semibold mb-2">Resultado não encontrado</h2>
+          <p className="text-muted-foreground mb-6">
+            Não conseguimos localizar seu diagnóstico neste momento. Refaça o quiz para gerar um novo resultado.
+          </p>
+          <Button onClick={() => setLocation("/quiz")}>Refazer quiz</Button>
+        </Card>
+      </div>
+    );
+  }
 
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
+
     try {
-      const response = await trpc.quiz.downloadPDF.mutate();
+      const token = trpcResult.payment?.downloadToken;
+      if (!token) {
+        toast.error("Seu PDF será liberado após a confirmação do pagamento.");
+        return;
+      }
+
+      const response = await trpc.pdf.downloadPDF.mutate({ token });
       if (response?.url) {
         const link = document.createElement("a");
         link.href = response.url;
-        link.download = `diagnostico-espiritual-${userName}.pdf`;
+        link.download = `diagnostico-espiritual-${displayName}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         toast.success("PDF baixado com sucesso!");
       }
     } catch (error) {
-      console.error("Error downloading PDF:", error);
-      toast.error("Erro ao baixar PDF");
+      console.error("Erro ao baixar PDF:", error);
+      toast.error("Não foi possível baixar o PDF agora.");
     } finally {
       setIsGeneratingPDF(false);
     }
   };
 
-  const handleShare = () => {
-    const text = `Fiz meu diagnóstico espiritual e descobri coisas importantes sobre minha jornada com Deus! Você também deveria fazer: ${window.location.origin}`;
-    if (navigator.share) {
-      navigator.share({ title: "Diagnóstico Espiritual", text });
-    } else {
-      navigator.clipboard.writeText(text);
-      toast.success("Link copiado para a área de transferência!");
+  const handleShare = async () => {
+    const shareData = {
+      title: "Diagnóstico Espiritual",
+      text: `Acabei de receber meu diagnóstico espiritual: ${result.profileName}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copiado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao compartilhar:", error);
+      toast.error("Não foi possível compartilhar agora.");
     }
   };
 
   const handleRetake = () => {
     clearQuizSessionState();
+    localStorage.removeItem("quizLeadId");
+    localStorage.removeItem("quizResponses");
+    localStorage.removeItem("quizResult");
+    localStorage.removeItem("userWhatsapp");
     setLocation("/quiz");
   };
 
   const handleCheckout = async () => {
-    if (!userName || !trpcResult) return;
-    
+    if (!trpcResult) {
+      toast.error("Seu resultado ainda está sendo carregado.");
+      return;
+    }
+
+    const storedLeadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    const email = trpcResult.lead?.email || storedLeadData?.email || user?.email || "";
+    const userPhone = trpcResult.lead?.whatsapp || storedLeadData?.whatsapp || "";
+    const payerName = displayName || storedLeadData?.name || "Usuário";
+
+    if (!email) {
+      toast.error("Não encontramos seu e-mail para iniciar o pagamento.");
+      return;
+    }
+
     setIsCheckingOut(true);
+
     try {
-      const result = await checkoutMutation.mutateAsync({
-        email: "user@example.com",
-        profileName: trpcResult.diagnostic.profileName,
-        userName: userName,
+      const checkout = await checkoutMutation.mutateAsync({
+        email,
+        profileName: result.profileName,
+        userName: payerName,
+        userPhone,
       });
-      
-      if (result.checkoutUrl) {
-        window.open(result.checkoutUrl, "_blank");
-        toast.success("Redirecionando para pagamento...");
-      } else {
-        toast.error("Não foi possível gerar link de pagamento");
+
+      if (!checkout.checkoutUrl) {
+        toast.error("Não foi possível abrir o checkout agora.");
+        return;
       }
+
+      toast.success("Redirecionando para o pagamento...");
+      window.location.href = checkout.checkoutUrl;
     } catch (error) {
-      console.error("Checkout error:", error);
-      toast.error("Erro ao iniciar pagamento");
+      console.error("Erro ao iniciar checkout:", error);
+      toast.error("Erro ao iniciar o pagamento. Tente novamente.");
     } finally {
       setIsCheckingOut(false);
     }
   };
 
   return (
-    <div className="min-h-screen spiritual-background relative">
-      <div className="max-w-2xl mx-auto px-4 py-12 relative z-10">
-        {/* SEÇÃO 1: ABERTURA INTIMISTA */}
-        <section className="mb-4 text-center">
-          <p className="text-sm font-medium mb-6" style={{ color: AZUL_PROFUNDO }}>👇 Não esqueça de rolar até o final</p>
-          <h1 className="text-3xl md:text-4xl font-semibold leading-tight mb-6" style={{ color: AZUL_PROFUNDO }}>
-            {resultHeadline}
-          </h1>
-        </section>
-
-        {/* SEÇÃO 2: EXPLICAÇÃO PROFUNDA */}
-        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Sua situação espiritual</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.deepExplanation.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 3: RAIZ DO PROBLEMA */}
-        <section className="quiz-card mb-12 border-l-4 bg-white" style={{ borderLeftColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>A raiz do problema</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.rootOfProblem.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 4: CONSEQUÊNCIA REAL */}
-        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>O impacto real</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.realConsequence.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 5: ACOLHIMENTO */}
-        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Você não está sozinho</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.acceptance.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 6: ESPERANÇA */}
-        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Há esperança</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {spiritualCopy.hope.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 7: TRANSIÇÃO PARA SOLUÇÃO */}
-        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>E aqui está o mais importante</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {diagnosis.transitionToSolution.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 8: APRESENTAÇÃO DA SOLUÇÃO */}
-        <section className="quiz-card mb-12 text-slate-900" style={{ backgroundColor: "#F5EFE0" }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>✨ Seu plano de transformação</h2>
-          <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8 text-center">
-            {spiritualCopy.solutionIntro.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
+    <div className="spiritual-background min-h-screen py-10 px-4">
+      <div className="container max-w-5xl">
+        <section className="quiz-card mb-8 border border-primary/20 bg-white/95 backdrop-blur">
+          <div className="flex items-start gap-3 mb-4">
+            <Sparkles className="w-6 h-6 text-primary mt-1" />
+            <div>
+              <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-2">
+                {displayName}, seu perfil atual aponta para <span className="text-primary">{result.profileName}</span>
+              </h1>
+            </div>
           </div>
 
-          {/* Benefícios */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4">O que você vai conseguir:</h3>
+          <p className="text-lg leading-8 text-slate-700 whitespace-pre-line">
+            {result.profileDescription}
+          </p>
+        </section>
+
+        {quizInsights.length > 0 && (
+          <section className="quiz-card mb-8 bg-slate-950 text-white border-slate-800">
+            <h2 className="text-2xl font-semibold mb-4">O que você revelou no quiz</h2>
+            <p className="text-slate-300 mb-6">
+              Este resumo foi montado com base nas suas respostas reais, para que o resultado fique conectado ao que você contou.
+            </p>
             <ul className="space-y-3">
-              {spiritualCopy.benefits.map((benefit, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span style={{ color: OURO }} className="text-xl">✔</span>
-                  <span>{benefit}</span>
+              {quizInsights.map((insight, index) => (
+                <li key={index} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base leading-7">
+                  {insight}
                 </li>
               ))}
             </ul>
+          </section>
+        )}
+
+        <section className="grid gap-6 md:grid-cols-2 mb-8">
+          <Card className="p-6 border-emerald-200 bg-emerald-50/70">
+            <h2 className="text-2xl font-semibold text-emerald-900 mb-4">Pontos de força que apareceram em você</h2>
+            <ul className="space-y-3 text-emerald-950">
+              {result.strengths.map((item, index) => (
+                <li key={index} className="rounded-lg bg-white/80 px-4 py-3 border border-emerald-100">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Card>
+
+          <Card className="p-6 border-amber-200 bg-amber-50/80">
+            <h2 className="text-2xl font-semibold text-amber-950 mb-4">Bloqueios que mais pesam hoje</h2>
+            <ul className="space-y-3 text-amber-950">
+              {result.challenges.map((item, index) => (
+                <li key={index} className="rounded-lg bg-white/80 px-4 py-3 border border-amber-100">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </section>
+
+        <section className="quiz-card mb-8 bg-white border-primary/20">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-4">O que faz sentido para sua próxima semana</h2>
+          <div className="space-y-3">
+            {result.recommendations.map((item, index) => (
+              <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-slate-700 leading-7">
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {result.nextSteps.length > 0 && (
+          <section className="quiz-card mb-8 bg-primary text-primary-foreground border-primary">
+            <p className="text-sm uppercase tracking-[0.25em] text-primary-foreground/70 mb-3">Seu próximo passo</p>
+            <h2 className="text-2xl font-semibold mb-4">Comece por aqui</h2>
+            <p className="text-lg leading-8">{result.nextSteps[0]}</p>
+          </section>
+        )}
+
+        <section className="quiz-card mb-10 bg-[#F5EFE0] border-[#E7D8B8] text-slate-900">
+          <h2 className="text-2xl font-semibold mb-4">Seu devocional de 7 dias foi pensado para este momento</h2>
+          <p className="text-base leading-7 mb-6">
+            Em vez de um material genérico, o próximo passo é receber um plano devocional alinhado ao seu perfil atual,
+            aos bloqueios que surgiram e ao ritmo que você disse conseguir manter agora.
+          </p>
+
+          <div className="grid gap-3 md:grid-cols-3 mb-8 text-sm">
+            <div className="rounded-xl bg-white/80 border border-white px-4 py-4">Textos e reflexões conectados ao seu perfil espiritual atual.</div>
+            <div className="rounded-xl bg-white/80 border border-white px-4 py-4">Aplicações práticas baseadas nas dificuldades que você relatou.</div>
+            <div className="rounded-xl bg-white/80 border border-white px-4 py-4">Um caminho simples para voltar à constância sem sobrecarga espiritual.</div>
           </div>
 
-          {/* Chamado interno */}
-          <div className="p-6 rounded-lg border mb-8" style={{ backgroundColor: "rgba(255, 255, 255, 0.7)", borderColor: "#BFDBFE" }}>
-            <p className="text-center text-lg font-medium">
-              {spiritualCopy.internalCall}
-            </p>
-          </div>
-
-          {/* CTA Principal */}
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="w-full text-lg font-bold"
-            style={{ backgroundColor: OURO, color: "#1a1a1a" }}
+            style={{ backgroundColor: "#FFC107", color: "#1a1a1a" }}
             onClick={handleCheckout}
             disabled={isCheckingOut}
           >
             {isCheckingOut ? (
               <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Processando...
+                Abrindo pagamento...
               </>
             ) : (
               <>
                 <Zap className="w-5 h-5 mr-2" />
-                {spiritualCopy.ctaPrimary}
+                Quero receber meu devocional personalizado
               </>
             )}
           </Button>
 
-          {/* Preço */}
           <p className="text-center text-sm mt-4 text-slate-600">
-            {spiritualCopy.priceMessage}
+            R$ 12,90. Pagamento seguro e redirecionamento imediato para o checkout.
           </p>
         </section>
 
-        {/* SEÇÃO 9: REFLEXÃO FINAL */}
-        <section className="quiz-card mb-12 bg-white border-2" style={{ borderColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>Você merece</h2>
-          <div className="text-base leading-relaxed text-foreground whitespace-pre-line space-y-4">
-            {spiritualCopy.closingReflection.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="mb-4">{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* SEÇÃO 10: AÇÕES SECUNDÁRIAS */}
-        <section className="mb-12 flex gap-4 justify-center flex-wrap">
-          <Button 
-            variant="outline" 
-            onClick={handleDownloadPDF}
-            disabled={isGeneratingPDF}
-          >
+        <section className="mb-10 flex gap-4 justify-center flex-wrap">
+          <Button variant="outline" onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
             <Download className="w-4 h-4 mr-2" />
             {isGeneratingPDF ? "Gerando..." : "Baixar PDF"}
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleShare}
-          >
+          <Button variant="outline" onClick={handleShare}>
             <Share2 className="w-4 h-4 mr-2" />
             Compartilhar
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleRetake}
-          >
+          <Button variant="outline" onClick={handleRetake}>
             <RotateCcw className="w-4 h-4 mr-2" />
             Refazer
           </Button>
         </section>
 
-        {/* SEÇÃO 11: TIMER */}
         <section className="text-center text-sm text-gray-500">
           <p>Seu resultado estará disponível por mais {formatTimeLeft(timeLeft)}</p>
         </section>

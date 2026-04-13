@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { getDb } from "./db";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { createLead, getDb } from "./db";
 import { leads, quizResponses, diagnosticHistory } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
@@ -13,14 +13,13 @@ describe("quiz.getResult procedure", () => {
       throw new Error("Database not available for tests");
     }
 
-    // Create a test lead
-    const leadResult = await db.insert(leads).values({
+    const leadResult = await createLead({
       whatsapp: "11999999999",
       email: "test@example.com",
       name: "Test User",
     });
-    
-    testLeadId = Number(leadResult.insertId);
+
+    testLeadId = Number(leadResult.id);
 
     // Create test quiz responses
     await db.insert(quizResponses).values({
@@ -78,6 +77,43 @@ describe("quiz.getResult procedure", () => {
     expect(diagnostic).toBeDefined();
     expect(diagnostic?.leadId).toBe(testLeadId);
     expect(diagnostic?.profileName).toBe("espiritualmente confuso(a)");
+  });
+
+  it("should return the most recent quiz response and diagnostic for the lead", async () => {
+    await db.insert(quizResponses).values({
+      leadId: testLeadId,
+      step1: "Test User",
+      step2: "Renewed",
+      step3: "Need clarity",
+      step4: "Daily",
+      step5: "Growing",
+      step6: "Peace",
+      step7: "Patience",
+      step8: "More intimacy",
+      step9: "20 minutes",
+      step10: "Inconsistency",
+      step11: "Spiritually rebuilding",
+      step12: "This is my newest response",
+    });
+
+    await db.insert(diagnosticHistory).values({
+      leadId: testLeadId,
+      profileName: "espiritualmente em reconstrução",
+      profileDescription: "Newest diagnostic entry for this lead.",
+      strengths: JSON.stringify(["Consistency is returning"]),
+      challenges: JSON.stringify(["Still rebuilding confidence"]),
+      recommendations: JSON.stringify(["Protect the new routine"]),
+      nextSteps: JSON.stringify(["Continue today"]),
+    });
+
+    const { getQuizResponseByLeadId, getDiagnosticByLeadId } = await import('./db');
+
+    const latestQuizResponse = await getQuizResponseByLeadId(testLeadId);
+    const latestDiagnostic = await getDiagnosticByLeadId(testLeadId);
+
+    expect(latestQuizResponse?.step12).toBe("This is my newest response");
+    expect(latestDiagnostic?.profileName).toBe("espiritualmente em reconstrução");
+    expect(latestDiagnostic?.profileDescription).toBe("Newest diagnostic entry for this lead.");
   });
 
   it("should return undefined for non-existent leadId", async () => {

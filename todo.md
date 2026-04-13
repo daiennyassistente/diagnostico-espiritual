@@ -705,3 +705,10 @@
 - [x] Corrigir botão de reconectar que não está abrindo a página de pagamento
 - [x] Corrigir handler de checkout para usar Mercado Pago em vez de Stripe
 - [x] Corrigir erro de hook call em handleCheckout - mover useMutation para fora da função
+- [ ] Validar fluxo completo do quiz sem alterar o sistema
+- [ ] Verificar personalização da página de resultado conforme respostas do quiz
+- [ ] Verificar fluxo de pagamento e redirecionamento para página de sucesso
+- [ ] Verificar geração do devocional personalizado e funcionamento do download
+
+- [x] Investigar e corrigir o botão de pagamento que não está funcionando
+- [x] Investigar e corrigir a falta de personalização dos resultados do quiz
