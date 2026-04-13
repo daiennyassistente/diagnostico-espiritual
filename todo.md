@@ -716,3 +716,4 @@
 - [x] Corrigir o redesign excessivo e ajustar somente o fundo para um bege claro, preservando o restante do padrão visual
 - [x] Remover os cards "O que revelou no quiz" e "O que faz sentido para sua próxima semana" da página de resultado
 - [x] Alterar a cor de fundo dos cards "Diagnóstico", "Pontos de Força" e "Bloqueios" para branco
+- [x] Corrigir: alterar APENAS o primeiro card (Diagnóstico) para branco e reverter os outros dois para cores originais
