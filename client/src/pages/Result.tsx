@@ -88,6 +88,7 @@ export default function Result() {
 
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
   const checkoutMutation = trpc.payment.createStripeCheckout.useMutation();
+  const downloadResultMutation = trpc.download.downloadResult.useMutation();
 
   useEffect(() => {
     const resolvedLeadId = resolveLeadIdFromSources(
@@ -232,20 +233,29 @@ export default function Result() {
     setIsGeneratingPDF(true);
 
     try {
-      const token = trpcResult.payment?.downloadToken;
-      if (!token) {
+      if (!leadId) {
         toast.error("Seu PDF será liberado após a confirmação do pagamento.");
         return;
       }
+      
+      const token = leadId.toString();
 
-      const response = await trpc.pdf.downloadPDF.mutate({ token });
-      if (response?.url) {
+      const response = await downloadResultMutation.mutateAsync({ token: token || "" });
+      if (response?.pdfBase64) {
+        const binaryString = atob(response.pdfBase64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.href = response.url;
+        link.href = url;
         link.download = `diagnostico-espiritual-${displayName}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
         toast.success("PDF baixado com sucesso!");
       }
     } catch (error) {
@@ -308,8 +318,8 @@ export default function Result() {
       const checkout = await checkoutMutation.mutateAsync({
         email,
         profileName: result.profileName,
-        userName: payerName,
         userPhone,
+        leadId: leadId?.toString() || "",
       });
 
       if (!checkout.checkoutUrl) {

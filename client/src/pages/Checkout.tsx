@@ -45,6 +45,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
         email,
         profileName: profileName || "Diagnóstico Espiritual",
         userPhone: whatsapp,
+        leadId: leadId?.toString() || "",
       },
       {
         onSuccess: (data: any) => {

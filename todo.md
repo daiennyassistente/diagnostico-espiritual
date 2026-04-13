@@ -343,13 +343,19 @@
 - [x] Criar procedimento tRPC para liberar acesso manualmente (implementado)
 - [x] Implementar lógica de liberação de acesso (implementado)
 - [x] Testar funcionalidade de liberação manual (testado)
-
+## Correção do Webhook Stripe - checkout.session.completed
+- [x] Adicionar tratamento do evento checkout.session.completed no webhook
+- [x] Registrar pagamentos corretamente no banco de dados
+- [x] Gerar PDF do devocional automaticamente após pagamento
+- [x] Testar fluxo completo de pagamento com novo webhook
+- [x] Validar que o leadId é passado corretamente para a sessão Stripe
+- [x] Verificar logs do webhook para confirmar processamento
 
 ## Gerenciamento de Perguntas do Quiz (Admin Legacy)
 - [x] Criar tabela de perguntas no banco de dados (10 perguntas padrão criadas)
 - [x] Implementar procedimentos tRPC para CRUD de perguntas (getQuestions, updateQuestion, createQuestion, deleteQuestion)
 - [x] Criar interface de gerenciamento na página admin-legacy (aba "Gerenciar Perguntas" adicionada)
-- [x] Testar edição, adição e remoção de perguntas (todos os botões visíveis e funcionais)
+- [x] Testar edição, adição e...remoção de perguntas (todos os botões visíveis e funcionais)
 - [x] Testar integração com o quiz em tempo real (10 perguntas carregadas corretamente)
 
 
@@ -726,9 +732,15 @@
 
 ## Configuração do Stripe - Passo a Passo
 
-- [ ] PASSO 1: Obter as chaves do Stripe (Secret Key, Publishable Key, Webhook Secret)
-- [ ] PASSO 2: Configurar as chaves no projeto (variáveis de ambiente)
-- [ ] PASSO 3: Implementar endpoint de criação de Stripe Checkout Session
+- [x] PASSO 1: Obter as chaves do Stripe (Secret Key, Publishable Key, Webhook Secret)
+- [x] PASSO 2: Configurar as chaves no projeto (variáveis de ambiente)
+- [x] PASSO 3: Implementar endpoint de criação de Stripe Checkout Session
 - [ ] PASSO 4: Configurar webhook do Stripe no Dashboard
 - [ ] PASSO 5: Testar o fluxo de pagamento completo
 - [ ] PASSO 6: Implementar envio de email após pagamento
+- [ ] PASSO 5: Testar o fluxo de pagamento completo
+- [ ] PASSO 6: Implementar envio de email após pagamento
+- [ ] Verificar se o painel de admin mostra os compradores na aba de compradores
+- [ ] BUGS A CORRIGIR: Email não está sendo enviado após pagamento
+- [ ] BUGS A CORRIGIR: Comprador não está sendo registrado no banco de dados
+- [ ] BUGS A CORRIGIR: Webhook do Stripe não está processando corretamente

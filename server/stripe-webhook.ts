@@ -176,6 +176,103 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         break;
       }
 
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        console.log(`[Webhook] Checkout session completed: ${session.id}`);
+
+        // Registrar pagamento no banco de dados
+        const clientReferenceId = session.client_reference_id;
+        const leadId = clientReferenceId;
+        const amount = session.amount_total || 0;
+
+        if (leadId) {
+          try {
+            const db = await getDb();
+            if (!db) {
+              console.error("[Webhook] Database not available");
+              return res.status(500).json({ error: "Database not available" });
+            }
+
+            // Verificar se já existe
+            const existing = await db
+              .select()
+              .from(payments)
+              .where(eq(payments.stripePaymentIntentId, session.id))
+              .limit(1);
+
+            if (existing.length === 0) {
+              // Inserir novo pagamento
+              await db.insert(payments).values({
+                leadId: parseInt(leadId),
+                stripePaymentIntentId: session.id,
+                amount: Math.round(amount / 100), // Converter de centavos para reais
+                status: "succeeded",
+                productName: "Devocional: 7 Dias para se Aproximar de Deus",
+              });
+              console.log(`[Webhook] Payment recorded for lead ${leadId}`);
+              
+              // Gerar devocional automaticamente
+              try {
+                const diagnostic = await db
+                  .select()
+                  .from(diagnosticHistory)
+                  .where(eq(diagnosticHistory.leadId, parseInt(leadId)))
+                  .limit(1);
+                
+                if (diagnostic.length > 0) {
+                  console.log(`[Webhook] Generating devotional PDF for lead ${leadId}`);
+                  
+                  // Preparar dados para gerar o devocional
+                  const devotionalData = {
+                    profileName: diagnostic[0].profileName,
+                    profileDescription: diagnostic[0].profileDescription,
+                    strengths: JSON.parse(diagnostic[0].strengths),
+                    challenges: JSON.parse(diagnostic[0].challenges),
+                    recommendations: JSON.parse(diagnostic[0].recommendations),
+                    nextSteps: JSON.parse(diagnostic[0].nextSteps),
+                    responses: {},
+                  };
+                  
+                  // Gerar PDF do devocional
+                  const pdfBuffer = await generateDevocionalPDF(devotionalData);
+                  console.log(`[Webhook] Devotional PDF generated successfully (${pdfBuffer.length} bytes)`);
+                } else {
+                  console.warn(`[Webhook] No diagnostic found for lead ${leadId}`);
+                }
+              } catch (pdfError: any) {
+                console.error(`[Webhook] Failed to generate devotional PDF: ${pdfError.message}`);
+              }
+              
+              // Enviar email com PDF devocional
+              try {
+                const leadData = await db.select().from(leads).where(eq(leads.id, parseInt(leadId))).limit(1);
+                if (leadData.length > 0) {
+                  const profileName = session.metadata?.profile_name || "Seu Devocional";
+                  const downloadLink = `${process.env.FRONTEND_URL || "https://espiritualquiz-sx87ncqt.manus.space"}/checkout-success`;
+                  
+                  const emailSent = await sendDevotionalConfirmationEmail(
+                    leadData[0].email,
+                    profileName,
+                    downloadLink
+                  );
+                  
+                  if (emailSent) {
+                    console.log(`[Webhook] Email sent to ${leadData[0].email}`);
+                  } else {
+                    console.warn(`[Webhook] Email failed for ${leadData[0].email}`);
+                  }
+                }
+              } catch (emailError: any) {
+                console.error(`[Webhook] Failed to send email: ${emailError.message}`);
+              }
+            }
+          } catch (dbError: any) {
+            console.error(`[Webhook] Database error: ${dbError.message}`);
+          }
+        }
+        break;
+      }
+
       case "charge.refunded": {
         const charge = event.data.object as Stripe.Charge;
         console.log(`[Webhook] Charge refunded: ${charge.id}`);

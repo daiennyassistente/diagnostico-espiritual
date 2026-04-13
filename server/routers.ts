@@ -723,6 +723,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           email: z.string().email(),
           profileName: z.string(),
           userPhone: z.string(),
+          leadId: z.string(),
         }),
       )
       .mutation(async ({ input, ctx }) => {
@@ -750,10 +751,13 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
             customer_email: input.email,
             success_url: `${origin}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/checkout`,
+            client_reference_id: input.leadId,
             metadata: {
               email: input.email,
               profileName: input.profileName,
               userPhone: input.userPhone,
+              user_id: input.leadId,
+              client_reference_id: input.leadId,
             },
           });
 
