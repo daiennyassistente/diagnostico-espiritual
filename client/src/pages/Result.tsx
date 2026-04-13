@@ -42,6 +42,7 @@ export default function Result() {
   const [timeLeft, setTimeLeft] = useState(86400);
   const [leadId, setLeadId] = useState<number | null>(null);
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Get leadId from URL query string, with localStorage fallback
   useEffect(() => {
@@ -216,6 +217,29 @@ export default function Result() {
     setLocation("/quiz");
   };
 
+  const handleCheckout = async () => {
+    if (!userName || !trpcResult) return;
+    
+    setIsCheckingOut(true);
+    try {
+      const checkoutMutation = trpc.quiz.createDevocionalCheckout.useMutation();
+      const result = await checkoutMutation.mutateAsync({
+        email: "user@example.com",
+        profileName: trpcResult.diagnostic.profileName,
+      });
+      
+      if (result.checkoutUrl) {
+        window.open(result.checkoutUrl, "_blank");
+        toast.success("Redirecionando para pagamento...");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Erro ao iniciar pagamento");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
   return (
     <div className="min-h-screen spiritual-background relative">
       <div className="max-w-2xl mx-auto px-4 py-12 relative z-10">
@@ -321,9 +345,20 @@ export default function Result() {
             size="lg" 
             className="w-full text-lg font-bold"
             style={{ backgroundColor: OURO, color: "#1a1a1a" }}
+            onClick={handleCheckout}
+            disabled={isCheckingOut}
           >
-            <Zap className="w-5 h-5 mr-2" />
-            {spiritualCopy.ctaPrimary}
+            {isCheckingOut ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                <Zap className="w-5 h-5 mr-2" />
+                {spiritualCopy.ctaPrimary}
+              </>
+            )}
           </Button>
 
           {/* Preço */}

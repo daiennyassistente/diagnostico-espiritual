@@ -702,3 +702,4 @@
 - [x] Centralizar o texto "Por isso existe..." ao card da oferta
 - [x] Substituir texto do botão de compra de "recomeçar" para "me reconectar"
 - [x] Mudar cor do botão de compra para um amarelo mais forte
+- [x] Corrigir botão de reconectar que não está abrindo a página de pagamento
