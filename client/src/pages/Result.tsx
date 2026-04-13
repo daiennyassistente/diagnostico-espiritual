@@ -43,6 +43,7 @@ export default function Result() {
   const [leadId, setLeadId] = useState<number | null>(null);
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const { data: user } = trpc.auth.me.useQuery();
 
   // Get leadId from URL query string, with localStorage fallback
   useEffect(() => {
@@ -222,15 +223,18 @@ export default function Result() {
     
     setIsCheckingOut(true);
     try {
-      const checkoutMutation = trpc.quiz.createDevocionalCheckout.useMutation();
+      const checkoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
       const result = await checkoutMutation.mutateAsync({
         email: "user@example.com",
         profileName: trpcResult.diagnostic.profileName,
+        userName: userName,
       });
       
       if (result.checkoutUrl) {
         window.open(result.checkoutUrl, "_blank");
         toast.success("Redirecionando para pagamento...");
+      } else {
+        toast.error("Não foi possível gerar link de pagamento");
       }
     } catch (error) {
       console.error("Checkout error:", error);
