@@ -397,7 +397,7 @@ export default function Result() {
           <Button
             size="lg"
             className="w-full text-lg font-bold"
-            style={{ backgroundColor: "#C9A54C", color: "#17395F" }}
+            style={{ backgroundColor: "#FFC700", color: "#17395F" }}
             onClick={handleCheckout}
             disabled={isCheckingOut}
           >
