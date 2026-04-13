@@ -329,7 +329,7 @@ export default function Result() {
   return (
     <div className="spiritual-background min-h-screen py-10 px-4">
       <div className="container max-w-5xl">
-        <section className="quiz-card mb-8 border border-accent/40 bg-card/95 backdrop-blur">
+        <section className="quiz-card mb-8 border border-accent/40 bg-white backdrop-blur">
           <div className="flex items-start gap-3 mb-4">
             <Sparkles className="w-6 h-6 text-primary mt-1" />
             <div>
@@ -348,7 +348,7 @@ export default function Result() {
 
 
         <section className="grid gap-6 md:grid-cols-2 mb-8">
-          <Card className="p-6 border-[#D7C08A] bg-[#FFF9EE]">
+          <Card className="p-6 border-[#D7C08A] bg-white">
             <h2 className="text-2xl font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
             <ul className="space-y-3 text-[#27405F]">
               {result.strengths.map((item, index) => (
@@ -359,7 +359,7 @@ export default function Result() {
             </ul>
           </Card>
 
-          <Card className="p-6 border-[#D7C08A] bg-[#F8F1E0]">
+          <Card className="p-6 border-[#D7C08A] bg-white">
             <h2 className="text-2xl font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
             <ul className="space-y-3 text-[#27405F]">
               {result.challenges.map((item, index) => (
