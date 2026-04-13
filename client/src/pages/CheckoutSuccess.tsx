@@ -19,9 +19,10 @@ export default function CheckoutSuccess() {
   const resendViaWhatsAppMutation = trpc.admin.resendViaWhatsApp.useMutation();
 
   useEffect(() => {
-    // Extrair leadId do URL
+    // Extrair leadId ou token do URL
     const params = new URLSearchParams(window.location.search);
     const leadId = params.get('leadId');
+    const token = params.get('token');
 
     // Recuperar dados do resultado e respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
@@ -43,8 +44,8 @@ export default function CheckoutSuccess() {
       setTimeout(() => {
         handleDownloadDevocional();
       }, 1000);
-    } else if (leadId) {
-      // Se houver leadId, mostrar mensagem de sucesso genérica
+    } else if (token || leadId) {
+      // Se houver token (do webhook) ou leadId, mostrar mensagem de sucesso genérica
       setIsLoading(false);
       setResult({
         profileName: "Seu Perfil Espiritual",
@@ -55,6 +56,7 @@ export default function CheckoutSuccess() {
         nextSteps: []
       });
       setResponses({});
+      toast.success("Pagamento confirmado! Seu devocional está pronto.");
     } else {
       // Se não houver dados, redirecionar para o quiz
       toast.error("Dados não encontrados. Redirecionando para o quiz...");
