@@ -10,6 +10,7 @@ import { generateDeepSpiritualDiagnosis } from "@/lib/deepSpiritualDiagnosis";
 import { generatePersonalizedTitle } from "@/lib/personalizedTitles";
 import { generateSpiritualPageCopy } from "@/lib/spiritualCopy";
 import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState";
+import { buildResultHeadline } from "@/lib/resultHeadline";
 
 interface AIResult {
   profileName: string;
@@ -168,6 +169,11 @@ export default function Result() {
     userName
   );
 
+  const resultHeadline = buildResultHeadline({
+    profileName: result.profileName,
+    personalizedTitle,
+  });
+
   // Cores
   const AZUL_PROFUNDO = "#1E40AF";
   const OURO = "#D4AF37";
@@ -215,9 +221,9 @@ export default function Result() {
       <div className="max-w-2xl mx-auto px-4 py-12 relative z-10">
         {/* SEÇÃO 1: ABERTURA INTIMISTA */}
         <section className="mb-12 text-center">
-          <div className="text-lg leading-relaxed text-foreground whitespace-pre-line font-medium mb-6">
-            {personalizedTitle}
-          </div>
+          <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground mb-6">
+            {resultHeadline}
+          </h1>
         </section>
 
         {/* SEÇÃO 2: EXPLICAÇÃO PROFUNDA */}
@@ -281,8 +287,8 @@ export default function Result() {
         </section>
 
         {/* SEÇÃO 8: APRESENTAÇÃO DA SOLUÇÃO */}
-        <section className="quiz-card mb-12 text-white" style={{ backgroundColor: AZUL_PROFUNDO }}>
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: OURO }}>✨ Seu plano de transformação</h2>
+        <section className="quiz-card mb-12 text-slate-900" style={{ backgroundColor: AZUL_CLARO }}>
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: AZUL_PROFUNDO }}>✨ Seu plano de transformação</h2>
           <div className="text-base leading-relaxed whitespace-pre-line space-y-4 mb-8">
             {spiritualCopy.solutionIntro.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-4">{paragraph}</p>
@@ -303,7 +309,7 @@ export default function Result() {
           </div>
 
           {/* Chamado interno */}
-          <div className="bg-white bg-opacity-10 p-6 rounded-lg border border-white border-opacity-20 mb-8">
+          <div className="p-6 rounded-lg border mb-8" style={{ backgroundColor: "rgba(255, 255, 255, 0.7)", borderColor: "#BFDBFE" }}>
             <p className="text-center text-lg font-medium">
               {spiritualCopy.internalCall}
             </p>
@@ -320,7 +326,7 @@ export default function Result() {
           </Button>
 
           {/* Preço */}
-          <p className="text-center text-sm mt-4 text-gray-300">
+          <p className="text-center text-sm mt-4 text-slate-600">
             {spiritualCopy.priceMessage}
           </p>
         </section>
