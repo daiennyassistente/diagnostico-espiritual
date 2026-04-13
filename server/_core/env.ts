@@ -11,5 +11,5 @@ export const ENV = {
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? "",
   twilioWhatsappNumber: process.env.TWILIO_WHATSAPP_NUMBER ?? "",
   twilioServiceSid: process.env.TWILIO_SERVICE_SID ?? "",
-  mercadoPagoPublicKey: process.env.VITE_MERCADOPAGO_PUBLIC_KEY ?? "",
+
 };

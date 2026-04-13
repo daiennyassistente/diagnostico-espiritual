@@ -476,56 +476,7 @@ export const appRouter = router({
       return await getAllQuizResponses();
     }),
 
-    createMercadoPagoCheckout: publicProcedure.input(
-        z.object({
-          email: z.string().email(),
-          profileName: z.string(),
-          userName: z.string().optional(),
-          userPhone: z.string().optional(),
-        }),
-      )
-      .mutation(async ({ input, ctx }) => {
-        try {
-          const { createMercadoPagoPreference, getMercadoPagoInitPoint } = await import("./_core/mercadopago");
-          
-          // Extrair nome e sobrenome do usuário
-          const fullName = input.userName || input.email.split('@')[0];
-          const nameParts = fullName.split(' ');
-          const firstName = nameParts[0] || "Cliente";
-          const lastName = nameParts.slice(1).join(' ') || "Devocional";
-          
-          // Extrair DDD e número do WhatsApp
-          const phoneNumber = input.userPhone || "11999999999";
-          const cleanPhone = phoneNumber.replace(/\D/g, '');
-          const areaCode = cleanPhone.substring(0, 2) || "11";
-          const number = cleanPhone.substring(2) || "999999999";
-          
-          const preference = await createMercadoPagoPreference({
-            title: "Devocional: 7 Dias para se Aproximar de Deus",
-            description: `Guia devocional personalizado baseado em seu perfil: ${input.profileName}. Contém 7 dias de reflexões, versículos bíblicos e orações específicas para sua jornada espiritual.`,
-            price: 12.90,
-            quantity: 1,
-            email: input.email,
-            externalReference: `devotional-${Date.now()}`,
-            successUrl: `${ctx.req.headers.origin}/checkout-success`,
-            failureUrl: `${ctx.req.headers.origin}/result`,
-            pendingUrl: `${ctx.req.headers.origin}/result`,
-            payerName: firstName,
-            payerSurname: lastName,
-            payerPhone: { areaCode, number },
-          });
 
-          const initPoint = getMercadoPagoInitPoint(preference);
-          if (!initPoint) {
-            throw new Error("Nao foi possivel gerar link de pagamento");
-          }
-
-          return { success: true, checkoutUrl: initPoint };
-        } catch (error: any) {
-          console.error("Mercado Pago checkout error:", error);
-          throw new Error("Erro ao criar sessao de pagamento");
-        }
-      }),
 
     getResult: publicProcedure
       .input(z.object({ leadId: z.number() }))
@@ -574,53 +525,7 @@ export const appRouter = router({
         }
       }),
 
-    processSecureFieldsPayment: publicProcedure
-      .input(
-        z.object({
-          cardToken: z.string(),
-          email: z.string().email(),
-          profileName: z.string(),
-          leadId: z.number(),
-        }),
-      )
-      .mutation(async ({ input }) => {
-        try {
-          const { MercadoPagoConfig, Payment } = await import("mercadopago");
-          
-          const client = new MercadoPagoConfig({
-            accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "",
-          });
 
-          const paymentClient = new Payment(client);
-
-          const payment = await paymentClient.create({
-            body: {
-              token: input.cardToken,
-              transaction_amount: 12.90,
-              installments: 1,
-              payment_method_id: "visa",
-              payer: {
-                email: input.email,
-              },
-              description: `Devocional personalizado - Perfil: ${input.profileName}`,
-              external_reference: `devotional-${input.leadId}-${Date.now()}`,
-            },
-          });
-
-          if ((payment.status as any) === "201" || (payment.status as any) === "200" || (payment.status as any) === 201 || (payment.status as any) === 200) {
-            return { 
-              success: true, 
-              paymentId: payment.id,
-              status: payment.status,
-            };
-          } else {
-            throw new Error("Erro ao processar pagamento");
-          }
-        } catch (error: any) {
-          console.error("Secure Fields payment error:", error);
-          throw new Error(`Erro ao processar pagamento: ${error.message}`);
-        }
-      }),
   }),
 
   pdf: router({
@@ -809,53 +714,57 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
       }),
   }),
 
+
+
   payment: router({
-    verifyMercadoPagoPayment: publicProcedure
-      .input(z.object({ externalReference: z.string() }))
-      .query(async ({ input }) => {
+    createStripeCheckout: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          profileName: z.string(),
+          userPhone: z.string(),
+        }),
+      )
+      .mutation(async ({ input, ctx }) => {
         try {
-          const { verifyMercadoPagoPayment } = await import("./_core/mercadopago");
-          const paymentInfo = await verifyMercadoPagoPayment(input.externalReference);
-          
-          if (paymentInfo && paymentInfo.approved) {
-            const db = await getDb();
-            if (db && paymentInfo.payer_email) {
-              const leadData = await db
-                .select()
-                .from(leads)
-                .where(eq(leads.email, paymentInfo.payer_email))
-                .limit(1);
+          const Stripe = await import("stripe");
+          const stripe = new Stripe.default(process.env.STRIPE_SECRET_KEY || "");
+          const origin = ctx.req.headers.origin || "https://diagnosticoespiritual.manus.space";
 
-              if (leadData.length > 0) {
-                const leadId = leadData[0].id;
-                const downloadToken = Buffer.from(`${leadId}-${paymentInfo.id}-${Date.now()}`).toString('base64');
-                
-                const existing = await db
-                  .select()
-                  .from(payments)
-                  .where(eq(payments.mercadopagoPaymentId, paymentInfo.id.toString()))
-                  .limit(1);
+          const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [
+              {
+                price_data: {
+                  currency: "brl",
+                  product_data: {
+                    name: "Devocional: 7 Dias para se Aproximar de Deus",
+                    description: input.profileName,
+                  },
+                  unit_amount: 1290,
+                },
+                quantity: 1,
+              },
+            ],
+            mode: "payment",
+            customer_email: input.email,
+            success_url: `${origin}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${origin}/checkout`,
+            metadata: {
+              email: input.email,
+              profileName: input.profileName,
+              userPhone: input.userPhone,
+            },
+          });
 
-                if (existing.length === 0) {
-                  await db.insert(payments).values({
-                    leadId: leadId,
-                    mercadopagoPaymentId: paymentInfo.id.toString(),
-                    amount: Math.round(paymentInfo.amount),
-                    status: "succeeded",
-                    productName: "Devocional: 7 Dias para se Aproximar de Deus",
-                    downloadToken: downloadToken,
-                  });
-
-                  console.log(`[Verify Payment] Payment recorded for lead ${leadId}`);
-                }
-              }
-            }
-          }
-          
-          return paymentInfo;
+          return {
+            success: true,
+            checkoutUrl: session.url,
+            sessionId: session.id,
+          };
         } catch (error: any) {
-          console.error("Verify payment error:", error);
-          throw new Error("Erro ao verificar pagamento");
+          console.error("Stripe checkout error:", error);
+          throw new Error("Erro ao criar sessão de pagamento");
         }
       }),
   }),

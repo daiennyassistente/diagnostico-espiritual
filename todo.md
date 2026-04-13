@@ -723,3 +723,12 @@
 - [x] Mudar todas as caixas de texto para branco, exceto "Comece por aqui" que permanece azul
 - [x] Deixar APENAS as caixas de texto "dai, seu perfil atual aponta para..." e "Seu devocional de 7 dias foi pensado..." com fundo branco, reverter as demais
 - [x] Deixar o botão de pagamento em amarelo bem chamativo e testar se está funcionando
+
+## Configuração do Stripe - Passo a Passo
+
+- [ ] PASSO 1: Obter as chaves do Stripe (Secret Key, Publishable Key, Webhook Secret)
+- [ ] PASSO 2: Configurar as chaves no projeto (variáveis de ambiente)
+- [ ] PASSO 3: Implementar endpoint de criação de Stripe Checkout Session
+- [ ] PASSO 4: Configurar webhook do Stripe no Dashboard
+- [ ] PASSO 5: Testar o fluxo de pagamento completo
+- [ ] PASSO 6: Implementar envio de email após pagamento

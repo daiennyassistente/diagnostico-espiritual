@@ -64,7 +64,7 @@ export const payments = mysqlTable("payments", {
   leadId: int("leadId").notNull(),
   stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }).unique(),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
-  mercadopagoPaymentId: varchar("mercadopagoPaymentId", { length: 255 }).unique(),
+
   amount: int("amount").notNull(),
   currency: varchar("currency", { length: 10 }).default("brl").notNull(),
   status: mysqlEnum("status", ["pending", "succeeded", "failed", "canceled", "approved"]).default("pending").notNull(),

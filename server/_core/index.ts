@@ -8,8 +8,6 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe-webhook";
-import { handleMercadoPagoWebhook } from "../mercadopago-webhook";
-import { testMercadoPagoWebhook } from "../test-webhook";
 import { createOrUpdateAdminUser } from "../db";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -50,19 +48,7 @@ async function startServer() {
     handleStripeWebhook
   );
 
-  // Mercado Pago webhook
-  app.post(
-    "/api/mercadopago/webhook",
-    express.raw({ type: "application/json" }),
-    handleMercadoPagoWebhook
-  );
 
-  // Teste do webhook (apenas para desenvolvimento)
-  app.post(
-    "/api/test/mercadopago-webhook",
-    express.json(),
-    testMercadoPagoWebhook
-  );
 
   // Download PDF route
   app.get("/api/download", async (req, res) => {

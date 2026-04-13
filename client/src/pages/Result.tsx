@@ -85,8 +85,9 @@ export default function Result() {
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { data: user } = trpc.auth.me.useQuery();
-  const checkoutMutation = trpc.quiz.createMercadoPagoCheckout.useMutation();
+
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
+  const checkoutMutation = trpc.payment.createStripeCheckout.useMutation();
 
   useEffect(() => {
     const resolvedLeadId = resolveLeadIdFromSources(
