@@ -129,7 +129,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
         {paymentMethod === null && (
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {/* Opção 1: Secure Fields */}
-            <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C]">
+            <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C] bg-white">
               <div onClick={() => setPaymentMethod("secure-fields")} className="space-y-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
                   <CreditCard className="w-6 h-6" style={{ color: "#3E342C" }} />
@@ -156,7 +156,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
             </Card>
 
             {/* Opção 2: Mercado Pago Preference */}
-            <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C]">
+            <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200 hover:border-[#3E342C] bg-white">
               <div onClick={() => setPaymentMethod("preference")} className="space-y-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: "#F5F1EA" }}>
                   <Zap className="w-6 h-6" style={{ color: "#3E342C" }} />
@@ -215,7 +215,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
             >
               ← Voltar
             </Button>
-            <Card className="p-8 text-center space-y-4">
+            <Card className="p-8 text-center space-y-4 bg-white">
               <h2 className="text-xl font-semibold" style={{ color: "#4A3F35" }}>
                 Você será redirecionado para o Mercado Pago
               </h2>
@@ -242,7 +242,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
         )}
 
         {/* Informações de Segurança */}
-        <Card className="mt-8 p-6" style={{ backgroundColor: "#F5F1EA" }}>
+        <Card className="mt-8 p-6 bg-white">
           <h3 className="font-semibold mb-3" style={{ color: "#4A3F35" }}>
             🔒 Segurança Garantida
           </h3>

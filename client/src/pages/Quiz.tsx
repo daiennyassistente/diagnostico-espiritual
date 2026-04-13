@@ -491,7 +491,7 @@ export default function Quiz() {
   if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult && !hasPendingResultRedirect) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
-        <div className="quiz-card max-w-2xl w-full">
+        <div className="quiz-card max-w-2xl w-full bg-white">
           <div className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold text-primary">
               Diagnóstico Espiritual
@@ -526,7 +526,7 @@ export default function Quiz() {
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
-        <div className="quiz-card max-w-2xl w-full text-center space-y-8">
+        <div className="quiz-card max-w-2xl w-full text-center space-y-8 bg-white">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-primary">
               {PROCESSING_MESSAGES[visibleProcessingStep]}
@@ -570,7 +570,7 @@ export default function Quiz() {
   if (showLeadForm) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
-        <div className="quiz-card max-w-2xl w-full">
+        <div className="quiz-card max-w-2xl w-full bg-white">
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-primary mb-2">
@@ -641,7 +641,7 @@ export default function Quiz() {
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 spiritual-background">
-        <div className="quiz-card max-w-2xl w-full">
+        <div className="quiz-card max-w-2xl w-full bg-white">
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="progress-bar">

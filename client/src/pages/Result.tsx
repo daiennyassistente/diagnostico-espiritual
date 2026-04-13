@@ -381,7 +381,7 @@ export default function Result() {
           </section>
         )}
 
-        <section className="quiz-card mb-10 bg-[#FAF4E7] border-[#D7C08A] text-[#27405F]">
+        <section className="quiz-card mb-10 bg-white border-[#D7C08A] text-[#27405F]">
           <h2 className="text-2xl font-semibold text-primary mb-4">Seu devocional de 7 dias foi pensado para este momento</h2>
           <p className="text-base leading-7 mb-6">
             Em vez de um material genérico, o próximo passo é receber um plano devocional alinhado ao seu perfil atual,

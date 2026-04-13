@@ -719,3 +719,4 @@
 - [x] Corrigir: alterar APENAS o primeiro card (Diagnóstico) para branco e reverter os outros dois para cores originais
 - [x] Ajustar cores finais: cards maiores com fundo bege/barro (#FAF4E7), cards "Diagnóstico", "Pontos de Força" e "Bloqueios" com fundo branco
 - [x] Deixar o card "Diagnóstico" (seu perfil...) com fundo branco também
+- [x] Deixar o fundo de todos os cards de todas as páginas brancos (#ffffff), exceto o card "Comece por aqui"
