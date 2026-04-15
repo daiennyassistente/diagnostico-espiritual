@@ -1,0 +1,62 @@
+
+    sendTestEmail: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { sendEmail } = await import('./email-service');
+          
+          const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="UTF-8">
+                <style>
+                  body { font-family: Arial, sans-serif; color: #333; }
+                  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .header { background-color: #4A3F35; color: white; padding: 20px; text-align: center; border-radius: 5px; }
+                  .content { padding: 20px; background-color: #F5F1EA; margin: 20px 0; border-radius: 5px; }
+                  .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1>✅ Email de Teste</h1>
+                  </div>
+                  
+                  <div class="content">
+                    <p>Olá,</p>
+                    
+                    <p>Este é um email de teste para confirmar que o sistema de envio de emails está funcionando corretamente!</p>
+                    
+                    <p><strong>Se você recebeu este email, significa que:</strong></p>
+                    <ul>
+                      <li>✅ SMTP está configurado corretamente</li>
+                      <li>✅ Emails de confirmação de pagamento funcionarão</li>
+                      <li>✅ Seus clientes receberão o devocional por email</li>
+                      <li>✅ Tudo está pronto para produção!</li>
+                    </ul>
+                    
+                    <p>Parabéns! Seu sistema de email está 100% funcional! 🎉</p>
+                  </div>
+                  
+                  <div class="footer">
+                    <p>© 2026 Diagnóstico Espiritual. Todos os direitos reservados.</p>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `;
+          
+          const result = await sendEmail({
+            to: input.email,
+            subject: '✅ Email de Teste - Diagnóstico Espiritual',
+            html: htmlContent,
+          });
+          
+          return { success: result, message: result ? 'Email enviado com sucesso!' : 'Erro ao enviar email' };
+        } catch (error: any) {
+          console.error('Send test email error:', error);
+          throw new Error('Erro ao enviar email de teste');
+        }
+      }),

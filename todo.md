@@ -744,3 +744,25 @@
 - [ ] BUGS A CORRIGIR: Email não está sendo enviado após pagamento
 - [ ] BUGS A CORRIGIR: Comprador não está sendo registrado no banco de dados
 - [ ] BUGS A CORRIGIR: Webhook do Stripe não está processando corretamente
+
+
+## Integração PIX com Stripe
+- [ ] Verificar se PIX está habilitado na conta Stripe
+- [ ] Atualizar checkout do Stripe para suportar PIX como método de pagamento
+- [ ] Configurar moeda BRL para PIX
+- [ ] Testar fluxo de pagamento com PIX
+- [ ] Validar recebimento de confirmação de PIX
+- [ ] Atualizar webhook para processar pagamentos PIX
+
+
+## Integração Mercado Pago com PIX
+- [x] Criar conta Mercado Pago
+- [x] Obter credenciais de teste (Checkout Pro)
+- [x] Instalar SDK do Mercado Pago
+- [x] Integrar API REST do Mercado Pago no backend
+- [x] Criar procedimento tRPC createMercadoPagoCheckout
+- [x] Configurar checkout para mostrar apenas PIX
+- [x] Atualizar frontend para usar Mercado Pago em vez de Stripe
+- [x] Testar fluxo de pagamento com PIX
+- [x] Validar webhook de pagamento
+- [x] Validar envio de email com PDF após pagamento

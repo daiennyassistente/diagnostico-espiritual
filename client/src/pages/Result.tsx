@@ -87,7 +87,7 @@ export default function Result() {
   const { data: user } = trpc.auth.me.useQuery();
 
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
-  const checkoutMutation = trpc.payment.createStripeCheckout.useMutation();
+  const checkoutMutation = trpc.payment.createMercadoPagoCheckout.useMutation();
   const downloadResultMutation = trpc.download.downloadResult.useMutation();
 
   useEffect(() => {

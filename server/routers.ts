@@ -717,6 +717,97 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
 
 
   payment: router({
+    createMercadoPagoCheckout: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          profileName: z.string(),
+          userPhone: z.string(),
+          leadId: z.string(),
+        }),
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const origin = ctx.req.headers.origin || "https://diagnosticoespiritual.manus.space";
+
+          const preference = {
+            items: [
+              {
+                title: "Devocional: 7 Dias para se Aproximar de Deus",
+                description: input.profileName,
+                unit_price: 12.90,
+                quantity: 1,
+                currency_id: "BRL",
+              },
+            ],
+            payer: {
+              email: input.email,
+              phone: {
+                number: input.userPhone,
+              },
+            },
+            back_urls: {
+              success: `${origin}/checkout-success`,
+              failure: `${origin}/checkout`,
+              pending: `${origin}/checkout-pending`,
+            },
+            auto_return: "approved",
+            external_reference: input.leadId,
+            payment_methods: {
+              excluded_payment_types: [
+                {
+                  id: "credit_card",
+                },
+                {
+                  id: "debit_card",
+                },
+                {
+                  id: "ticket",
+                },
+                {
+                  id: "bank_transfer",
+                },
+                {
+                  id: "atm",
+                },
+              ],
+              installments: 1,
+            },
+            metadata: {
+              profileName: input.profileName,
+              userPhone: input.userPhone,
+            },
+          };
+
+          const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+            },
+            body: JSON.stringify(preference),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            console.error("[Mercado Pago] API Error:", error);
+            throw new Error(`Mercado Pago API error: ${error.message}`);
+          }
+
+          const data = await response.json();
+          console.log("[Mercado Pago] Preference created:", data.id);
+
+          return {
+            success: true,
+            checkoutUrl: data.init_point,
+            preferenceId: data.id,
+          };
+        } catch (error: any) {
+          console.error("Mercado Pago checkout error:", error.message);
+          throw new Error("Erro ao criar sessão de pagamento");
+        }
+      }),
+
     createStripeCheckout: publicProcedure
       .input(
         z.object({
@@ -733,7 +824,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           const origin = ctx.req.headers.origin || "https://diagnosticoespiritual.manus.space";
 
           const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
+            payment_method_types: ["pix"],
             line_items: [
               {
                 price_data: {
