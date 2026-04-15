@@ -752,25 +752,9 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               pending: `${origin}/checkout-pending`,
             },
             auto_return: "approved",
+            notification_url: `${origin}/api/mercadopago/webhook`,
             external_reference: input.leadId,
             payment_methods: {
-              excluded_payment_types: [
-                {
-                  id: "credit_card",
-                },
-                {
-                  id: "debit_card",
-                },
-                {
-                  id: "ticket",
-                },
-                {
-                  id: "bank_transfer",
-                },
-                {
-                  id: "atm",
-                },
-              ],
               installments: 1,
             },
             metadata: {
