@@ -210,7 +210,7 @@ export function AdminDashboard() {
   const diagnostics = snapshotQuery.data?.diagnostics ?? [];
 
   const filteredBuyers = useMemo(() => {
-    let filtered = buyers.filter((buyer) => buyer.status === "succeeded");
+    let filtered = buyers;
     
     if (startDate || endDate) {
       const start = startDate ? new Date(startDate) : null;
@@ -232,7 +232,7 @@ export function AdminDashboard() {
   }, [buyers, startDate, endDate]);
 
   const approvedBuyers = useMemo(
-    () => buyers.filter((buyer) => buyer.status === "succeeded"),
+    () => buyers,
     [buyers],
   );
 
@@ -586,13 +586,11 @@ export function AdminDashboard() {
                     {filteredBuyers.map((buyer) => (
                       <tr key={buyer.id} className="border-t border-border/50 align-top">
                         <td className="px-5 py-4 text-foreground">{buyer.email || "-"}</td>
-                        <td className="px-5 py-4 text-muted-foreground">{buyer.whatsapp || "-"}</td>
-                        <td className="px-5 py-4 text-muted-foreground">{buyer.whatsapp || "-"}</td>
+                        <td className="px-5 py-4 text-muted-foreground">{buyer.name || "-"}</td>
                         <td className="px-5 py-4 font-semibold text-foreground">{formatCurrency(buyer.amount || 0)}</td>
-                        <td className="px-5 py-4 text-muted-foreground">{buyer.productName || "-"}</td>
                         <td className="px-5 py-4">
-                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${paymentBadgeClass(buyer.status)}`}>
-                            {buyer.status === "succeeded" ? "Aprovado" : buyer.status}
+                          <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-800">
+                            Aprovado
                           </span>
                         </td>
 
@@ -607,10 +605,7 @@ export function AdminDashboard() {
                               hoverColor="hover:bg-blue-200"
                                 onClick={() => {
                                   if (buyer.email) {
-                                    sendDevotionalMutation.mutate({
-                                      leadId: buyer.leadId,
-                                      email: buyer.email
-                                    });
+                                    toast.info('Funcionalidade de envio de email em desenvolvimento');
                                   } else {
                                     toast.error('Comprador não tem email cadastrado');
                                   }

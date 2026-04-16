@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken } from "./db";
 import { generateDevotionalPDF } from "./devotional-generator";
 import { sendEmail } from "./email-service";
-import { payments } from "../drizzle/schema";
+import { payments, buyers } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
 
@@ -53,6 +53,35 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     }
     console.log(`[Mercado Pago Webhook] Pagamento aprovado`);
 
+    // Criar registro de comprador
+    const db = await getDb();
+    if (db && paymentData.payer?.email) {
+      try {
+        // Verificar se já existe comprador com este paymentId
+        const existingBuyer = await db
+          .select({ id: buyers.id })
+          .from(buyers)
+          .where(eq(buyers.paymentId, String(paymentId)))
+          .limit(1);
+
+        if (existingBuyer.length === 0) {
+          // Inserir novo comprador
+          await db.insert(buyers).values({
+            paymentId: String(paymentId),
+            email: paymentData.payer.email,
+            name: paymentData.payer.first_name || paymentData.payer.email,
+            amount: Math.round(Number(paymentData.transaction_amount || 0) * 100),
+            currency: String(paymentData.currency_id || "BRL").toLowerCase(),
+          });
+          console.log(`[Mercado Pago Webhook] Comprador criado: ${paymentData.payer.email}`);
+        } else {
+          console.log(`[Mercado Pago Webhook] Comprador já existe para paymentId: ${paymentId}`);
+        }
+      } catch (buyerError) {
+        console.error(`[Mercado Pago Webhook] Erro ao criar comprador:`, buyerError);
+      }
+    }
+
     const leadId = paymentData.external_reference;
     if (!leadId) {
       console.log("[Mercado Pago Webhook] Pagamento sem external_reference; notificação recebida sem processamento adicional");
@@ -60,8 +89,7 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     }
     console.log(`[Mercado Pago Webhook] Lead ID encontrado: ${leadId}`);
     
-    // Update payment status in database
-    const db = await getDb();
+    // Update payment status in database (db já foi obtido acima)
     if (db) {
       const existingPayment = await db
         .select({ id: payments.id })

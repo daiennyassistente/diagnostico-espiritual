@@ -116,3 +116,16 @@ export const admins = mysqlTable("admins", {
 
 export type Admin = typeof admins.$inferSelect;
 export type InsertAdmin = typeof admins.$inferInsert;
+
+export const buyers = mysqlTable("buyers", {
+  id: int("id").autoincrement().primaryKey(),
+  paymentId: varchar("paymentId", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 320 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  amount: int("amount").notNull(),
+  currency: varchar("currency", { length: 10 }).default("brl").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Buyer = typeof buyers.$inferSelect;
+export type InsertBuyer = typeof buyers.$inferInsert;

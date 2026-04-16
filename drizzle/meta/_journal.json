@@ -106,6 +106,13 @@
       "when": 1776379082959,
       "tag": "0014_faulty_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1776380264575,
+      "tag": "0015_flimsy_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

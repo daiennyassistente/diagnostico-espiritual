@@ -358,6 +358,9 @@ export const appRouter = router({
     getAllLeads: adminProcedure.query(async () => {
       return await getAllLeadsWithQuizStatus();
     }),
+    getBuyers: adminProcedure.query(async () => {
+      return await getAdminBuyers();
+    }),
     getPaymentDetails: adminProcedure
       .input(z.object({ paymentId: z.number() }))
       .query(async ({ input }) => {

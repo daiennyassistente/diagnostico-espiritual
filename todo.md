@@ -799,3 +799,14 @@
 - [x] Remover colunas emailStatus e emailSentAt do schema do Drizzle para sincronizar com banco de dados
 - [x] Aplicar migração SQL para remover colunas obsoletas da tabela payments
 
+
+## Integração Mercado Pago
+- [x] Corrigir erro 400 do webhook do Mercado Pago (mover middleware express.json() para antes dos webhooks)
+- [x] Corrigir erro ao escolher PIX (adicionar header X-Idempotency-Key)
+- [x] Criar tabela de compradores para registrar pagamentos aprovados
+- [x] Implementar registro automático de compradores no webhook do Mercado Pago
+- [x] Remover colunas obsoletas (emailStatus, emailSentAt) do schema Drizzle
+- [x] Atualizar query getAdminBuyers para retornar dados da tabela buyers
+- [x] Implementar query tRPC admin.getBuyers
+- [x] Atualizar AdminDashboard para exibir compradores corretamente
+- [x] Validar que compradores aparecem na aba Compradores do admin após pagamento aprovado

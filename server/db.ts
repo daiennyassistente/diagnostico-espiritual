@@ -13,6 +13,7 @@ import {
   quizResponses,
   users,
   admins,
+  buyers,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -307,23 +308,16 @@ export async function getAdminBuyers() {
 
   const records = await db
     .select({
-      id: payments.id,
-      leadId: payments.leadId,
-      email: leads.email,
-      whatsapp: leads.whatsapp,
-      amount: payments.amount,
-      currency: payments.currency,
-      status: payments.status,
-      productName: payments.productName,
-      stripePaymentIntentId: payments.stripePaymentIntentId,
-      stripeCustomerId: payments.stripeCustomerId,
-
-      createdAt: payments.createdAt,
-      updatedAt: payments.updatedAt,
+      id: buyers.id,
+      paymentId: buyers.paymentId,
+      email: buyers.email,
+      name: buyers.name,
+      amount: buyers.amount,
+      currency: buyers.currency,
+      createdAt: buyers.createdAt,
     })
-    .from(payments)
-    .innerJoin(leads, eq(payments.leadId, leads.id))
-    .orderBy(desc(payments.createdAt));
+    .from(buyers)
+    .orderBy(desc(buyers.createdAt));
 
   return records;
 }
