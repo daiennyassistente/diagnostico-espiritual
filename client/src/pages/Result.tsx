@@ -427,7 +427,7 @@ export default function Result() {
           </Button>
 
           <p className="text-center text-sm mt-4 text-slate-600">
-            R$ 12,90. Pagamento seguro e redirecionamento imediato para o checkout.
+            R$ 12,90. Pagamento seguro e envio do pdf por e-mail
           </p>
         </section>
 
