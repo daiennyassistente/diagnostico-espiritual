@@ -85,6 +85,13 @@
       "when": 1775954539540,
       "tag": "0011_left_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1776359461606,
+      "tag": "0012_whole_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }

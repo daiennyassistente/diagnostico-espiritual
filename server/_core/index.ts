@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe-webhook";
+import { handleMercadoPagoWebhook } from "../mercadopago-webhook";
 import { createOrUpdateAdminUser } from "../db";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -46,6 +47,18 @@ async function startServer() {
     "/api/stripe/webhook",
     express.raw({ type: "application/json" }),
     handleStripeWebhook
+  );
+
+  // Mercado Pago webhook (GET for notifications)
+  app.get(
+    "/api/mercadopago/webhook",
+    handleMercadoPagoWebhook
+  );
+
+  app.post(
+    "/api/mercadopago/webhook",
+    express.json(),
+    handleMercadoPagoWebhook
   );
 
 
