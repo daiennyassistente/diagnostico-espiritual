@@ -534,12 +534,15 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         try {
+          console.log("[sendDevotionalEmail] Input:", input);
           const { sendEmail } = await import("./email-service.ts");
           const { generateDevotionalPDF } = await import("./devotional-generator.ts");
           const { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById } = await import("./db.ts");
 
           // Get lead
+          console.log("[sendDevotionalEmail] Looking for lead with ID:", input.leadId);
           const lead = await getLeadById(input.leadId);
+          console.log("[sendDevotionalEmail] Lead found:", lead);
           if (!lead) {
             throw new Error("Lead not found");
           }

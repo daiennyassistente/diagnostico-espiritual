@@ -607,7 +607,7 @@ export function AdminDashboard() {
                                 onClick={() => {
                                   if (buyer.email) {
                                     sendDevotionalMutation.mutate({
-                                      leadId: buyer.id,
+                                      leadId: buyer.leadId,
                                       email: buyer.email
                                     });
                                   } else {
