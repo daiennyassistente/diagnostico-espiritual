@@ -89,6 +89,7 @@ export default function Result() {
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
   const checkoutMutation = trpc.payment.createMercadoPagoCheckout.useMutation();
   const downloadResultMutation = trpc.download.downloadResult.useMutation();
+  const sendDevotionalMutation = trpc.quiz.sendDevotionalEmail.useMutation();
 
   useEffect(() => {
     const resolvedLeadId = resolveLeadIdFromSources(
@@ -267,23 +268,25 @@ export default function Result() {
   };
 
   const handleShare = async () => {
-    const shareData = {
-      title: "Diagnóstico Espiritual",
-      text: `Acabei de receber meu diagnóstico espiritual: ${result.profileName}`,
-      url: window.location.href,
-    };
+    if (!leadId) {
+      toast.error("Não foi possível identificar seu diagnóstico.");
+      return;
+    }
+
+    const storedLeadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    const email = trpcResult?.lead?.email || storedLeadData?.email || user?.email || "";
+
+    if (!email) {
+      toast.error("Não encontramos seu e-mail.");
+      return;
+    }
 
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        return;
-      }
-
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copiado com sucesso!");
+      await sendDevotionalMutation.mutateAsync({ leadId, email });
+      toast.success("Devocional enviado para seu email com sucesso!");
     } catch (error) {
-      console.error("Erro ao compartilhar:", error);
-      toast.error("Não foi possível compartilhar agora.");
+      console.error("Erro ao enviar devocional:", error);
+      toast.error("Não foi possível enviar o devocional agora.");
     }
   };
 
@@ -436,9 +439,9 @@ export default function Result() {
             <Download className="w-4 h-4 mr-2" />
             {isGeneratingPDF ? "Gerando..." : "Baixar PDF"}
           </Button>
-          <Button variant="outline" onClick={handleShare}>
+          <Button variant="outline" onClick={handleShare} disabled={sendDevotionalMutation.isPending}>
             <Share2 className="w-4 h-4 mr-2" />
-            Compartilhar
+            {sendDevotionalMutation.isPending ? "Enviando..." : "Enviar por Email"}
           </Button>
           <Button variant="outline" onClick={handleRetake}>
             <RotateCcw className="w-4 h-4 mr-2" />
