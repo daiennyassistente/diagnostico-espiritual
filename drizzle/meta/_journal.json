@@ -99,6 +99,13 @@
       "when": 1776372425620,
       "tag": "0013_fluffy_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1776379082959,
+      "tag": "0014_faulty_kate_bishop",
+      "breakpoints": true
     }
   ]
 }

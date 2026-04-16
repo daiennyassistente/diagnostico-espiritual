@@ -793,3 +793,9 @@
 - [x] Corrigir exclusivamente o fluxo de seleção e geração do PIX sem alterar outras áreas do sistema
 - [x] Validar que a escolha de PIX funciona corretamente após a correção
 
+- [x] Investigar por que pagamento aprovado/entregue no Mercado Pago não atualiza a aba Compradores
+- [x] Corrigir exclusivamente a sincronização entre webhook/pagamento salvo e listagem da aba Compradores
+- [x] Validar que comprador com pagamento aprovado aparece corretamente no admin após a correção
+- [x] Remover colunas emailStatus e emailSentAt do schema do Drizzle para sincronizar com banco de dados
+- [x] Aplicar migração SQL para remover colunas obsoletas da tabela payments
+

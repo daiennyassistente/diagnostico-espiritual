@@ -3,7 +3,7 @@ import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, upd
 import { generateDevotionalPDF } from "./devotional-generator";
 import { sendEmail } from "./email-service";
 import { payments } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 
 export async function handleMercadoPagoWebhook(req: Request, res: Response) {
@@ -63,13 +63,42 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     // Update payment status in database
     const db = await getDb();
     if (db) {
-      await db
-        .update(payments)
-        .set({
-          status: "approved",
-          updatedAt: new Date(),
-        })
-        .where(eq(payments.leadId, Number(leadId)));
+      const existingPayment = await db
+        .select({ id: payments.id })
+        .from(payments)
+        .where(eq(payments.leadId, Number(leadId)))
+        .limit(1);
+
+      if (existingPayment.length > 0) {
+        await db
+          .update(payments)
+          .set({
+            status: "approved",
+            updatedAt: new Date(),
+          })
+          .where(eq(payments.id, existingPayment[0].id));
+      } else {
+        await db.execute(sql`
+          INSERT INTO payments (
+            leadId,
+            amount,
+            currency,
+            status,
+            productName,
+            createdAt,
+            updatedAt
+          ) VALUES (
+            ${Number(leadId)},
+            ${Math.round(Number(paymentData.transaction_amount || 0) * 100)},
+            ${String(paymentData.currency_id || "BRL").toLowerCase()},
+            ${"approved"},
+            ${String(paymentData.description || "Diagnóstico Espiritual")},
+            NOW(),
+            NOW()
+          )
+        `);
+      }
+
       console.log(`[Mercado Pago Webhook] Pagamento ${paymentId} marcado como aprovado para lead ${leadId}`);
     }
     console.log(`[Mercado Pago Webhook] Status atualizado no banco de dados`);

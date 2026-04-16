@@ -941,15 +941,49 @@ export async function createPayment(paymentData: {
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(payments).values({
-    leadId: paymentData.leadId,
-    amount: Math.round(paymentData.amount * 100), // Convert to cents
-    currency: paymentData.currency,
-    status: paymentData.status,
-    productName: paymentData.productName,
-    stripePaymentIntentId: paymentData.stripePaymentIntentId || null,
-    stripeCustomerId: paymentData.stripeCustomerId || null,
-  });
+  const normalizedAmount = Math.round(paymentData.amount * 100);
+  const existingPayment = await db
+    .select({ id: payments.id })
+    .from(payments)
+    .where(eq(payments.leadId, paymentData.leadId))
+    .limit(1);
 
-  return result;
+  if (existingPayment.length > 0) {
+    return db
+      .update(payments)
+      .set({
+        amount: normalizedAmount,
+        currency: paymentData.currency,
+        status: paymentData.status,
+        productName: paymentData.productName,
+        stripePaymentIntentId: paymentData.stripePaymentIntentId || null,
+        stripeCustomerId: paymentData.stripeCustomerId || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.id, existingPayment[0].id));
+  }
+
+  return db.execute(sql`
+    INSERT INTO payments (
+      leadId,
+      stripePaymentIntentId,
+      stripeCustomerId,
+      amount,
+      currency,
+      status,
+      productName,
+      createdAt,
+      updatedAt
+    ) VALUES (
+      ${paymentData.leadId},
+      ${paymentData.stripePaymentIntentId || null},
+      ${paymentData.stripeCustomerId || null},
+      ${normalizedAmount},
+      ${paymentData.currency},
+      ${paymentData.status},
+      ${paymentData.productName},
+      NOW(),
+      NOW()
+    )
+  `);
 }

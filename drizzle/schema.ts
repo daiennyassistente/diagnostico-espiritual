@@ -70,8 +70,6 @@ export const payments = mysqlTable("payments", {
   status: mysqlEnum("status", ["pending", "succeeded", "failed", "canceled", "approved"]).default("pending").notNull(),
   productName: text("productName").notNull(),
   downloadToken: varchar("downloadToken", { length: 255 }), // Token para download do PDF
-  emailStatus: mysqlEnum("emailStatus", ["pendente", "enviado", "falha"]).default("pendente").notNull(),
-  emailSentAt: timestamp("emailSentAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
