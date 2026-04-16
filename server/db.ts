@@ -633,6 +633,9 @@ export async function getAllLeadsWithQuizStatus() {
       hasQuizResponse: sql<boolean>`EXISTS(SELECT 1 FROM ${quizResponses} WHERE ${quizResponses.leadId} = ${leads.id})`,
       hasDiagnostic: sql<boolean>`EXISTS(SELECT 1 FROM ${diagnosticHistory} WHERE ${diagnosticHistory.leadId} = ${leads.id})`,
       hasPayment: sql<boolean>`EXISTS(SELECT 1 FROM ${payments} WHERE ${payments.leadId} = ${leads.id})`,
+      paymentAmount: sql<number | null>`(SELECT amount FROM ${payments} WHERE ${payments.leadId} = ${leads.id} LIMIT 1)`,
+      paymentStatus: sql<string | null>`(SELECT status FROM ${payments} WHERE ${payments.leadId} = ${leads.id} LIMIT 1)`,
+      paymentId: sql<number | null>`(SELECT id FROM ${payments} WHERE ${payments.leadId} = ${leads.id} LIMIT 1)`,
     })
     .from(leads)
     .orderBy(desc(leads.createdAt));

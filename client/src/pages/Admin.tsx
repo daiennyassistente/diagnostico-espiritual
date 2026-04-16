@@ -398,7 +398,8 @@ export default function Admin() {
                       <th className="px-4 py-2 font-semibold">Email</th>
                       <th className="px-4 py-2 font-semibold">WhatsApp</th>
                       <th className="px-4 py-2 font-semibold">Data</th>
-                      <th className="px-4 py-2 font-semibold">Status</th>
+                      <th className="px-4 py-2 font-semibold">Valor</th>
+                      <th className="px-4 py-2 font-semibold">Status Pgto</th>
                       <th className="px-4 py-2 font-semibold">Acao</th>
                     </tr>
                   </thead>
@@ -410,8 +411,11 @@ export default function Admin() {
                         <td className="px-4 py-2 text-muted-foreground">
                           {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
                         </td>
+                        <td className="px-4 py-2 font-semibold">
+                          R$ {(lead.paymentAmount || 0).toFixed(2).replace('.', ',')}
+                        </td>
                         <td className="px-4 py-2">
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Comprador</span>
+                          <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Aprovado</span>
                         </td>
                         <td className="px-4 py-2">
                           <Button
