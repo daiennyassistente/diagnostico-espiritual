@@ -317,6 +317,8 @@ export async function getAdminBuyers() {
       productName: payments.productName,
       stripePaymentIntentId: payments.stripePaymentIntentId,
       stripeCustomerId: payments.stripeCustomerId,
+      emailStatus: payments.emailStatus,
+      emailSentAt: payments.emailSentAt,
       createdAt: payments.createdAt,
       updatedAt: payments.updatedAt,
     })
@@ -923,4 +925,32 @@ export async function updatePaymentDownloadToken(leadId: number, token: string) 
       .set({ downloadToken: token })
       .where(eq(payments.id, payment[0].id));
   }
+}
+
+
+export async function createPayment(paymentData: {
+  leadId: number;
+  amount: number;
+  currency: string;
+  status: "pending" | "succeeded" | "failed" | "canceled" | "approved";
+  productName: string;
+  stripePaymentIntentId?: string | null;
+  stripeCustomerId?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(payments).values({
+    leadId: paymentData.leadId,
+    amount: Math.round(paymentData.amount * 100), // Convert to cents
+    currency: paymentData.currency,
+    status: paymentData.status,
+    productName: paymentData.productName,
+    stripePaymentIntentId: paymentData.stripePaymentIntentId || null,
+    stripeCustomerId: paymentData.stripeCustomerId || null,
+  });
+
+  return result;
 }

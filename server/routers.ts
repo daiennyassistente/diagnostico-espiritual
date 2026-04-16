@@ -859,6 +859,21 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           const data = await response.json();
           console.log("[Mercado Pago] Preference created:", data.id);
 
+          // Create payment record in database
+          try {
+            const { createPayment } = await import("./db");
+            await createPayment({
+              leadId: Number(input.leadId),
+              amount: 12.90,
+              currency: "BRL",
+              status: "pending",
+              productName: "Devocional: 7 Dias para se Aproximar de Deus",
+            });
+            console.log("[Mercado Pago] Payment record created for lead:", input.leadId);
+          } catch (dbError) {
+            console.error("[Mercado Pago] Failed to create payment record:", dbError);
+          }
+
           return {
             success: true,
             checkoutUrl: data.init_point,
