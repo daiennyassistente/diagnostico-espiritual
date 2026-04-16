@@ -89,7 +89,6 @@ export default function Result() {
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
   const checkoutMutation = trpc.payment.createMercadoPagoCheckout.useMutation();
   const downloadResultMutation = trpc.download.downloadResult.useMutation();
-  const sendDevotionalMutation = trpc.quiz.sendDevotionalEmail.useMutation();
 
   useEffect(() => {
     const resolvedLeadId = resolveLeadIdFromSources(
@@ -267,28 +266,7 @@ export default function Result() {
     }
   };
 
-  const handleShare = async () => {
-    if (!leadId) {
-      toast.error("Não foi possível identificar seu diagnóstico.");
-      return;
-    }
 
-    const storedLeadData = parseStoredLeadData(localStorage.getItem("leadData"));
-    const email = trpcResult?.lead?.email || storedLeadData?.email || user?.email || "";
-
-    if (!email) {
-      toast.error("Não encontramos seu e-mail.");
-      return;
-    }
-
-    try {
-      await sendDevotionalMutation.mutateAsync({ leadId, email });
-      toast.success("Devocional enviado para seu email com sucesso!");
-    } catch (error) {
-      console.error("Erro ao enviar devocional:", error);
-      toast.error("Não foi possível enviar o devocional agora.");
-    }
-  };
 
   const handleRetake = () => {
     clearQuizSessionState();
@@ -439,10 +417,7 @@ export default function Result() {
             <Download className="w-4 h-4 mr-2" />
             {isGeneratingPDF ? "Gerando..." : "Baixar PDF"}
           </Button>
-          <Button variant="outline" onClick={handleShare} disabled={sendDevotionalMutation.isPending}>
-            <Share2 className="w-4 h-4 mr-2" />
-            {sendDevotionalMutation.isPending ? "Enviando..." : "Enviar por Email"}
-          </Button>
+
           <Button variant="outline" onClick={handleRetake}>
             <RotateCcw className="w-4 h-4 mr-2" />
             Refazer
