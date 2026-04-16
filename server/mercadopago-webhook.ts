@@ -135,32 +135,11 @@ Equipe Diagnóstico Espiritual
       });
       console.log(`[Mercado Pago Webhook] Email sent to ${lead.email}`);
       
-      // Update email status to sent
-      if (db) {
-        await db
-          .update(payments)
-          .set({
-            emailStatus: "enviado",
-            emailSentAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .where(eq(payments.leadId, Number(leadId)));
-        console.log(`[Mercado Pago Webhook] Email status updated to sent for lead ${leadId}`);
-      }
+
     } catch (emailError) {
       console.error(`[Mercado Pago Webhook] Failed to send email:`, emailError);
       
-      // Update email status to failed
-      if (db) {
-        await db
-          .update(payments)
-          .set({
-            emailStatus: "falha",
-            updatedAt: new Date(),
-          })
-          .where(eq(payments.leadId, Number(leadId)));
-        console.log(`[Mercado Pago Webhook] Email status updated to failed for lead ${leadId}`);
-      }
+
       // Don't fail the webhook if email fails - payment was already processed
     }
 

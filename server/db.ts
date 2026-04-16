@@ -317,8 +317,7 @@ export async function getAdminBuyers() {
       productName: payments.productName,
       stripePaymentIntentId: payments.stripePaymentIntentId,
       stripeCustomerId: payments.stripeCustomerId,
-      emailStatus: payments.emailStatus,
-      emailSentAt: payments.emailSentAt,
+
       createdAt: payments.createdAt,
       updatedAt: payments.updatedAt,
     })

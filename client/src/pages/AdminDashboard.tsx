@@ -578,7 +578,6 @@ export function AdminDashboard() {
                       <th className="px-5 py-4 font-semibold text-foreground">Valor</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Produto</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Status</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Email</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Ações</th>
                     </tr>
@@ -596,19 +595,7 @@ export function AdminDashboard() {
                             {buyer.status === "succeeded" ? "Aprovado" : buyer.status}
                           </span>
                         </td>
-                        <td className="px-5 py-4">
-                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                            buyer.emailStatus === "enviado" ? "bg-green-100 text-green-700" :
-                            buyer.emailStatus === "falha" ? "bg-red-100 text-red-700" :
-                            "bg-yellow-100 text-yellow-700"
-                          }`}>
-                            {buyer.emailStatus === "enviado" && buyer.emailSentAt ? 
-                              `Enviado ${new Date(buyer.emailSentAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` :
-                              buyer.emailStatus === "falha" ? "Falha" :
-                              "Pendente"
-                            }
-                          </span>
-                        </td>
+
                         <td className="px-5 py-4 text-muted-foreground">{formatDateTime(buyer.createdAt)}</td>
                         <td className="px-5 py-4">
                           <div className="flex gap-2">
