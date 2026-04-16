@@ -328,7 +328,8 @@ export default function Result() {
       }
 
       toast.success("Redirecionando para o pagamento...");
-      window.open(checkout.checkoutUrl, "_blank");
+      // Use window.location.href para melhor compatibilidade com celulares
+      window.location.href = checkout.checkoutUrl;
     } catch (error) {
       console.error("Erro ao iniciar checkout:", error);
       toast.error("Erro ao iniciar o pagamento. Tente novamente.");

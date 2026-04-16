@@ -525,7 +525,82 @@ export const appRouter = router({
         }
       }),
 
+    sendDevotionalEmail: publicProcedure
+      .input(
+        z.object({
+          leadId: z.number(),
+          email: z.string().email(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        try {
+          const { sendEmail } = await import("./email-service.ts");
+          const { generateDevotionalPDF } = await import("./devotional-generator.ts");
+          const { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById } = await import("./db.ts");
 
+          // Get lead
+          const lead = await getLeadById(input.leadId);
+          if (!lead) {
+            throw new Error("Lead not found");
+          }
+
+          // Get diagnostic
+          const diagnostic = await getDiagnosticByLeadId(input.leadId);
+          if (!diagnostic) {
+            throw new Error("Diagnostic not found");
+          }
+
+          // Get quiz responses
+          const quizResponse = await getQuizResponseByLeadId(input.leadId);
+          const responses: Record<string, string> = quizResponse
+            ? Object.fromEntries(
+                Object.entries(quizResponse)
+                  .filter(([key, value]) => /^step\d+$/.test(key) && typeof value === "string" && value.trim().length > 0)
+                  .map(([key, value]) => [key, String(value)])
+              )
+            : {};
+
+          // Generate PDF
+          const pdfBuffer = await generateDevotionalPDF({
+            profileName: diagnostic.profileName,
+            profileDescription: diagnostic.profileDescription,
+            challenges: JSON.parse(diagnostic.challenges),
+            recommendations: JSON.parse(diagnostic.recommendations),
+            strengths: JSON.parse(diagnostic.strengths),
+            nextSteps: JSON.parse(diagnostic.nextSteps),
+            responses,
+            userName: responses.step1,
+          });
+
+          // Send email
+          const emailSent = await sendEmail({
+            to: input.email,
+            subject: `Seu Devocional Personalizado - ${diagnostic.profileName}`,
+            html: `
+              <p>Olá ${lead.name},</p>
+              <p>Seu devocional personalizado de 7 dias está em anexo!</p>
+              <p>Este material foi especialmente preparado para você com base no seu diagnóstico espiritual.</p>
+              <p>Bênçãos!</p>
+            `,
+            attachments: [
+              {
+                filename: `devocional-${diagnostic.profileName.toLowerCase().replace(/\s+/g, "-")}.pdf`,
+                content: pdfBuffer,
+                contentType: "application/pdf",
+              },
+            ],
+          });
+
+          if (!emailSent) {
+            throw new Error("Failed to send email");
+          }
+
+          return { success: true, message: "Email sent successfully" };
+        } catch (error: any) {
+          console.error("Send devotional email error:", error);
+          throw new Error("Erro ao enviar email com devocional");
+        }
+      }),
   }),
 
   pdf: router({
