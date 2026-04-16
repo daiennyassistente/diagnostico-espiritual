@@ -834,6 +834,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+                "X-Idempotency-Key": crypto.randomUUID(),
               },
               body: JSON.stringify(paymentData),
             });

@@ -789,3 +789,7 @@
 - [x] Adicionar log simples do body recebido no webhook do Mercado Pago
 - [x] Validar que o webhook do Mercado Pago não retorna 400 para payload válido com action e data.id
 
+- [x] Investigar erro ao escolher PIX no checkout do Mercado Pago
+- [x] Corrigir exclusivamente o fluxo de seleção e geração do PIX sem alterar outras áreas do sistema
+- [x] Validar que a escolha de PIX funciona corretamente após a correção
+
