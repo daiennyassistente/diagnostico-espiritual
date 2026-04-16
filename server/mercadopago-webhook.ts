@@ -9,27 +9,37 @@ import { eq } from "drizzle-orm";
 export async function handleMercadoPagoWebhook(req: Request, res: Response) {
   try {
     // Log all request data for debugging
-    console.log(`[Mercado Pago Webhook] Full request:`, {
-      method: req.method,
-      query: req.query,
-      body: req.body,
-      headers: req.headers,
-    });
+    console.log(`[Mercado Pago Webhook] ========== WEBHOOK RECEBIDO =========`);
+    console.log(`[Mercado Pago Webhook] Timestamp: ${new Date().toISOString()}`);
+    console.log(`[Mercado Pago Webhook] Method: ${req.method}`);
+    console.log(`[Mercado Pago Webhook] Query:`, req.query);
+    console.log(`[Mercado Pago Webhook] Body:`, req.body);
+    console.log(`[Mercado Pago Webhook] =====================================`);
 
-    // Mercado Pago sends the data as query parameters
-    const { id, type } = req.query;
+    // Mercado Pago sends the data in the request body
+    // Structure: { type: "payment", data: { id: "123" }, action: "payment.updated" }
+    const body = req.body || {};
+    const type = body.type;
+    const paymentId = body.data?.id;
 
-    console.log(`[Mercado Pago Webhook] Received event: ${type}, ID: ${id}`);
+    console.log(`[Mercado Pago Webhook] ✓ Received event: type=${type}, paymentId=${paymentId}`);
+    console.log(`[Mercado Pago Webhook] Processando pagamento...`);
 
-    // Only process payment.updated events
+    // Only process payment events
     if (type !== "payment") {
-      console.log(`[Mercado Pago Webhook] Ignoring event type: ${type}`);
+      console.log(`[Mercado Pago Webhook] ✗ Tipo de evento ignorado: ${type}`);
       return res.status(200).json({ received: true });
+    }
+    console.log(`[Mercado Pago Webhook] ✓ Tipo de evento válido: payment`);
+
+    // Validate payment ID
+    if (!paymentId) {
+      console.error(`[Mercado Pago Webhook] ✗ Nenhum ID de pagamento encontrado`);
+      return res.status(400).json({ error: "No payment ID" });
     }
 
     // Fetch payment details from Mercado Pago API
-    const paymentId = String(id);
-    const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    const response = await fetch(`https://api.mercadopago.com/v1/payments/${String(paymentId)}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
@@ -37,25 +47,28 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     });
 
     if (!response.ok) {
-      console.error(`[Mercado Pago Webhook] Failed to fetch payment ${paymentId}`);
+      console.error(`[Mercado Pago Webhook] ✗ Erro ao buscar pagamento ${paymentId}: ${response.status} ${response.statusText}`);
       return res.status(400).json({ error: "Failed to fetch payment" });
     }
+    console.log(`[Mercado Pago Webhook] ✓ Pagamento encontrado na API do Mercado Pago`);
 
     const paymentData = await response.json();
-    console.log(`[Mercado Pago Webhook] Payment status: ${paymentData.status}`);
+    console.log(`[Mercado Pago Webhook] ✓ Status do pagamento: ${paymentData.status}`);
 
     // Only process approved payments
     if (paymentData.status !== "approved") {
-      console.log(`[Mercado Pago Webhook] Payment not approved, status: ${paymentData.status}`);
+      console.log(`[Mercado Pago Webhook] ✗ Pagamento não aprovado, status: ${paymentData.status}`);
       return res.status(200).json({ received: true });
     }
+    console.log(`[Mercado Pago Webhook] ✓ Pagamento APROVADO!`);
 
     // Get the external reference (leadId)
     const leadId = paymentData.external_reference;
     if (!leadId) {
-      console.error(`[Mercado Pago Webhook] No external_reference found`);
+      console.error(`[Mercado Pago Webhook] ✗ Nenhuma external_reference encontrada`);
       return res.status(400).json({ error: "No external_reference" });
     }
+    console.log(`[Mercado Pago Webhook] ✓ Lead ID encontrado: ${leadId}`);
 
     // Update payment status in database
     const db = await getDb();
@@ -67,21 +80,24 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
           updatedAt: new Date(),
         })
         .where(eq(payments.leadId, Number(leadId)));
-      console.log(`[Mercado Pago Webhook] Payment ${paymentId} marked as approved for lead ${leadId}`);
+      console.log(`[Mercado Pago Webhook] ✓ Pagamento ${paymentId} marcado como aprovado para lead ${leadId}`);
     }
+    console.log(`[Mercado Pago Webhook] ✓ Status atualizado no banco de dados`);
 
     // Get lead and diagnostic info
     const lead = await getLeadById(Number(leadId));
     if (!lead) {
-      console.error(`[Mercado Pago Webhook] Lead not found: ${leadId}`);
+      console.error(`[Mercado Pago Webhook] ✗ Lead não encontrado: ${leadId}`);
       return res.status(400).json({ error: "Lead not found" });
     }
+    console.log(`[Mercado Pago Webhook] ✓ Lead encontrado: ${lead.email}`);
 
     const diagnostic = await getDiagnosticByLeadId(Number(leadId));
     if (!diagnostic) {
-      console.error(`[Mercado Pago Webhook] Diagnostic not found for lead: ${leadId}`);
+      console.error(`[Mercado Pago Webhook] ✗ Diagnóstico não encontrado para lead: ${leadId}`);
       return res.status(400).json({ error: "Diagnostic not found" });
     }
+    console.log(`[Mercado Pago Webhook] ✓ Diagnóstico encontrado: ${diagnostic.profileName}`);
 
     // Get quiz responses
     const quizResponse = await getQuizResponseByLeadId(Number(leadId));
@@ -133,19 +149,20 @@ Equipe Diagnóstico Espiritual
           },
         ],
       });
-      console.log(`[Mercado Pago Webhook] Email sent to ${lead.email}`);
+      console.log(`[Mercado Pago Webhook] ✓✓✓ EMAIL ENVIADO COM SUCESSO PARA: ${lead.email}`);
       
 
     } catch (emailError) {
-      console.error(`[Mercado Pago Webhook] Failed to send email:`, emailError);
+      console.error(`[Mercado Pago Webhook] ✗ Erro ao enviar email:`, emailError);
       
 
       // Don't fail the webhook if email fails - payment was already processed
     }
 
+    console.log(`[Mercado Pago Webhook] ✓ Webhook processado com sucesso!`);
     return res.status(200).json({ received: true });
   } catch (error) {
-    console.error("[Mercado Pago Webhook] Error:", error);
+    console.error("[Mercado Pago Webhook] ✗ ERRO CRÍTICO:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }

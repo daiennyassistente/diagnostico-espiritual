@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState";
 import { extractQuizInsights } from "@/lib/resultPersonalization";
 import { parseStoredLeadData } from "@/lib/leadStorage";
+import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 
 interface AIResult {
   profileName: string;
@@ -89,6 +90,7 @@ export default function Result() {
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
   const checkoutMutation = trpc.payment.createMercadoPagoCheckout.useMutation();
   const downloadResultMutation = trpc.download.downloadResult.useMutation();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
     const resolvedLeadId = resolveLeadIdFromSources(
@@ -391,8 +393,8 @@ export default function Result() {
             size="lg"
             className="w-full text-lg font-bold"
             style={{ backgroundColor: "#FFC700", color: "#17395F" }}
-            onClick={handleCheckout}
-            disabled={isCheckingOut}
+            onClick={() => setShowCheckout(true)}
+            disabled={false}
           >
             {isCheckingOut ? (
               <>
@@ -427,6 +429,34 @@ export default function Result() {
         <section className="text-center text-sm text-gray-500">
           <p>Seu resultado estará disponível por mais {formatTimeLeft(timeLeft)}</p>
         </section>
+
+        {showCheckout && result && trpcResult && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-md">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold">Pagamento</h2>
+                  <button
+                    onClick={() => setShowCheckout(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <MercadoPagoCheckout
+                  email={trpcResult.lead?.email || parseStoredLeadData(localStorage.getItem("leadData"))?.email || user?.email || ""}
+                  leadId={leadId?.toString() || ""}
+                  profileName={result.profileName}
+                  userPhone={trpcResult.lead?.whatsapp || parseStoredLeadData(localStorage.getItem("leadData"))?.whatsapp || ""}
+                  onSuccess={() => {
+                    toast.success("Pagamento processado com sucesso!");
+                    setLocation("/sucesso");
+                  }}
+                />
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

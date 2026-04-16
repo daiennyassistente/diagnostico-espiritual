@@ -473,7 +473,16 @@ export const appRouter = router({
     }),
 
     getStatistics: publicProcedure.query(async () => {
-      return await getAllQuizResponses();
+      const responses = await getAllQuizResponses();
+      const totalResponses = responses.length;
+      const completeResponses = responses.filter((r: any) => {
+        const steps = [r.step1, r.step2, r.step3, r.step4, r.step5, r.step6, r.step7, r.step8, r.step9, r.step10];
+        return steps.filter(Boolean).length === 10;
+      }).length;
+      return {
+        totalResponses,
+        completeResponses,
+      };
     }),
 
 
@@ -795,6 +804,137 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
 
 
   payment: router({
+    createMercadoPagoPayment: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          profileName: z.string(),
+          userPhone: z.string(),
+          leadId: z.string(),
+          paymentMethod: z.enum(["card", "pix"]),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        try {
+          if (input.paymentMethod === "pix") {
+            // Create PIX payment
+            const paymentData = {
+              transaction_amount: 12.90,
+              description: input.profileName,
+              payment_method_id: "pix",
+              payer: {
+                email: input.email,
+                first_name: "Cliente",
+              },
+              external_reference: input.leadId,
+            };
+
+            const response = await fetch("https://api.mercadopago.com/v1/payments", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+              },
+              body: JSON.stringify(paymentData),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              console.error("[Mercado Pago PIX] Error:", error);
+              throw new Error("Erro ao gerar PIX");
+            }
+
+            const data = await response.json();
+            const pixCode = data.point_of_interaction?.transaction_data?.qr_code;
+            const pixImage = data.point_of_interaction?.transaction_data?.qr_code_base64;
+
+            // Create payment record
+            try {
+              const { createPayment } = await import("./db");
+              await createPayment({
+                leadId: Number(input.leadId),
+                amount: 12.90,
+                currency: "BRL",
+                status: "pending",
+                productName: "Devocional: 7 Dias para se Aproximar de Deus",
+              });
+            } catch (dbError) {
+              console.error("[Mercado Pago] Failed to create payment record:", dbError);
+            }
+
+            return {
+              success: true,
+              pixCode: pixCode || "",
+              pixQrCode: pixImage ? `data:image/png;base64,${pixImage}` : "",
+              paymentId: data.id,
+            };
+          } else {
+            // For card payments, we'll use the checkout preference
+            const preference = {
+              items: [
+                {
+                  title: "Devocional: 7 Dias para se Aproximar de Deus",
+                  description: input.profileName,
+                  unit_price: 12.90,
+                  quantity: 1,
+                  currency_id: "BRL",
+                },
+              ],
+              payer: {
+                email: input.email,
+                phone: {
+                  number: input.userPhone,
+                },
+              },
+              external_reference: input.leadId,
+            };
+
+            const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+              },
+              body: JSON.stringify(preference),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              console.error("[Mercado Pago Card] Error:", error);
+              throw new Error("Erro ao criar checkout");
+            }
+
+            const data = await response.json();
+
+            // Create payment record
+            try {
+              const { createPayment } = await import("./db");
+              await createPayment({
+                leadId: Number(input.leadId),
+                amount: 12.90,
+                currency: "BRL",
+                status: "pending",
+                productName: "Devocional: 7 Dias para se Aproximar de Deus",
+              });
+            } catch (dbError) {
+              console.error("[Mercado Pago] Failed to create payment record:", dbError);
+            }
+
+            return {
+              success: true,
+              checkoutUrl: data.init_point,
+              preferenceId: data.id,
+            };
+          }
+        } catch (error: any) {
+          console.error("[Mercado Pago Payment] Error:", error.message);
+          return {
+            success: false,
+            error: error.message || "Erro ao processar pagamento",
+          };
+        }
+      }),
+
     createMercadoPagoCheckout: publicProcedure
       .input(
         z.object({

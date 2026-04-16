@@ -42,14 +42,18 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Stripe webhook must be registered BEFORE express.json() to access raw body
+  // Configure body parser FIRST, before any routes
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Stripe webhook must be registered with raw body to access signature
   app.post(
     "/api/stripe/webhook",
     express.raw({ type: "application/json" }),
     handleStripeWebhook
   );
 
-  // Mercado Pago webhook (GET for notifications)
+  // Mercado Pago webhooks (GET and POST) - JSON is already parsed by middleware above
   app.get(
     "/api/mercadopago/webhook",
     handleMercadoPagoWebhook
@@ -57,7 +61,6 @@ async function startServer() {
 
   app.post(
     "/api/mercadopago/webhook",
-    express.json(),
     handleMercadoPagoWebhook
   );
 
@@ -123,9 +126,7 @@ async function startServer() {
     }
   });
 
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
   // Serve static files from public directory
   app.use(express.static("public"));
   // OAuth callback under /api/oauth/callback

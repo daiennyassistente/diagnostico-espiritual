@@ -64,9 +64,9 @@ export default function Admin() {
   const createQuestionMutation = trpc.admin.createQuestion.useMutation({ onSuccess: () => { refetchQuestions(); setNewQuestion(''); setNewOptions(['', '', '', '']); setNewStep(1); } });
   const deleteQuestionMutation = trpc.admin.deleteQuestion.useMutation({ onSuccess: () => refetchQuestions() });
 
-  const handleSendDevotional = async (leadId: number) => {
+  const handleSendDevotional = async (leadId: number, email: string) => {
     try {
-      await sendDevotionalMutation.mutateAsync({ leadId: leadId.toString() });
+      await sendDevotionalMutation.mutateAsync({ leadId, email });
       alert('Email enviado com sucesso!');
     } catch (error) {
       alert('Erro ao enviar email');
@@ -421,7 +421,7 @@ export default function Admin() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleSendDevotional(lead.id)}
+                            onClick={() => handleSendDevotional(lead.id, lead.email)}
                             disabled={sendDevotionalMutation.isPending}
                           >
                             {sendDevotionalMutation.isPending ? 'Enviando...' : 'Enviar Email'}

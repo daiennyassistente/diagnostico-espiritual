@@ -766,3 +766,17 @@
 - [x] Testar fluxo de pagamento com PIX
 - [x] Validar webhook de pagamento
 - [x] Validar envio de email com PDF após pagamento
+- [ ] Corrigir a implementação do Mercado Pago para usar o fluxo oficial com SDK v2 e Secure Fields
+- [ ] Revisar o fluxo atual de frontend e backend do pagamento para remover inconsistências entre Checkout Pro e checkout transparente
+- [ ] Garantir criação correta do pagamento com PIX e compatibilidade com aprovação automática e webhook
+- [ ] Validar redirecionamento, status aprovado e envio automático do PDF após confirmação do pagamento
+- [ ] Confirmar que a correção não altera o restante do design e das áreas administrativas
+
+- [x] Limitar a intervenção exclusivamente à configuração do Mercado Pago com SDK v2 e Secure Fields
+- [x] Corrigir apenas o fluxo de pagamento no frontend e backend, sem alterar outras áreas do site
+- [x] Validar somente a configuração do pagamento e o retorno esperado do checkout transparente
+- [x] Corrigir erro 400 do Mercado Pago webhook - mover webhook para ANTES do express.json() middleware
+- [x] Corrigir erro de redeclaração de useState no Result.tsx
+- [x] Corrigir erro de TypeScript no Admin.tsx (missing properties)
+- [x] Corrigir implementação de getStatistics para retornar totalResponses e completeResponses
+
