@@ -8,6 +8,14 @@ import { eq } from "drizzle-orm";
 
 export async function handleMercadoPagoWebhook(req: Request, res: Response) {
   try {
+    // Log all request data for debugging
+    console.log(`[Mercado Pago Webhook] Full request:`, {
+      method: req.method,
+      query: req.query,
+      body: req.body,
+      headers: req.headers,
+    });
+
     // Mercado Pago sends the data as query parameters
     const { id, type } = req.query;
 

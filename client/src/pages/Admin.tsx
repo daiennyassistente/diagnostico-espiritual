@@ -46,7 +46,7 @@ const STEP_LABELS = [
 ];
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState<'respostas' | 'estatisticas' | 'perguntas'>('respostas');
+  const [activeTab, setActiveTab] = useState<'respostas' | 'estatisticas' | 'perguntas' | 'compradores'>('respostas');
   const [searchQuery, setSearchQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -58,9 +58,20 @@ export default function Admin() {
   const { data: allResponses, isLoading: loadingResponses } = trpc.quiz.getAllResponses.useQuery();
   const { data: statistics, isLoading: loadingStats } = trpc.quiz.getStatistics.useQuery();
   const { data: questions, isLoading: loadingQuestions, refetch: refetchQuestions } = trpc.admin.getQuestions.useQuery();
+  const { data: allLeads, isLoading: loadingLeads } = trpc.admin.getAllLeads.useQuery();
+  const sendDevotionalMutation = trpc.quiz.sendDevotionalEmail.useMutation();
   const updateQuestionMutation = trpc.admin.updateQuestion.useMutation({ onSuccess: () => refetchQuestions() });
   const createQuestionMutation = trpc.admin.createQuestion.useMutation({ onSuccess: () => { refetchQuestions(); setNewQuestion(''); setNewOptions(['', '', '', '']); setNewStep(1); } });
   const deleteQuestionMutation = trpc.admin.deleteQuestion.useMutation({ onSuccess: () => refetchQuestions() });
+
+  const handleSendDevotional = async (leadId: number) => {
+    try {
+      await sendDevotionalMutation.mutateAsync({ leadId: leadId.toString() });
+      alert('Email enviado com sucesso!');
+    } catch (error) {
+      alert('Erro ao enviar email');
+    }
+  };
 
   const filteredResponses = allResponses?.filter((r: QuizResponse) => {
     const query = searchQuery.toLowerCase();
@@ -121,38 +132,48 @@ export default function Admin() {
           <p className="text-muted-foreground">Gerenciar respostas do quiz, estatísticas e perguntas</p>
         </div>
 
-        <div className="flex gap-4 mb-8 border-b border-border">
-          <button
-            onClick={() => setActiveTab('respostas')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'respostas'
-                ? 'text-foreground border-b-2 border-accent'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Respostas
-          </button>
-          <button
-            onClick={() => setActiveTab('estatisticas')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'estatisticas'
-                ? 'text-foreground border-b-2 border-accent'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Estatísticas
-          </button>
-          <button
-            onClick={() => setActiveTab('perguntas')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'perguntas'
-                ? 'text-foreground border-b-2 border-accent'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Perguntas
-          </button>
-        </div>
+        <div className="flex gap-2 mb-6 border-b border-border">
+        <button
+          onClick={() => setActiveTab('respostas')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'respostas'
+              ? 'text-accent border-b-2 border-accent'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Respostas
+        </button>
+        <button
+          onClick={() => setActiveTab('estatisticas')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'estatisticas'
+              ? 'text-accent border-b-2 border-accent'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Estatísticas
+        </button>
+        <button
+          onClick={() => setActiveTab('compradores')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'compradores'
+              ? 'text-accent border-b-2 border-accent'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Compradores
+        </button>
+        <button
+          onClick={() => setActiveTab('perguntas')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'perguntas'
+              ? 'text-accent border-b-2 border-accent'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Perguntas
+        </button>
+      </div>
 
         {activeTab === 'respostas' && (
           <div className="space-y-4">
@@ -358,6 +379,54 @@ export default function Admin() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'compradores' && (
+          <div className="space-y-4">
+            {loadingLeads ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-accent" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-border rounded-lg">
+                <table className="w-full text-sm">
+                  <thead className="bg-secondary/70 text-left">
+                    <tr>
+                      <th className="px-4 py-2 font-semibold">Email</th>
+                      <th className="px-4 py-2 font-semibold">WhatsApp</th>
+                      <th className="px-4 py-2 font-semibold">Data</th>
+                      <th className="px-4 py-2 font-semibold">Status</th>
+                      <th className="px-4 py-2 font-semibold">Acao</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allLeads?.filter((lead: any) => lead.hasPayment).map((lead: any) => (
+                      <tr key={lead.id} className="border-t border-border hover:bg-secondary/30">
+                        <td className="px-4 py-2">{lead.email}</td>
+                        <td className="px-4 py-2">{lead.whatsapp}</td>
+                        <td className="px-4 py-2 text-muted-foreground">
+                          {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
+                        </td>
+                        <td className="px-4 py-2">
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Comprador</span>
+                        </td>
+                        <td className="px-4 py-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleSendDevotional(lead.id)}
+                            disabled={sendDevotionalMutation.isPending}
+                          >
+                            {sendDevotionalMutation.isPending ? 'Enviando...' : 'Enviar Email'}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
