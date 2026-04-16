@@ -188,6 +188,7 @@ function ActionButton({
 export function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
+  const [buyerSearchQuery, setBuyerSearchQuery] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const { user } = useAuth();
@@ -228,8 +229,17 @@ export function AdminDashboard() {
       });
     }
     
+    if (buyerSearchQuery.trim()) {
+      const query = buyerSearchQuery.toLowerCase();
+      filtered = filtered.filter((buyer) => {
+        const emailStr = typeof buyer.email === 'string' ? buyer.email : String(buyer.email || '');
+        const nameStr = typeof buyer.name === 'string' ? buyer.name : String(buyer.name || '');
+        return emailStr.toLowerCase().includes(query) || nameStr.toLowerCase().includes(query);
+      });
+    }
+    
     return filtered;
-  }, [buyers, startDate, endDate]);
+  }, [buyers, startDate, endDate, buyerSearchQuery]);
 
   const approvedBuyers = useMemo(
     () => buyers,
@@ -509,6 +519,16 @@ export function AdminDashboard() {
 
           
           <div className="flex gap-2 flex-wrap items-end">
+            <div className="flex flex-col gap-1 flex-1 min-w-[200px]">
+              <label className="text-xs font-semibold text-muted-foreground">Pesquisar por email ou nome</label>
+              <input
+                type="text"
+                placeholder="Digite email ou nome..."
+                value={buyerSearchQuery}
+                onChange={(e) => setBuyerSearchQuery(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+            </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-muted-foreground">Data de Início</label>
               <input
@@ -527,15 +547,16 @@ export function AdminDashboard() {
                 className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
-            {(startDate || endDate) && (
+            {(startDate || endDate || buyerSearchQuery) && (
               <button
                 onClick={() => {
                   setStartDate("");
                   setEndDate("");
+                  setBuyerSearchQuery("");
                 }}
                 className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
               >
-                Limpar datas
+                Limpar filtros
               </button>
             )}
           </div>
