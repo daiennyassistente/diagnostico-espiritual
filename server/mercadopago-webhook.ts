@@ -58,34 +58,42 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
 
     // Criar registro de comprador
     const db = await getDb();
-    if (db && paymentData.payer?.email) {
+    const leadId = paymentData.external_reference;
+    
+    if (db && leadId) {
       try {
-        // Verificar se já existe comprador com este paymentId
-        const existingBuyer = await db
-          .select({ id: buyers.id })
-          .from(buyers)
-          .where(eq(buyers.paymentId, String(paymentId)))
-          .limit(1);
+        // Buscar dados do lead para obter email e nome (dados não mascarados)
+        const lead = await getLeadById(Number(leadId));
+        
+        if (lead && lead.email) {
+          // Verificar se já existe comprador com este paymentId
+          const existingBuyer = await db
+            .select({ id: buyers.id })
+            .from(buyers)
+            .where(eq(buyers.paymentId, String(paymentId)))
+            .limit(1);
 
-        if (existingBuyer.length === 0) {
-          // Inserir novo comprador
-          await db.insert(buyers).values({
-            paymentId: String(paymentId),
-            email: paymentData.payer.email,
-            name: paymentData.payer.first_name || paymentData.payer.email,
-            amount: Math.round(Number(paymentData.transaction_amount || 0) * 100),
-            currency: String(paymentData.currency_id || "BRL").toLowerCase(),
-          });
-          console.log(`[Mercado Pago Webhook] Comprador criado: ${paymentData.payer.email}`);
+          if (existingBuyer.length === 0) {
+            // Inserir novo comprador usando dados do lead (não mascarados)
+            await db.insert(buyers).values({
+              paymentId: String(paymentId),
+              email: lead.email,
+              name: lead.name || lead.email,
+              amount: Math.round(Number(paymentData.transaction_amount || 0) * 100),
+              currency: String(paymentData.currency_id || "BRL").toLowerCase(),
+            });
+            console.log(`[Mercado Pago Webhook] Comprador criado: ${lead.email}`);
+          } else {
+            console.log(`[Mercado Pago Webhook] Comprador já existe para paymentId: ${paymentId}`);
+          }
         } else {
-          console.log(`[Mercado Pago Webhook] Comprador já existe para paymentId: ${paymentId}`);
+          console.log(`[Mercado Pago Webhook] Lead não encontrado ou sem email para leadId: ${leadId}`);
         }
       } catch (buyerError) {
         console.error(`[Mercado Pago Webhook] Erro ao criar comprador:`, buyerError);
       }
     }
 
-    const leadId = paymentData.external_reference;
     if (!leadId) {
       console.log("[Mercado Pago Webhook] Pagamento sem external_reference; notificação recebida sem processamento adicional");
       return res.status(200).json({ received: true });
