@@ -42,18 +42,18 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Configure body parser FIRST, before any routes
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  
-  // Stripe webhook must be registered with raw body to access signature
+  // Stripe webhook MUST be registered BEFORE global JSON parser to access raw body
   app.post(
     "/api/stripe/webhook",
     express.raw({ type: "application/json" }),
     handleStripeWebhook
   );
 
-  // Mercado Pago webhooks (GET and POST) - JSON is already parsed by middleware above
+  // Configure body parser AFTER Stripe webhook but BEFORE other routes
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Mercado Pago webhooks (GET and POST) - JSON is parsed by middleware above
   app.get(
     "/api/mercadopago/webhook",
     handleMercadoPagoWebhook
@@ -66,7 +66,7 @@ async function startServer() {
 
 
 
-  // Download PDF route
+  // Download PDF route (uses parsed JSON from middleware)
   app.get("/api/download", async (req, res) => {
     try {
       const { token } = req.query;
