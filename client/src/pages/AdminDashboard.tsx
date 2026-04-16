@@ -540,11 +540,9 @@ export function AdminDashboard() {
                 <table className="min-w-full text-sm">
                   <thead className="bg-secondary/70 text-left">
                     <tr>
+                      <th className="px-5 py-4 font-semibold text-foreground">Nome</th>
                       <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Telefone</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Valor</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Produto</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Status</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Ações</th>
@@ -553,15 +551,14 @@ export function AdminDashboard() {
                   <tbody>
                     {filteredBuyers.map((buyer) => (
                       <tr key={buyer.id} className="border-t border-border/50 align-top">
+                        <td className="px-5 py-4 text-foreground">{buyer.name || "-"}</td>
                         <td className="px-5 py-4 text-foreground">{buyer.email || "-"}</td>
-                        <td className="px-5 py-4 text-muted-foreground">{buyer.name || "-"}</td>
                         <td className="px-5 py-4 font-semibold text-foreground">{formatCurrency(buyer.amount || 0)}</td>
                         <td className="px-5 py-4">
                           <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-800">
                             Aprovado
                           </span>
                         </td>
-
                         <td className="px-5 py-4 text-muted-foreground">{formatDateTime(buyer.createdAt)}</td>
                         <td className="px-5 py-4">
                           <div className="flex gap-2">
