@@ -779,4 +779,7 @@
 - [x] Corrigir erro de redeclaração de useState no Result.tsx
 - [x] Corrigir erro de TypeScript no Admin.tsx (missing properties)
 - [x] Corrigir implementação de getStatistics para retornar totalResponses e completeResponses
+- [x] Criar testes automatizados para webhook do Mercado Pago (9/9 passando)
+- [x] Validar que webhook recebe e processa notificações corretamente
+- [x] Documentar fluxo e instruções de teste do webhook
 
