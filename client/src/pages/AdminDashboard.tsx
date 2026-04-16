@@ -195,6 +195,7 @@ export function AdminDashboard() {
   // Mutações para ações dos botões
   const resendEmailMutation = trpc.admin.resendEmail.useMutation();
   const resendWhatsAppMutation = trpc.admin.resendViaWhatsApp.useMutation();
+  const sendDevotionalMutation = trpc.quiz.sendDevotionalEmail.useMutation();
   // const generateLinkMutation = trpc.admin.generateDownloadLink.useMutation();
   const unlockAccessMutation = trpc.admin.unlockAccess.useMutation();
 
@@ -598,30 +599,22 @@ export function AdminDashboard() {
                         <td className="px-5 py-4">
                           <div className="flex gap-2">
                             <ActionButton
-                              icon="📱"
-                              title="Reenviar via WhatsApp"
-                              bgColor="bg-green-100"
-                              textColor="text-green-700"
-                              hoverColor="hover:bg-green-200"
+                              icon="📧"
+                              title="Enviar por Email"
+                              bgColor="bg-blue-100"
+                              textColor="text-blue-700"
+                              hoverColor="hover:bg-blue-200"
                                 onClick={() => {
-                                  if (buyer.whatsapp) {
-                                    // Validar e normalizar número
-                                    const normalizedWhatsapp = buyer.whatsapp.replace(/\D/g, '');
-                                    if (normalizedWhatsapp.length < 10) {
-                                      toast.error('Número de WhatsApp inválido');
-                                      return;
-                                    }
-                                    const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${buyer.id}`;
-                                    resendWhatsAppMutation.mutate({
-                                      whatsappNumber: buyer.whatsapp,
-                                      pdfUrl: pdfUrl,
-                                      userName: buyer.email?.split('@')[0] || 'Comprador'
+                                  if (buyer.email) {
+                                    sendDevotionalMutation.mutate({
+                                      leadId: buyer.id,
+                                      email: buyer.email
                                     });
                                   } else {
-                                    toast.error('Comprador não tem WhatsApp cadastrado');
+                                    toast.error('Comprador não tem email cadastrado');
                                   }
                                 }}
-                              isLoading={resendWhatsAppMutation.isPending}
+                              isLoading={sendDevotionalMutation.isPending}
                             />
                           </div>
                         </td>
