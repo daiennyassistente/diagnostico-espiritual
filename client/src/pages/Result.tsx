@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -84,6 +84,10 @@ export default function Result() {
   const [leadId, setLeadId] = useState<number | null>(null);
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [pixQrCode, setPixQrCode] = useState<string | null>(null);
+  const [pixCopyPaste, setPixCopyPaste] = useState<string | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const { data: user } = trpc.auth.me.useQuery();
 
   const generateDiagnosisMutation = trpc.aiResult.generateFromResponses.useMutation();
