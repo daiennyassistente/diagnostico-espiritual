@@ -431,57 +431,6 @@ export function AdminDashboard() {
                                 </a>
                               )}
                               <ActionButton
-                                icon="📧"
-                                title="Reenviar resultado"
-                                bgColor="bg-blue-100"
-                                textColor="text-blue-700"
-                                hoverColor="hover:bg-blue-200"
-                                onClick={() => {
-                                  resendEmailMutation.mutate({ email: emailStr, type: 'result' });
-                                }}
-                                isLoading={resendEmailMutation.isPending}
-                              />
-                              <ActionButton
-                                icon="📄"
-                                title="Link para resultado + guia"
-                                bgColor="bg-amber-100"
-                                textColor="text-amber-700"
-                                hoverColor="hover:bg-amber-200"
-                                onClick={() => {
-                                  const link = `${window.location.origin}/checkout-success?leadId=${item.id}`;
-                                  navigator.clipboard.writeText(link);
-                                  toast.success('Link copiado para a área de transferência!');
-                                }}
-                                isLoading={false}
-                              />
-                              <ActionButton
-                                icon="📱"
-                                title="Reenviar via WhatsApp"
-                                bgColor="bg-green-100"
-                                textColor="text-green-700"
-                                hoverColor="hover:bg-green-200"
-                                onClick={() => {
-                                  if (whatsappStr) {
-                                    // Validar e normalizar número
-                                    const normalizedWhatsapp = whatsappStr.replace(/\D/g, '');
-                                    if (normalizedWhatsapp.length < 10) {
-                                      toast.error('Número de WhatsApp inválido');
-                                      return;
-                                    }
-                                    // Gerar URL do PDF (usando a URL de sucesso como referência)
-                                    const pdfUrl = `${window.location.origin}/api/download-devotional?leadId=${item.id}`;
-                                    resendWhatsAppMutation.mutate({
-                                      whatsappNumber: whatsappStr,
-                                      pdfUrl: pdfUrl,
-                                      userName: nameStr
-                                    });
-                                  } else {
-                                    toast.error('Usuário não tem WhatsApp cadastrado');
-                                  }
-                                }}
-                                isLoading={resendWhatsAppMutation.isPending}
-                              />
-                              <ActionButton
                                 icon="🔓"
                                 title="Liberar acesso"
                                 bgColor="bg-purple-100"
