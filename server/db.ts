@@ -315,7 +315,6 @@ export async function getAdminBuyers() {
       amount: buyers.amount,
       currency: buyers.currency,
       createdAt: buyers.createdAt,
-      whatsapp: sql`NULL`.as("whatsapp"),
     })
     .from(buyers)
     .orderBy(desc(buyers.createdAt));

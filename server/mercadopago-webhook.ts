@@ -46,6 +46,9 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
 
     const paymentData = await response.json();
     console.log(`[Mercado Pago Webhook] Status do pagamento: ${paymentData.status}`);
+    console.log(`[Mercado Pago Webhook] Dados completos do pagamento:`, JSON.stringify(paymentData, null, 2));
+    console.log(`[Mercado Pago Webhook] Payer email: ${paymentData.payer?.email}`);
+    console.log(`[Mercado Pago Webhook] Payer first_name: ${paymentData.payer?.first_name}`);
 
     if (paymentData.status !== "approved") {
       console.log(`[Mercado Pago Webhook] Pagamento ainda não aprovado: ${paymentData.status}`);
