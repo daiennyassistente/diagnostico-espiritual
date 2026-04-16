@@ -437,11 +437,9 @@ export function AdminDashboard() {
                                 textColor="text-purple-700"
                                 hoverColor="hover:bg-purple-200"
                                 onClick={() => {
-                                  const link = `${window.location.origin}/checkout-success?leadId=${item.id}`;
-                                  navigator.clipboard.writeText(link);
-                                  toast.success('Link copiado para a área de transferência!');
+                                  resendEmailMutation.mutate({ email: emailStr, type: 'result' });
                                 }}
-                                isLoading={false}
+                                isLoading={resendEmailMutation.isPending}
                               />
                             </div>
                           </td>
