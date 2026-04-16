@@ -53,16 +53,15 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   
-  // Mercado Pago webhooks (GET and POST) - JSON is parsed by middleware above
-  app.get(
-    "/api/mercadopago/webhook",
-    handleMercadoPagoWebhook
-  );
-
+  // Mercado Pago webhook - aceita apenas POST
   app.post(
     "/api/mercadopago/webhook",
     handleMercadoPagoWebhook
   );
+
+  app.all("/api/mercadopago/webhook", (_req, res) => {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  });
 
 
 

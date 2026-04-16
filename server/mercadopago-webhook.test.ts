@@ -96,7 +96,7 @@ describe("Mercado Pago Webhook", () => {
     expect(mockRes.json).toHaveBeenCalledWith({ received: true });
   });
 
-  it("should return 400 for missing payment ID", async () => {
+  it("should return 200 for missing payment ID without rejecting the notification", async () => {
     mockReq.body = {
       type: "payment",
       data: {},
@@ -104,8 +104,8 @@ describe("Mercado Pago Webhook", () => {
 
     await handleMercadoPagoWebhook(mockReq as Request, mockRes as Response);
 
-    expect(mockRes.status).toHaveBeenCalledWith(400);
-    expect(mockRes.json).toHaveBeenCalledWith({ error: "No payment ID" });
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith({ received: true });
   });
 
   it("should return 200 for non-payment event types", async () => {
@@ -120,7 +120,7 @@ describe("Mercado Pago Webhook", () => {
     expect(mockRes.json).toHaveBeenCalledWith({ received: true });
   });
 
-  it("should handle GET requests", async () => {
+  it("should return 405 for methods different from POST", async () => {
     mockReq.method = "GET";
     mockReq.body = {
       type: "payment",
@@ -128,22 +128,9 @@ describe("Mercado Pago Webhook", () => {
       action: "payment.updated",
     };
 
-    // Mock the fetch call
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            id: "123456",
-            status: "approved",
-            external_reference: "1",
-          }),
-      } as Response)
-    );
-
     await handleMercadoPagoWebhook(mockReq as Request, mockRes as Response);
 
-    // Should process the GET request the same way as POST
-    expect(mockRes.status).toHaveBeenCalled();
+    expect(mockRes.status).toHaveBeenCalledWith(405);
+    expect(mockRes.json).toHaveBeenCalledWith({ error: "Method Not Allowed" });
   });
 });

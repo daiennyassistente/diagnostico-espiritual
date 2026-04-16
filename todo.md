@@ -783,3 +783,9 @@
 - [x] Validar que webhook recebe e processa notificações corretamente
 - [x] Documentar fluxo e instruções de teste do webhook
 
+- [x] Corrigir exclusivamente o endpoint /api/mercadopago/webhook para aceitar apenas POST e responder 200 ao payload do Mercado Pago
+- [x] Ajustar a leitura do body JSON no webhook do Mercado Pago sem exigir campos além de data.id
+- [x] Garantir retorno 405 para métodos diferentes de POST no webhook do Mercado Pago
+- [x] Adicionar log simples do body recebido no webhook do Mercado Pago
+- [x] Validar que o webhook do Mercado Pago não retorna 400 para payload válido com action e data.id
+
