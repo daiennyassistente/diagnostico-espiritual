@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { WhatsAppButton } from '@/components/WhatsAppButton';
 
 interface QuizStep {
   id: number;
@@ -718,5 +719,9 @@ export default function Quiz() {
     );
   }
 
-  return null;
+  return (
+    <>
+      <WhatsAppButton />
+    </>
+  );
 }
