@@ -9,7 +9,6 @@ import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState
 import { extractQuizInsights } from "@/lib/resultPersonalization";
 import { parseStoredLeadData } from "@/lib/leadStorage";
 import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface AIResult {
   profileName: string;
@@ -464,7 +463,6 @@ export default function Result() {
           </div>
         )}
       </div>
-      <WhatsAppButton />
     </div>
   );
 }
