@@ -58,12 +58,12 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
 
     // Criar registro de comprador
     const db = await getDb();
-    const leadId = paymentData.external_reference;
+    const buyerLeadId = paymentData.external_reference;
     
-    if (db && leadId) {
+    if (db && buyerLeadId) {
       try {
         // Buscar dados do lead para obter email e nome (dados não mascarados)
-        const lead = await getLeadById(Number(leadId));
+        const lead = await getLeadById(Number(buyerLeadId));
         
         if (lead && lead.email) {
           // Verificar se já existe comprador com este paymentId
@@ -87,25 +87,25 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
             console.log(`[Mercado Pago Webhook] Comprador já existe para paymentId: ${paymentId}`);
           }
         } else {
-          console.log(`[Mercado Pago Webhook] Lead não encontrado ou sem email para leadId: ${leadId}`);
+          console.log(`[Mercado Pago Webhook] Lead não encontrado ou sem email para leadId: ${buyerLeadId}`);
         }
       } catch (buyerError) {
         console.error(`[Mercado Pago Webhook] Erro ao criar comprador:`, buyerError);
       }
     }
 
-    if (!leadId) {
+    if (!buyerLeadId) {
       console.log("[Mercado Pago Webhook] Pagamento sem external_reference; notificação recebida sem processamento adicional");
       return res.status(200).json({ received: true });
     }
-    console.log(`[Mercado Pago Webhook] Lead ID encontrado: ${leadId}`);
+    console.log(`[Mercado Pago Webhook] Lead ID encontrado: ${buyerLeadId}`);
     
     // Update payment status in database (db já foi obtido acima)
     if (db) {
       const existingPayment = await db
         .select({ id: payments.id })
         .from(payments)
-        .where(eq(payments.leadId, Number(leadId)))
+        .where(eq(payments.leadId, Number(buyerLeadId)))
         .limit(1);
 
       if (existingPayment.length > 0) {
@@ -127,7 +127,7 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
             createdAt,
             updatedAt
           ) VALUES (
-            ${Number(leadId)},
+            ${Number(buyerLeadId)},
             ${Math.round(Number(paymentData.transaction_amount || 0) * 100)},
             ${String(paymentData.currency_id || "BRL").toLowerCase()},
             ${"approved"},
@@ -138,26 +138,26 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
         `);
       }
 
-      console.log(`[Mercado Pago Webhook] Pagamento ${paymentId} marcado como aprovado para lead ${leadId}`);
+      console.log(`[Mercado Pago Webhook] Pagamento ${paymentId} marcado como aprovado para lead ${buyerLeadId}`);
     }
     console.log(`[Mercado Pago Webhook] Status atualizado no banco de dados`);
 
-    const lead = await getLeadById(Number(leadId));
+    const lead = await getLeadById(Number(buyerLeadId));
     if (!lead) {
-      console.log(`[Mercado Pago Webhook] Lead não encontrado para ${leadId}; notificação recebida sem processamento adicional`);
+      console.log(`[Mercado Pago Webhook] Lead não encontrado para ${buyerLeadId}; notificação recebida sem processamento adicional`);
       return res.status(200).json({ received: true });
     }
     console.log(`[Mercado Pago Webhook] Lead encontrado: ${lead.email}`);
 
-    const diagnostic = await getDiagnosticByLeadId(Number(leadId));
+    const diagnostic = await getDiagnosticByLeadId(Number(buyerLeadId));
     if (!diagnostic) {
-      console.log(`[Mercado Pago Webhook] Diagnóstico não encontrado para ${leadId}; notificação recebida sem processamento adicional`);
+      console.log(`[Mercado Pago Webhook] Diagnóstico não encontrado para ${buyerLeadId}; notificação recebida sem processamento adicional`);
       return res.status(200).json({ received: true });
     }
     console.log(`[Mercado Pago Webhook] Diagnóstico encontrado: ${diagnostic.profileName}`);
 
     // Get quiz responses
-    const quizResponse = await getQuizResponseByLeadId(Number(leadId));
+    const quizResponse = await getQuizResponseByLeadId(Number(buyerLeadId));
     const responses: Record<string, string> = quizResponse
       ? Object.fromEntries(
           Object.entries(quizResponse)

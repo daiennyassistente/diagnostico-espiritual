@@ -306,17 +306,20 @@ export async function getAdminBuyers() {
     throw new Error("Database not available");
   }
 
+  // Puxar dados dos compradores com informações dos leads (nome, email, whatsapp)
   const records = await db
     .select({
       id: buyers.id,
       paymentId: buyers.paymentId,
-      email: buyers.email,
-      name: buyers.name,
+      email: leads.email,  // Email do lead (não mascarado)
+      name: leads.name,    // Nome do lead (não mascarado)
+      whatsapp: leads.whatsapp,  // WhatsApp do lead
       amount: buyers.amount,
       currency: buyers.currency,
       createdAt: buyers.createdAt,
     })
     .from(buyers)
+    .leftJoin(leads, eq(buyers.id, leads.id))  // Join com leads para puxar dados reais
     .orderBy(desc(buyers.createdAt));
 
   return records;

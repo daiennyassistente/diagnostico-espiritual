@@ -119,6 +119,7 @@ export type InsertAdmin = typeof admins.$inferInsert;
 
 export const buyers = mysqlTable("buyers", {
   id: int("id").autoincrement().primaryKey(),
+  leadId: int("leadId"),  // Referência ao lead para puxar dados reais
   paymentId: varchar("paymentId", { length: 255 }).notNull().unique(),
   email: varchar("email", { length: 320 }).notNull(),
   name: varchar("name", { length: 255 }),
