@@ -283,7 +283,7 @@ export async function getAdminUsers() {
   const records = await db
     .selectDistinct({
       id: leads.id,
-      name: sql`SUBSTRING_INDEX(${leads.email}, '@', 1)`.as("name"),
+      name: leads.name,
       email: leads.email,
       whatsapp: leads.whatsapp,
       createdAt: leads.createdAt,
