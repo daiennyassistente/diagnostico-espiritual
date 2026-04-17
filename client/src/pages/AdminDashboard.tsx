@@ -394,7 +394,7 @@ export function AdminDashboard() {
                       <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Telefone</th>
                       <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Tipo</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Status</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data da resposta</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Ações</th>
                     </tr>
@@ -412,8 +412,14 @@ export function AdminDashboard() {
                           <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${roleBadgeClass(roleStr)}`}>
-                              {roleStr === "admin" ? "Administrador" : "Participante"}
+                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                              item.status === 'comprou' ? 'bg-emerald-100 text-emerald-800' :
+                              item.status === 'pendente' ? 'bg-amber-100 text-amber-800' :
+                              'bg-blue-100 text-blue-800'
+                            }`}>
+                              {item.status === 'comprou' ? '✓ Comprou' :
+                               item.status === 'pendente' ? '⏳ Pendente' :
+                               '📝 Quiz'}
                             </span>
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">{formatDateTime(item.updatedAt)}</td>

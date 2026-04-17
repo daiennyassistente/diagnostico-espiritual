@@ -292,9 +292,15 @@ export async function getAdminUsers() {
       loginMethod: sql`'quiz'`.as("loginMethod"),
       role: sql`'user'`.as("role"),
       lastSignedIn: leads.updatedAt,
+      status: sql`CASE 
+        WHEN ${payments.status} = 'approved' THEN 'comprou'
+        WHEN ${payments.status} IN ('pending', 'processing') THEN 'pendente'
+        ELSE 'quiz'
+      END`.as("status"),
     })
     .from(leads)
     .innerJoin(quizResponses, eq(leads.id, quizResponses.leadId))
+    .leftJoin(payments, eq(leads.id, payments.leadId))
     .orderBy(desc(leads.updatedAt), desc(leads.createdAt));
 
   return records;
