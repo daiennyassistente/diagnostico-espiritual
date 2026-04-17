@@ -810,3 +810,16 @@
 - [x] Implementar query tRPC admin.getBuyers
 - [x] Atualizar AdminDashboard para exibir compradores corretamente
 - [x] Validar que compradores aparecem na aba Compradores do admin após pagamento aprovado
+
+
+## Correção do Mascaramento de Dados - Coluna Phone (2026-04-17)
+- [x] Investigar por que dados aparecem como "XXXXXXXXXXX" na aba de Compradores
+- [x] Identificar que a coluna phone não existia na tabela buyers do banco de dados
+- [x] Adicionar coluna phone à tabela buyers via SQL
+- [x] Adicionar coluna leadId à tabela buyers via SQL
+- [x] Atualizar query getAdminBuyers para incluir a coluna phone
+- [x] Restaurar coluna "Telefone" no frontend AdminDashboard.tsx
+- [x] Criar teste unitário admin-buyers.test.ts para validar a query
+- [x] Validar que dados aparecem corretamente sem mascaramento
+- [x] Confirmar que novos compradores aparecem com dados reais (nome, email, telefone)
+- [x] Todos os testes passando (2/2 no admin-buyers.test.ts)

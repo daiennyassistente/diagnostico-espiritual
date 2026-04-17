@@ -80,6 +80,7 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
               leadId: Number(buyerLeadId),
               email: lead.email,
               name: lead.name || lead.email,
+              phone: lead.whatsapp,  // Telefone do lead
               amount: Math.round(Number(paymentData.transaction_amount || 0) * 100),
               currency: String(paymentData.currency_id || "BRL").toLowerCase(),
             });

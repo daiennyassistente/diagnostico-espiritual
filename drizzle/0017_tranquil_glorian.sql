@@ -1,0 +1,1 @@
+ALTER TABLE `buyers` ADD `phone` varchar(20);

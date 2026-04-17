@@ -123,6 +123,7 @@ export const buyers = mysqlTable("buyers", {
   paymentId: varchar("paymentId", { length: 255 }).notNull().unique(),
   email: varchar("email", { length: 320 }).notNull(),
   name: varchar("name", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),  // Telefone do comprador
   amount: int("amount").notNull(),
   currency: varchar("currency", { length: 10 }).default("brl").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
