@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { parseStoredLeadData } from "@/lib/leadStorage";
 import { useEffect, useState } from "react";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface CheckoutProps {
   profileName?: string;
@@ -144,6 +145,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
           </ul>
         </Card>
       </div>
+      <WhatsAppButton />
     </div>
   );
 }
