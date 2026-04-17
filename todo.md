@@ -823,3 +823,15 @@
 - [x] Validar que dados aparecem corretamente sem mascaramento
 - [x] Confirmar que novos compradores aparecem com dados reais (nome, email, telefone)
 - [x] Todos os testes passando (2/2 no admin-buyers.test.ts)
+
+
+## Implementação de Botões do Admin Dashboard
+
+- [x] Implementar resendEmail para enviar resultado ou devocional por email
+- [ ] Implementar resendViaWhatsApp para enviar PDF via WhatsApp
+- [ ] Implementar unlockAccess para liberar acesso ao resultado
+- [x] Implementar botão "Enviar por Email" na aba Compradores
+- [ ] Implementar botão "Enviar por WhatsApp" na aba Compradores
+- [ ] Implementar botão "Gerar Link de Download" na aba Compradores
+- [ ] Implementar botão "Liberar acesso" na aba Usuários
+- [ ] Testar todos os botões do admin dashboard

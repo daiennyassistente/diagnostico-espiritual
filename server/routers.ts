@@ -369,8 +369,110 @@ export const appRouter = router({
     resendEmail: adminProcedure
       .input(z.object({ email: z.string().email(), type: z.enum(['result', 'devotional']) }))
       .mutation(async ({ input }) => {
-        console.log(`Resending ${input.type} to ${input.email}`);
-        return { success: true, message: 'Email reenviado com sucesso' };
+        try {
+          const { getLeadByEmail, getDiagnosticByLeadId, getQuizResponseByLeadId } = await import('./db');
+          const { sendEmail } = await import('./email-service');
+          const { generateDevotionalPDF } = await import('./devotional-generator');
+
+          const lead = await getLeadByEmail(input.email);
+          if (!lead) {
+            throw new Error('Lead não encontrado');
+          }
+
+          if (input.type === 'result') {
+            // Enviar resultado do diagnóstico
+            const diagnostic = await getDiagnosticByLeadId(lead.id);
+            if (!diagnostic) {
+              throw new Error('Diagnóstico não encontrado');
+            }
+
+            const emailBody = `
+Olá ${lead.name || 'Amigo(a)'},
+
+Seu diagnóstico espiritual foi gerado com sucesso!
+
+Perfil: ${diagnostic.profileName}
+
+${diagnostic.profileDescription}
+
+Pontos Fortes:
+${JSON.parse(diagnostic.strengths || '[]').join('\n')}
+
+Desafios:
+${JSON.parse(diagnostic.challenges || '[]').join('\n')}
+
+Recomendações:
+${JSON.parse(diagnostic.recommendations || '[]').join('\n')}
+
+Bênçãos,
+Equipe Diagnóstico Espiritual
+            `;
+
+            await sendEmail({
+              to: input.email,
+              subject: `Seu Diagnóstico Espiritual - ${diagnostic.profileName}`,
+              html: emailBody,
+            });
+          } else if (input.type === 'devotional') {
+            // Enviar devocional
+            const diagnostic = await getDiagnosticByLeadId(lead.id);
+            if (!diagnostic) {
+              throw new Error('Diagnóstico não encontrado');
+            }
+
+            const quizResponse = await getQuizResponseByLeadId(lead.id);
+            const responses: Record<string, string> = quizResponse
+              ? Object.fromEntries(
+                  Object.entries(quizResponse)
+                    .filter(([key, value]) => /^step\d+$/.test(key) && typeof value === 'string' && value.trim().length > 0)
+                    .map(([key, value]) => [key, String(value)])
+                )
+              : {};
+
+            const pdfBuffer = await generateDevotionalPDF({
+              profileName: diagnostic.profileName,
+              profileDescription: diagnostic.profileDescription,
+              challenges: JSON.parse(diagnostic.challenges),
+              recommendations: JSON.parse(diagnostic.recommendations),
+              strengths: JSON.parse(diagnostic.strengths),
+              nextSteps: JSON.parse(diagnostic.nextSteps),
+              responses,
+              userName: responses.step1,
+            });
+
+            const emailBody = `
+Olá ${lead.name || 'Amigo(a)'},
+
+Seu devocional personalizado de 7 dias está em anexo!
+
+Este material foi especialmente preparado para você com base no seu diagnóstico espiritual.
+
+Que Deus abençoe seu tempo de intimidade com Ele!
+
+Bênçãos,
+Equipe Diagnóstico Espiritual
+            `;
+
+            await sendEmail({
+              to: input.email,
+              subject: `Seu Devocional Personalizado - ${diagnostic.profileName}`,
+              html: emailBody,
+              attachments: [
+                {
+                  filename: `devocional-${diagnostic.profileName.toLowerCase().replace(/\s+/g, '-')}.pdf`,
+                  content: pdfBuffer,
+                  contentType: 'application/pdf',
+                },
+              ],
+            });
+          }
+
+          console.log(`Email de ${input.type} reenviado com sucesso para ${input.email}`);
+          return { success: true, message: 'Email reenviado com sucesso' };
+        } catch (error: any) {
+          console.error(`Erro ao reenviar email: ${error.message}`);
+          throw new Error(`Erro ao reenviar email: ${error.message}`);
+        }
       }),
     resendViaWhatsApp: publicProcedure
       .input(z.object({ whatsappNumber: z.string().min(10), pdfUrl: z.string().url(), userName: z.string().optional() }))

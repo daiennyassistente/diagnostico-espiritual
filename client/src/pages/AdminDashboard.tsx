@@ -574,13 +574,14 @@ export function AdminDashboard() {
                               bgColor="bg-blue-100"
                               textColor="text-blue-700"
                               hoverColor="hover:bg-blue-200"
-                                onClick={() => {
-                                  if (buyer.email) {
-                                    toast.info('Funcionalidade de envio de email em desenvolvimento');
-                                  } else {
-                                    toast.error('Comprador não tem email cadastrado');
-                                  }
-                                }}
+                              onClick={() => {
+                                if (buyer.email) {
+                                  sendDevotionalMutation.mutate({ leadId: Number(buyer.id), email: buyer.email });
+                                  toast.success('Email enviado com sucesso!');
+                                } else {
+                                  toast.error('Comprador não tem email cadastrado');
+                                }
+                              }}
                               isLoading={sendDevotionalMutation.isPending}
                             />
                           </div>

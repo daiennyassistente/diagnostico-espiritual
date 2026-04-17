@@ -179,6 +179,16 @@ export async function getLeadById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getLeadByEmail(email: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select().from(leads).where(eq(leads.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function getQuizResponseByLeadId(leadId: number) {
   const db = await getDb();
   if (!db) {
