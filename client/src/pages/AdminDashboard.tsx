@@ -444,6 +444,7 @@ export function AdminDashboard() {
                                 hoverColor="hover:bg-purple-200"
                                 onClick={() => {
                                   resendEmailMutation.mutate({ email: emailStr, type: 'result' });
+                                  toast.success('Acesso liberado! Email enviado.');
                                 }}
                                 isLoading={resendEmailMutation.isPending}
                               />
@@ -584,6 +585,28 @@ export function AdminDashboard() {
                               }}
                               isLoading={sendDevotionalMutation.isPending}
                             />
+                            {buyer.phone && (
+                              <ActionButton
+                                icon="📱"
+                                title="Enviar por WhatsApp"
+                                bgColor="bg-green-100"
+                                textColor="text-green-700"
+                                hoverColor="hover:bg-green-200"
+                                onClick={() => {
+                                  if (buyer.phone) {
+                                    resendWhatsAppMutation.mutate({
+                                      whatsappNumber: buyer.phone.replace(/\D/g, ''),
+                                      pdfUrl: `${window.location.origin}/api/download/${buyer.id}`,
+                                      userName: buyer.name || 'Amigo(a)',
+                                    });
+                                    toast.success('PDF enviado via WhatsApp!');
+                                  } else {
+                                    toast.error('Comprador não tem telefone cadastrado');
+                                  }
+                                }}
+                                isLoading={resendWhatsAppMutation.isPending}
+                              />
+                            )}
                           </div>
                         </td>
                       </tr>

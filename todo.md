@@ -828,10 +828,10 @@
 ## Implementação de Botões do Admin Dashboard
 
 - [x] Implementar resendEmail para enviar resultado ou devocional por email
-- [ ] Implementar resendViaWhatsApp para enviar PDF via WhatsApp
-- [ ] Implementar unlockAccess para liberar acesso ao resultado
+- [x] Implementar resendViaWhatsApp para enviar PDF via WhatsApp
+- [x] Implementar unlockAccess para liberar acesso ao resultado
 - [x] Implementar botão "Enviar por Email" na aba Compradores
-- [ ] Implementar botão "Enviar por WhatsApp" na aba Compradores
+- [x] Implementar botão "Enviar por WhatsApp" na aba Compradores
 - [ ] Implementar botão "Gerar Link de Download" na aba Compradores
-- [ ] Implementar botão "Liberar acesso" na aba Usuários
+- [x] Implementar botão "Liberar acesso" na aba Usuários
 - [ ] Testar todos os botões do admin dashboard
