@@ -319,7 +319,7 @@ export async function getAdminBuyers() {
       paymentId: buyers.paymentId,
       email: buyers.email,
       name: buyers.name,
-      whatsapp: sql`"-"`,  // Placeholder para whatsapp
+      whatsapp: sql`"-"`,
       amount: buyers.amount,
       currency: buyers.currency,
       createdAt: buyers.createdAt,
