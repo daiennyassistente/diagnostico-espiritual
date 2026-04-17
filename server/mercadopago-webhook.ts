@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken } from "./db";
 import { generateDevotionalPDF } from "./devotional-generator";
 import { sendEmail } from "./email-service";
-import { payments, buyers } from "../drizzle/schema";
+import { payments, buyers, quizResponses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
 
@@ -49,16 +49,39 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     console.log(`[Mercado Pago Webhook] Dados completos do pagamento:`, JSON.stringify(paymentData, null, 2));
     console.log(`[Mercado Pago Webhook] Payer email: ${paymentData.payer?.email}`);
     console.log(`[Mercado Pago Webhook] Payer first_name: ${paymentData.payer?.first_name}`);
+    
+    // Extract quizId from metadata
+    const quizId = paymentData.metadata?.quizId;
+    console.log(`[Mercado Pago Webhook] Quiz ID: ${quizId}`);
 
     if (paymentData.status !== "approved") {
       console.log(`[Mercado Pago Webhook] Pagamento ainda não aprovado: ${paymentData.status}`);
       return res.status(200).json({ received: true });
     }
     console.log(`[Mercado Pago Webhook] Pagamento aprovado`);
+    
+    // Verificar idempotência: se o pagamento já foi processado, não processar novamente
+    const db = await getDb();
+    if (db && quizId) {
+      const [existingPayment] = await db
+        .select({ paid: quizResponses.paid })
+        .from(quizResponses)
+        .where(eq(quizResponses.quizId, quizId))
+        .limit(1);
+      
+      if (existingPayment && existingPayment.paid === 1) {
+        console.log(`[Mercado Pago Webhook] Pagamento já foi processado para quizId ${quizId}. Ignorando reprocessamento.`);
+        return res.status(200).json({ received: true });
+      }
+    }
 
     // Criar registro de comprador
-    const db = await getDb();
     const buyerLeadId = paymentData.external_reference;
+    
+    // Verificar se quizId foi fornecido
+    if (!quizId) {
+      console.warn("[Mercado Pago Webhook] Aviso: quizId não encontrado no metadata. Processando com leadId apenas.");
+    }
     
     if (db && buyerLeadId) {
       try {
@@ -158,8 +181,38 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     }
     console.log(`[Mercado Pago Webhook] Diagnóstico encontrado: ${diagnostic.profileName}`);
 
-    // Get quiz responses
-    const quizResponse = await getQuizResponseByLeadId(Number(buyerLeadId));
+    // Get quiz responses - ONLY for the specific quiz if quizId is available
+    let quizResponse = null;
+    if (quizId && db && !quizResponse) {
+      // Buscar apenas o quiz específico com o quizId
+      try {
+        const [specificQuiz] = await db
+          .select()
+          .from(quizResponses)
+          .where(eq(quizResponses.quizId, quizId))
+          .limit(1);
+        quizResponse = specificQuiz || null;
+      } catch (err) {
+        console.error(`[Mercado Pago Webhook] Erro ao buscar quiz com quizId ${quizId}:`, err);
+      }
+      
+      if (quizResponse) {
+        // Marcar este quiz como pago e registrar que o email foi enviado
+        await db
+          .update(quizResponses)
+          .set({
+            paid: 1,
+            emailSent: 1,
+            updatedAt: new Date(),
+          })
+          .where(eq(quizResponses.quizId, quizId));
+        console.log(`[Mercado Pago Webhook] Quiz ${quizId} marcado como pago e email registrado como enviado`);
+      }
+    } else {
+      // Fallback: buscar por leadId se quizId não estiver disponível
+      quizResponse = await getQuizResponseByLeadId(Number(buyerLeadId));
+    }
+    
     const responses: Record<string, string> = quizResponse
       ? Object.fromEntries(
           Object.entries(quizResponse)
@@ -209,6 +262,19 @@ Equipe Diagnóstico Espiritual
         ],
       });
       console.log(`[Mercado Pago Webhook] Email enviado com sucesso para: ${lead.email}`);
+      
+      // Mark email as sent if we have quizId
+      if (quizId && db) {
+        try {
+          await db
+            .update(quizResponses)
+            .set({ emailSent: 1 })
+            .where(eq(quizResponses.quizId, quizId));
+          console.log(`[Mercado Pago Webhook] Quiz ${quizId} marcado como email enviado`);
+        } catch (err) {
+          console.error(`[Mercado Pago Webhook] Erro ao marcar email como enviado:`, err);
+        }
+      }
     } catch (emailError) {
       console.error(`[Mercado Pago Webhook] Erro ao enviar email:`, emailError);
       // Don't fail the webhook if email fails - payment was already processed

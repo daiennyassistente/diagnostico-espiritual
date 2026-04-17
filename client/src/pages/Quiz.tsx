@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 interface QuizStep {
   id: number;
@@ -212,6 +213,13 @@ export default function Quiz() {
     return storedStarted || storedStep > 0 || Object.keys(storedResponses).length > 0;
   });
   const [isNavigatingToResult, setIsNavigatingToResult] = useState(() => readRecentNavigationFlag() || readPendingResultRedirect());
+  const [quizId] = useState(() => {
+    const storedQuizId = sessionStorage.getItem('quizId');
+    if (storedQuizId) return storedQuizId;
+    const newQuizId = uuidv4();
+    sessionStorage.setItem('quizId', newQuizId);
+    return newQuizId;
+  });
   const advanceTimeoutRef = useRef<number | null>(null);
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
@@ -427,8 +435,9 @@ export default function Quiz() {
 
       if (leadResult.success && leadResult.leadId) {
         const responsesData = {
+          quizId: quizId,
           leadId: leadResult.leadId,
-          step1: responses[0], // Nome
+          step1: responses[0],
           step2: responses[1],
           step3: responses[2],
           step4: responses[3],

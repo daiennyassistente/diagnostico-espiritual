@@ -83,6 +83,7 @@ export default function Result() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [timeLeft, setTimeLeft] = useState(86400);
   const [leadId, setLeadId] = useState<number | null>(null);
+  const [quizId, setQuizId] = useState<string>("");
   const [isGeneratingDiagnosis, setIsGeneratingDiagnosis] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { data: user } = trpc.auth.me.useQuery();
@@ -101,6 +102,9 @@ export default function Result() {
     if (resolvedLeadId) {
       setLeadId(resolvedLeadId);
     }
+
+    const storedQuizId = sessionStorage.getItem("quizId") || "";
+    setQuizId(storedQuizId);
   }, []);
 
   useEffect(() => {
@@ -299,6 +303,7 @@ export default function Result() {
 
     try {
       const checkout = await checkoutMutation.mutateAsync({
+        quizId,
         email,
         profileName: result.profileName,
         userPhone,

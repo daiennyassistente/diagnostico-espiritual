@@ -437,6 +437,7 @@ export const appRouter = router({
     submitResponses: publicProcedure
       .input(
         z.object({
+          quizId: z.string(),
           leadId: z.number(),
           step1: z.string().optional(),
           step2: z.string().optional(),
@@ -454,6 +455,7 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         await createQuizResponse({
+          quizId: input.quizId,
           leadId: input.leadId,
           step1: input.step1,
           step2: input.step2,
@@ -942,6 +944,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
     createMercadoPagoCheckout: publicProcedure
       .input(
         z.object({
+          quizId: z.string(),
           email: z.string().email(),
           profileName: z.string(),
           userPhone: z.string(),
@@ -980,6 +983,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               installments: 1,
             },
             metadata: {
+              quizId: input.quizId,
               profileName: input.profileName,
               userPhone: input.userPhone,
             },

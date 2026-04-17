@@ -28,6 +28,7 @@ export type InsertUser = typeof users.$inferInsert;
 
 export const quizResponses = mysqlTable("quiz_responses", {
   id: int("id").autoincrement().primaryKey(),
+  quizId: varchar("quizId", { length: 36 }).notNull().unique(), // UUID único para cada tentativa de quiz
   leadId: int("leadId").notNull(),
   step1: text("step1"), // Qual é o seu nome?
   step2: text("step2"), // Como você se sente espiritualmente hoje?
@@ -41,6 +42,8 @@ export const quizResponses = mysqlTable("quiz_responses", {
   step10: text("step10"), // Você sente que sua dificuldade maior é mais…
   step11: text("step11"), // Hoje, no fundo, você sente que está…
   step12: text("step12"), // Algo que você queira acrescentar ou desabafar?
+  paid: int("paid").default(0).notNull(), // 0 = não pago, 1 = pago (para evitar problemas com boolean)
+  emailSent: int("emailSent").default(0).notNull(), // 0 = não enviado, 1 = enviado
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

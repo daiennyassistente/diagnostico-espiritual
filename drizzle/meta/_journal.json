@@ -127,6 +127,13 @@
       "when": 1776458412514,
       "tag": "0017_tranquil_glorian",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1776459845249,
+      "tag": "0018_stormy_paper_doll",
+      "breakpoints": true
     }
   ]
 }
