@@ -77,6 +77,7 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
             // Inserir novo comprador usando dados do lead (não mascarados)
             await db.insert(buyers).values({
               paymentId: String(paymentId),
+              leadId: Number(buyerLeadId),
               email: lead.email,
               name: lead.name || lead.email,
               amount: Math.round(Number(paymentData.transaction_amount || 0) * 100),
