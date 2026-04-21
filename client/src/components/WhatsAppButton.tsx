@@ -8,7 +8,7 @@ interface WhatsAppButtonProps {
   className?: string;
 }
 
-const DEFAULT_PHONE = '5511999999999'; // Número padrão de suporte
+const DEFAULT_PHONE = '5585984463738'; // Número padrão de suporte
 const DEFAULT_MESSAGE = 'Olá! Gostaria de receber suporte sobre o Diagnóstico Espiritual.';
 
 export function WhatsAppButton({
