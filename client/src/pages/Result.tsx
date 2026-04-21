@@ -78,6 +78,19 @@ const buildResponsesMap = (responses: Record<string, string>) => {
   return mapped;
 };
 
+// Função para disparar evento Purchase do Pixel da Meta
+const firePixelPurchaseEvent = (amount: number, productName: string) => {
+  if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
+    (window as any).fbq('track', 'Purchase', {
+      value: amount,
+      currency: 'BRL',
+      content_name: productName,
+      content_type: 'product'
+    });
+    console.log('[Meta Pixel] Evento Purchase disparado:', { value: amount, currency: 'BRL', product: productName });
+  }
+};
+
 export default function Result() {
   const [, setLocation] = useLocation();
   const [responses, setResponses] = useState<Record<string, string> | null>(null);
@@ -141,6 +154,18 @@ export default function Result() {
       retry: false,
     },
   );
+
+  // Disparar evento Purchase do Pixel quando o checkout for concluído
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('payment_success');
+    
+    if (paymentSuccess === 'true' && trpcResult?.diagnostic) {
+      const amount = 12.90; // Valor do diagnóstico
+      const productName = trpcResult.diagnostic.profileName || 'Diagnóstico Espiritual';
+      firePixelPurchaseEvent(amount, productName);
+    }
+  }, [trpcResult]);
 
   useEffect(() => {
     if (!trpcResult || trpcResult.diagnostic || !responses || !leadId || isGeneratingDiagnosis) {

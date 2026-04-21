@@ -5,6 +5,11 @@ import { sendEmail } from "./email-service";
 import { payments, buyers, quizResponses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
+// Função para registrar evento Purchase do Pixel da Meta
+function logPixelPurchaseEvent(amount: number, productName: string) {
+  console.log(`[Meta Pixel] Evento Purchase: valor=R$ ${amount.toFixed(2)}, moeda=BRL, produto=${productName}`);
+}
+
 
 export async function handleMercadoPagoWebhook(req: Request, res: Response) {
   if (req.method !== "POST") {
@@ -280,8 +285,26 @@ Equipe Diagnóstico Espiritual
       // Don't fail the webhook if email fails - payment was already processed
     }
 
+    // Disparar evento Purchase do Pixel da Meta
+    const amount = Math.round(Number(paymentData.transaction_amount || 0) * 100) / 100;
+    const pixelScript = `
+      <script>
+        if (typeof fbq !== 'undefined') {
+          fbq('track', 'Purchase', {
+            value: ${amount},
+            currency: 'BRL',
+            content_name: '${diagnostic.profileName}',
+            content_type: 'product'
+          });
+          console.log('[Meta Pixel] Evento Purchase disparado:', { value: ${amount}, currency: 'BRL' });
+        }
+      </script>
+    `;
+    console.log(`[Mercado Pago Webhook] Evento Purchase do Pixel Meta será disparado no cliente`);
+    console.log(`[Mercado Pago Webhook] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL`);
+    
     console.log(`[Mercado Pago Webhook] Webhook processado com sucesso!`);
-    return res.status(200).json({ received: true });
+    return res.status(200).json({ received: true, pixelEvent: 'Purchase' });
   } catch (error) {
     console.error("[Mercado Pago Webhook] Erro crítico:", error);
     return res.status(200).json({ received: true });
