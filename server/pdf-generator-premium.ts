@@ -266,42 +266,7 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
         addDivider(doc);
       });
 
-      // ========== PÁGINA 2: DIAGNÓSTICO EMOCIONAL ==========
-      addPageBreak(doc);
-      addDiagnosticMessage(doc, content.userName, content.profileName, content.profileDescription, content.strengths, content.challenges);
 
-      // ========== PÁGINA FINAL ==========
-      addPageBreak(doc);
-
-      doc.moveDown(3);
-      addHeader(doc, "Que Deus te Abençoe!", COLORS.gold);
-
-      doc.moveDown(2);
-      addBodyText(
-        doc,
-        `${content.userName}, que estes 7 dias sejam um tempo de renovação espiritual, restauração da intimidade com Deus e fortalecimento de sua fé em Jesus Cristo.`,
-        11
-      );
-
-      doc.moveDown(1.5);
-      addBodyText(
-        doc,
-        `Lembre-se: a jornada espiritual não termina aqui. Continue buscando a Deus com sinceridade, lendo Sua Palavra e vivendo em obediência. Que o Espírito Santo guie seus passos e que você experimente a paz, a graça e o amor de Cristo todos os dias de sua vida.`,
-        11
-      );
-
-      doc.moveDown(2);
-      addDivider(doc);
-
-      doc.moveDown(2);
-      doc.fontSize(10).fillColor(COLORS.lightGold).text("Diagnóstico Espiritual", {
-        align: "center",
-      });
-      doc.fontSize(9).fillColor(COLORS.lightGray).text("Um ministério de oração, conselho e esperança em Cristo", {
-        align: "center",
-      });
-
-      doc.moveDown(1);
       doc.fontSize(8).fillColor(COLORS.darkGray).text(`Gerado em ${new Date().toLocaleDateString("pt-BR")}`, {
         align: "center",
       });
