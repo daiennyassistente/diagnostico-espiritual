@@ -7,6 +7,7 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
+import { WhatsAppReferralButton } from '@/components/WhatsAppReferralButton';
 
 interface QuizStep {
   id: number;
@@ -521,6 +522,15 @@ export default function Quiz() {
             >
               Quero começar meu diagnóstico
             </Button>
+            <div className="pt-4 border-t border-muted">
+              <p className="text-sm text-foreground/60 mb-3">Prefere falar com um especialista?</p>
+              <WhatsAppReferralButton
+                phoneNumber="5585984463738"
+                message="Olá! Gostaria de ser encaminhado para receber mais informações sobre o Diagnóstico Espiritual."
+                label="Encaminhar para WhatsApp"
+                className="flex justify-center"
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { extractQuizInsights } from "@/lib/resultPersonalization";
 import { parseStoredLeadData } from "@/lib/leadStorage";
 import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { WhatsAppReferralButton } from "@/components/WhatsAppReferralButton";
 
 interface AIResult {
   profileName: string;
@@ -430,6 +431,17 @@ export default function Result() {
             <RotateCcw className="w-4 h-4 mr-2" />
             Refazer
           </Button>
+        </section>
+
+        <section className="mb-10 text-center">
+          <div className="border-t border-muted pt-6">
+            <p className="text-sm text-foreground/60 mb-3">Prefere falar com um especialista?</p>
+            <WhatsAppReferralButton
+              phoneNumber="5585984463738"
+              message="Olá! Gostaria de ser encaminhado para receber mais informações sobre o Diagnóstico Espiritual."
+              label="Encaminhar para WhatsApp"
+            />
+          </div>
         </section>
 
         <section className="text-center text-sm text-gray-500">
