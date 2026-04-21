@@ -223,10 +223,8 @@ export default function Quiz() {
     return newQuizId;
   });
   const [userId] = useState(() => {
-    const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) return storedUserId;
+    // Gerar novo userId a cada entrada, mesmo que seja a mesma pessoa
     const newUserId = uuidv4();
-    localStorage.setItem('userId', newUserId);
     return newUserId;
   });
   const advanceTimeoutRef = useRef<number | null>(null);

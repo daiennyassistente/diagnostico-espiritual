@@ -110,15 +110,6 @@ export async function createLead(lead: InsertLead) {
   }
 
   try {
-    // Verificar se userId já existe
-    if (lead.userId) {
-      const existingLead = await getLeadByUserId(lead.userId);
-      if (existingLead) {
-        console.log(`[Lead] userId ${lead.userId} já existe, retornando lead existente`);
-        return { id: existingLead.id };
-      }
-    }
-
     const result = await db.insert(leads).values(lead);
 
     // Drizzle-orm retorna um objeto com insertId
