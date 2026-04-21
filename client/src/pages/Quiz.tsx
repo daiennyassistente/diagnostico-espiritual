@@ -735,5 +735,28 @@ export default function Quiz() {
     );
   }
 
-  return <WhatsAppButton />;
+   // Fallback: se nenhum estado foi atingido, mostrar a tela inicial
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
+      <div className="quiz-card max-w-2xl w-full bg-white">
+        <div className="text-center space-y-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-primary">
+            Diagnóstico Espiritual
+          </h1>
+          <p className="text-lg text-foreground/80 leading-relaxed">
+            Responda algumas perguntas rápidas para identificar possíveis bloqueios espirituais e descobrir o que pode estar travando sua vida.
+          </p>
+          <Button
+            onClick={() => {
+              setHasStarted(true);
+              setCurrentStep(1);
+            }}
+            className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
+          >
+            Quero começar meu diagnóstico
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }

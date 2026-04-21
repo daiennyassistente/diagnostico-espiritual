@@ -285,23 +285,11 @@ Equipe Diagnóstico Espiritual
       // Don't fail the webhook if email fails - payment was already processed
     }
 
-    // Disparar evento Purchase do Pixel da Meta
+    // Registrar evento Purchase do Pixel da Meta para ser disparado no cliente
     const amount = Math.round(Number(paymentData.transaction_amount || 0) * 100) / 100;
-    const pixelScript = `
-      <script>
-        if (typeof fbq !== 'undefined') {
-          fbq('track', 'Purchase', {
-            value: ${amount},
-            currency: 'BRL',
-            content_name: '${diagnostic.profileName}',
-            content_type: 'product'
-          });
-          console.log('[Meta Pixel] Evento Purchase disparado:', { value: ${amount}, currency: 'BRL' });
-        }
-      </script>
-    `;
-    console.log(`[Mercado Pago Webhook] Evento Purchase do Pixel Meta será disparado no cliente`);
-    console.log(`[Mercado Pago Webhook] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL`);
+    logPixelPurchaseEvent(amount, diagnostic.profileName);
+    console.log(`[Meta Pixel] Evento Purchase será disparado no cliente quando a página de resultado carregar`);
+    console.log(`[Meta Pixel] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL`);
     
     console.log(`[Mercado Pago Webhook] Webhook processado com sucesso!`);
     return res.status(200).json({ received: true, pixelEvent: 'Purchase' });

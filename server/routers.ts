@@ -234,8 +234,12 @@ const persistDiagnosticHistory = async (
 export const appRouter = router({
   system: systemRouter,
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+    me: publicProcedure.query((opts) => {
+      console.log('[Auth] auth.me called, user:', opts.ctx.user);
+      return opts.ctx.user;
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
+      console.log('[Auth] logout called, user:', ctx.user);
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return {

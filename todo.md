@@ -835,3 +835,26 @@
 - [ ] Implementar botão "Gerar Link de Download" na aba Compradores
 - [x] Implementar botão "Liberar acesso" na aba Usuários
 - [ ] Testar todos os botões do admin dashboard
+
+
+## Bug: Acesso ao Admin
+
+- [ ] Corrigir erro "não autorizado" ao acessar página de admin
+- [ ] Verificar autenticação e permissões de acesso
+- [ ] Testar acesso ao admin após correção
+
+
+## Configuração do Evento Purchase do Pixel da Meta
+
+- [ ] Implementar disparo do evento Purchase no backend (webhook de pagamento)
+- [ ] Garantir que evento seja disparado apenas uma vez por pagamento
+- [ ] Usar fbq('track', 'Purchase') com value e currency
+- [ ] Validar se Pixel está carregado antes de disparar
+- [ ] Testar evento no Gerenciador de Eventos da Meta
+
+
+## Bugs Urgentes a Corrigir
+
+- [ ] Resultado do quiz sendo gerado confuso
+- [ ] Personalização do resultado incorreta
+- [ ] Erro ao tentar adicionar opção PIX
