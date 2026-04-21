@@ -630,6 +630,27 @@ export function AdminDashboard() {
                               }}
                               isLoading={false}
                             />
+                            {buyer.phone && (
+                              <ActionButton
+                                icon="💬"
+                                title="Encaminhar para WhatsApp"
+                                bgColor="bg-green-100"
+                                textColor="text-green-700"
+                                hoverColor="hover:bg-green-200"
+                                onClick={() => {
+                                  if (buyer.phone) {
+                                    const whatsappNumber = buyer.phone.replace(/\D/g, '');
+                                    const message = `Olá ${buyer.name || 'Amigo(a)'}! Seu devocional está pronto. Clique aqui para baixar: ${window.location.origin}/api/download?token=${buyer.id}`;
+                                    const encodedMessage = encodeURIComponent(message);
+                                    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+                                    toast.success('Abrindo WhatsApp!');
+                                  } else {
+                                    toast.error('Comprador não tem telefone cadastrado');
+                                  }
+                                }}
+                                isLoading={false}
+                              />
+                            )}
                           </div>
                         </td>
                       </tr>
