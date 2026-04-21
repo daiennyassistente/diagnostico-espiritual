@@ -222,6 +222,13 @@ export default function Quiz() {
     sessionStorage.setItem('quizId', newQuizId);
     return newQuizId;
   });
+  const [userId] = useState(() => {
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) return storedUserId;
+    const newUserId = uuidv4();
+    localStorage.setItem('userId', newUserId);
+    return newUserId;
+  });
   const advanceTimeoutRef = useRef<number | null>(null);
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
@@ -430,6 +437,7 @@ export default function Quiz() {
       }
 
       const leadResult = await submitLeadMutation.mutateAsync({
+        userId: userId,
         whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         email: leadData.email,
         name: responses[0], // Nome da primeira pergunta (índice 0)

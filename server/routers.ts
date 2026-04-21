@@ -522,6 +522,7 @@ Equipe Diagnóstico Espiritual
     submitLead: publicProcedure
       .input(
         z.object({
+          userId: z.string(),
           whatsapp: z.string().min(10, "WhatsApp deve ter pelo menos 10 dígitos"),
           email: z.string().email("E-mail inválido"),
           name: z.string().optional(), // Nome da primeira pergunta
@@ -529,6 +530,7 @@ Equipe Diagnóstico Espiritual
       )
       .mutation(async ({ input }) => {
         const result = await createLead({
+          userId: input.userId,
           whatsapp: input.whatsapp,
           email: input.email,
           name: input.name,

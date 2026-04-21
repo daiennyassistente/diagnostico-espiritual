@@ -53,6 +53,7 @@ export type InsertQuizResponse = typeof quizResponses.$inferInsert;
 
 export const leads = mysqlTable("leads", {
   id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 36 }).notNull().unique(), // UUID único para identificar cada usuário
   name: varchar("name", { length: 255 }), // Nome da pessoa coletado na primeira pergunta
   whatsapp: varchar("whatsapp", { length: 20 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
