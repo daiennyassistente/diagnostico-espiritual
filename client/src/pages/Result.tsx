@@ -417,7 +417,8 @@ export default function Result() {
           </Button>
 
           <p className="text-center text-sm mt-4 text-slate-600">
-            R$ 12,90. Pagamento seguro e envio do pdf por e-mail
+            R$ 12,90. Pagamento seguro e envio do pdf por e-mail<br />
+            <span className="text-xs mt-2 block">Não esqueça de olhar a sua caixa de spam</span>
           </p>
         </section>
 
