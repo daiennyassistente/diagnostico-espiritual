@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken, checkDevotionalDeliveryExists, createDevotionalDelivery, updateDevotionalDeliveryStatus } from "./db";
 import { generateDevotionalPDF } from "./devotional-generator";
+import { generateDevotionalPDFFromDays } from "./devotional-pdf-service";
 import { sendEmail } from "./email-service";
 import { payments, buyers, quizResponses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
@@ -236,17 +237,40 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
         )
       : {};
 
-    // Generate PDF
-    const pdfBuffer = await generateDevotionalPDF({
-      profileName: diagnostic.profileName,
-      profileDescription: diagnostic.profileDescription,
-      challenges: JSON.parse(diagnostic.challenges),
-      recommendations: JSON.parse(diagnostic.recommendations),
-      strengths: JSON.parse(diagnostic.strengths),
-      nextSteps: JSON.parse(diagnostic.nextSteps),
-      responses,
-      userName: responses.step1,
-    });
+    // Generate Premium PDF with professional design
+    let pdfBuffer: Buffer;
+    try {
+      console.log(`[Mercado Pago Webhook] Iniciando geração de PDF premium para ${lead.email}`);
+      
+      // Tentar usar o novo gerador de PDF com design profissional
+      const { generateDevotionalWithPDF } = await import("./devotional-pdf-service");
+      pdfBuffer = await generateDevotionalWithPDF({
+        userName: lead.name || responses.step1 || "Amigo(a)",
+        profileName: diagnostic.profileName,
+        profileDescription: diagnostic.profileDescription,
+        strengths: JSON.parse(diagnostic.strengths),
+        challenges: JSON.parse(diagnostic.challenges),
+        recommendations: JSON.parse(diagnostic.recommendations),
+        nextSteps: JSON.parse(diagnostic.nextSteps),
+        responses,
+      });
+      
+      console.log(`[Mercado Pago Webhook] PDF premium gerado com sucesso (${pdfBuffer.length} bytes)`);
+    } catch (pdfError) {
+      console.error(`[Mercado Pago Webhook] Erro ao gerar PDF premium, usando fallback:`, pdfError);
+      // Fallback para o gerador antigo se houver erro
+      pdfBuffer = await generateDevotionalPDF({
+        profileName: diagnostic.profileName,
+        profileDescription: diagnostic.profileDescription,
+        challenges: JSON.parse(diagnostic.challenges),
+        recommendations: JSON.parse(diagnostic.recommendations),
+        strengths: JSON.parse(diagnostic.strengths),
+        nextSteps: JSON.parse(diagnostic.nextSteps),
+        responses,
+        userName: responses.step1,
+      });
+      console.log(`[Mercado Pago Webhook] PDF fallback gerado com sucesso`);
+    }
 
     // Send email with PDF
     const emailSubject = `Seu Devocional Personalizado - ${diagnostic.profileName}`;
