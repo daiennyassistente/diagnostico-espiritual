@@ -51,6 +51,74 @@ function addSectionTitle(doc: any, text: string) {
   });
 }
 
+function addDiagnosticMessage(doc: any, userName: string, profileName: string, profileDescription: string, strengths: string[], challenges: string[]) {
+  doc.moveDown(1);
+  
+  // Mensagem emocional inicial
+  doc.fontSize(12).fillColor(COLORS.white).font("Helvetica").text(
+    `${userName}, o que você respondeu neste quiz revelou muito mais do que simples palavras. Revelou o clamor do seu coração.`,
+    { align: "justify", lineGap: 8 }
+  );
+  
+  doc.moveDown(0.8);
+  
+  // Descrição do perfil de forma emocional
+  doc.fontSize(11).fillColor(COLORS.lightGray).text(
+    `Você foi identificado como alguém ${profileName.toLowerCase()}. Isso não é um rótulo, é um reconhecimento. É Deus dizendo: "Eu vejo você. Eu entendo sua jornada. Eu conheço cada passo que você deu."`,
+    { align: "justify", lineGap: 6 }
+  );
+  
+  doc.moveDown(1);
+  
+  doc.fontSize(11).fillColor(COLORS.lightGray).text(
+    profileDescription,
+    { align: "justify", lineGap: 6 }
+  );
+  
+  doc.moveDown(1.5);
+  
+  // Forças
+  if (strengths.length > 0) {
+    doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("O que Deus vê em você:", { lineGap: 6 });
+    doc.moveDown(0.3);
+    
+    strengths.forEach((strength) => {
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(`✦ ${strength}`, {
+        lineGap: 5,
+      });
+    });
+    
+    doc.moveDown(1);
+  }
+  
+  // Desafios
+  if (challenges.length > 0) {
+    doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("Os desafios que você enfrenta:", { lineGap: 6 });
+    doc.moveDown(0.3);
+    
+    challenges.forEach((challenge) => {
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(`◆ ${challenge}`, {
+        lineGap: 5,
+      });
+    });
+    
+    doc.moveDown(1.5);
+  }
+  
+  // Mensagem final da página 2
+  doc.fontSize(11).fillColor(COLORS.lightGray).text(
+    `Nos próximos 7 dias, você não receberá apenas informações. Você receberá um encontro. Um encontro com a verdade de quem você é em Cristo. Um encontro com o amor de Deus que não depende do seu desempenho, mas da Sua fidelidade.`,
+    { align: "justify", lineGap: 6 }
+  );
+  
+  doc.moveDown(1);
+  
+  doc.fontSize(11).fillColor(COLORS.lightGray).text(
+    `Que este devocional seja um espaço onde você se sinta visto, compreendido e profundamente amado por Deus.`,
+    { align: "justify", lineGap: 6 }
+  );
+}
+
 function addBodyText(doc: any, text: string, size: number = 11) {
   doc.fontSize(size).font("Helvetica").fillColor(COLORS.white).text(text, {
     align: "justify",
@@ -132,36 +200,7 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
         10
       );
 
-      doc.moveDown(2);
-      addDivider(doc);
 
-      doc.moveDown(2);
-      addSectionTitle(doc, "Seu Perfil Espiritual");
-      doc.moveDown(0.5);
-
-      if (content.strengths.length > 0) {
-        addBodyText(doc, "Forças Identificadas:", 11);
-        content.strengths.forEach((strength) => {
-          doc.fontSize(10).fillColor(COLORS.lightGray).text(`• ${strength}`, { lineGap: 4 });
-        });
-        doc.moveDown(0.5);
-      }
-
-      if (content.challenges.length > 0) {
-        addBodyText(doc, "Desafios Percebidos:", 11);
-        content.challenges.forEach((challenge) => {
-          doc.fontSize(10).fillColor(COLORS.lightGray).text(`• ${challenge}`, { lineGap: 4 });
-        });
-        doc.moveDown(0.5);
-      }
-
-      if (content.recommendations.length > 0) {
-        addBodyText(doc, "Recomendações:", 11);
-        content.recommendations.forEach((rec) => {
-          doc.fontSize(10).fillColor(COLORS.lightGray).text(`• ${rec}`, { lineGap: 4 });
-        });
-        doc.moveDown(0.5);
-      }
 
       // ========== DIAS DO DEVOCIONAL ==========
       content.days.forEach((day) => {
@@ -217,6 +256,10 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
         doc.moveDown(1);
         addDivider(doc);
       });
+
+      // ========== PÁGINA 2: DIAGNÓSTICO EMOCIONAL ==========
+      addPageBreak(doc);
+      addDiagnosticMessage(doc, content.userName, content.profileName, content.profileDescription, content.strengths, content.challenges);
 
       // ========== PÁGINA FINAL ==========
       addPageBreak(doc);
