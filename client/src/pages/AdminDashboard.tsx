@@ -571,7 +571,7 @@ export function AdminDashboard() {
                       <tr key={buyer.id} className="border-t border-border/50 align-top">
                         <td className="px-5 py-4 text-foreground">{buyer.name || "-"}</td>
                         <td className="px-5 py-4 text-foreground">{buyer.email || "-"}</td>
-                        <td className="px-5 py-4 text-foreground">{buyer.phone ? <a href={`https://wa.me/${buyer.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">{buyer.phone}</a> : "-"}</td>
+                        <td className="px-5 py-4 text-foreground text-green-600 font-semibold">{buyer.phone || "-"}</td>
                         <td className="px-5 py-4 font-semibold text-foreground">{formatCurrency(buyer.amount || 0)}</td>
                         <td className="px-5 py-4">
                           <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-800">
