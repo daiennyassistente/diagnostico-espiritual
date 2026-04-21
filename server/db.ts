@@ -110,6 +110,15 @@ export async function createLead(lead: InsertLead) {
   }
 
   try {
+    // Verificar se userId já existe
+    if (lead.userId) {
+      const existingLead = await getLeadByUserId(lead.userId);
+      if (existingLead) {
+        console.log(`[Lead] userId ${lead.userId} já existe, retornando lead existente`);
+        return { id: existingLead.id };
+      }
+    }
+
     const result = await db.insert(leads).values(lead);
 
     // Drizzle-orm retorna um objeto com insertId
@@ -186,6 +195,16 @@ export async function getLeadByEmail(email: string) {
   }
 
   const result = await db.select().from(leads).where(eq(leads.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getLeadByUserId(userId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.select().from(leads).where(eq(leads.userId, userId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
