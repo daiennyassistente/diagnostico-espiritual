@@ -14,6 +14,8 @@ import {
   users,
   admins,
   buyers,
+  devotionalDeliveries,
+  InsertDevotionalDelivery,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1008,4 +1010,138 @@ export async function createPayment(paymentData: {
       NOW()
     )
   `);
+}
+
+
+// ============================================
+// Funções para controle de entregas de devocionais
+// ============================================
+
+/**
+ * Verifica se um devocional já foi entregue para um transaction_id específico
+ */
+export async function checkDevotionalDeliveryExists(transactionId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select({ id: devotionalDeliveries.id, status: devotionalDeliveries.status })
+    .from(devotionalDeliveries)
+    .where(eq(devotionalDeliveries.transactionId, transactionId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Registra uma entrega de devocional com proteção contra duplicidade
+ */
+export async function createDevotionalDelivery(data: InsertDevotionalDelivery) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Verifica se já existe uma entrega para este transaction_id
+    const existing = await checkDevotionalDeliveryExists(data.transactionId);
+    if (existing) {
+      console.warn(`[Devotional] Delivery already exists for transaction_id: ${data.transactionId}`);
+      return existing;
+    }
+
+    const result = await db.insert(devotionalDeliveries).values(data);
+    return result;
+  } catch (error: any) {
+    // Se o erro for de duplicidade de transactionId, retorna o registro existente
+    if (error.code === 'ER_DUP_ENTRY') {
+      console.warn(`[Devotional] Duplicate transaction_id detected: ${data.transactionId}`);
+      return await checkDevotionalDeliveryExists(data.transactionId);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Atualiza o status de uma entrega de devocional
+ */
+export async function updateDevotionalDeliveryStatus(
+  transactionId: string,
+  status: "pending" | "sent" | "failed" | "cancelled",
+  failureReason?: string
+) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const updateData: any = {
+    status,
+    updatedAt: new Date(),
+  };
+
+  if (status === "sent") {
+    updateData.sentAt = new Date();
+  }
+
+  if (failureReason) {
+    updateData.failureReason = failureReason;
+  }
+
+  return db
+    .update(devotionalDeliveries)
+    .set(updateData)
+    .where(eq(devotionalDeliveries.transactionId, transactionId));
+}
+
+/**
+ * Obtém o histórico de entregas para um lead
+ */
+export async function getDevotionalDeliveriesByLeadId(leadId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return db
+    .select()
+    .from(devotionalDeliveries)
+    .where(eq(devotionalDeliveries.leadId, leadId))
+    .orderBy(desc(devotionalDeliveries.createdAt));
+}
+
+/**
+ * Obtém o histórico de entregas para um email
+ */
+export async function getDevotionalDeliveriesByEmail(email: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return db
+    .select()
+    .from(devotionalDeliveries)
+    .where(eq(devotionalDeliveries.email, email))
+    .orderBy(desc(devotionalDeliveries.createdAt));
+}
+
+/**
+ * Obtém uma entrega específica por transaction_id
+ */
+export async function getDevotionalDeliveryByTransactionId(transactionId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(devotionalDeliveries)
+    .where(eq(devotionalDeliveries.transactionId, transactionId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
 }

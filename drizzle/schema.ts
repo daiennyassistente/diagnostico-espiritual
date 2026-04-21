@@ -135,3 +135,20 @@ export const buyers = mysqlTable("buyers", {
 
 export type Buyer = typeof buyers.$inferSelect;
 export type InsertBuyer = typeof buyers.$inferInsert;
+
+export const devotionalDeliveries = mysqlTable("devotional_deliveries", {
+  id: int("id").autoincrement().primaryKey(),
+  transactionId: varchar("transactionId", { length: 255 }).notNull().unique(), // ID único do pagamento (Mercado Pago, Stripe, etc)
+  paymentId: int("paymentId").notNull(), // Referência à tabela payments
+  leadId: int("leadId").notNull(), // Referência ao lead
+  email: varchar("email", { length: 320 }).notNull(), // Email do comprador
+  productName: text("productName").notNull(), // Nome do produto entregue
+  status: mysqlEnum("status", ["pending", "sent", "failed", "cancelled"]).default("pending").notNull(),
+  sentAt: timestamp("sentAt"), // Data/hora do envio
+  failureReason: text("failureReason"), // Motivo da falha, se houver
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DevotionalDelivery = typeof devotionalDeliveries.$inferSelect;
+export type InsertDevotionalDelivery = typeof devotionalDeliveries.$inferInsert;

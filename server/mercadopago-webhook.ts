@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken } from "./db";
+import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken, checkDevotionalDeliveryExists, createDevotionalDelivery, updateDevotionalDeliveryStatus } from "./db";
 import { generateDevotionalPDF } from "./devotional-generator";
 import { sendEmail } from "./email-service";
 import { payments, buyers, quizResponses } from "../drizzle/schema";
@@ -55,6 +55,9 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     console.log(`[Mercado Pago Webhook] Payer email: ${paymentData.payer?.email}`);
     console.log(`[Mercado Pago Webhook] Payer first_name: ${paymentData.payer?.first_name}`);
     
+    // Usar o ID do pagamento como transaction_id único
+    const transactionId = String(paymentId);
+    
     // Extract quizId from metadata
     const quizId = paymentData.metadata?.quizId;
     console.log(`[Mercado Pago Webhook] Quiz ID: ${quizId}`);
@@ -64,6 +67,13 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
       return res.status(200).json({ received: true });
     }
     console.log(`[Mercado Pago Webhook] Pagamento aprovado`);
+    
+    // Verificar se já existe uma entrega registrada para este transaction_id
+    const existingDelivery = await checkDevotionalDeliveryExists(transactionId);
+    if (existingDelivery && existingDelivery.status === "sent") {
+      console.log(`[Mercado Pago Webhook] Devocional já foi entregue para transaction_id ${transactionId}. Ignorando reprocessamento.`);
+      return res.status(200).json({ received: true, message: "Delivery already processed" });
+    }
     
     // Verificar idempotência: se o pagamento já foi processado, não processar novamente
     const db = await getDb();
@@ -254,6 +264,31 @@ Equipe Diagnóstico Espiritual
     `;
 
     try {
+      // Criar registro de entrega antes de enviar o email
+      if (db) {
+        try {
+          const payment = await db
+            .select({ id: payments.id })
+            .from(payments)
+            .where(eq(payments.leadId, Number(buyerLeadId)))
+            .limit(1);
+          
+          const paymentId_db = payment.length > 0 ? payment[0].id : null;
+          
+          await createDevotionalDelivery({
+            transactionId,
+            paymentId: paymentId_db || 0,
+            leadId: Number(buyerLeadId),
+            email: lead.email,
+            productName: "Devocional: 7 Dias para se Aproximar de Deus",
+            status: "pending",
+          });
+          console.log(`[Mercado Pago Webhook] Registro de entrega criado para transaction_id ${transactionId}`);
+        } catch (deliveryError) {
+          console.error(`[Mercado Pago Webhook] Erro ao criar registro de entrega:`, deliveryError);
+        }
+      }
+      
       await sendEmail({
         to: lead.email,
         subject: emailSubject,
@@ -267,6 +302,14 @@ Equipe Diagnóstico Espiritual
         ],
       });
       console.log(`[Mercado Pago Webhook] Email enviado com sucesso para: ${lead.email}`);
+      
+      // Atualizar status de entrega para "sent"
+      try {
+        await updateDevotionalDeliveryStatus(transactionId, "sent");
+        console.log(`[Mercado Pago Webhook] Status de entrega atualizado para "sent" para transaction_id ${transactionId}`);
+      } catch (updateError) {
+        console.error(`[Mercado Pago Webhook] Erro ao atualizar status de entrega:`, updateError);
+      }
       
       // Mark email as sent if we have quizId
       if (quizId && db) {
@@ -282,6 +325,14 @@ Equipe Diagnóstico Espiritual
       }
     } catch (emailError) {
       console.error(`[Mercado Pago Webhook] Erro ao enviar email:`, emailError);
+      
+      // Atualizar status de entrega para "failed"
+      try {
+        await updateDevotionalDeliveryStatus(transactionId, "failed", String(emailError));
+        console.log(`[Mercado Pago Webhook] Status de entrega atualizado para "failed" para transaction_id ${transactionId}`);
+      } catch (updateError) {
+        console.error(`[Mercado Pago Webhook] Erro ao atualizar status de entrega para failed:`, updateError);
+      }
       // Don't fail the webhook if email fails - payment was already processed
     }
 
