@@ -120,9 +120,9 @@ function addDiagnosticMessage(doc: any, userName: string, profileName: string, p
 }
 
 function addBodyText(doc: any, text: string, size: number = 11) {
-  doc.fontSize(size).font("Helvetica").fillColor(COLORS.white).text(text, {
+  doc.fontSize(size).font("Helvetica").fillColor(COLORS.lightGray).text(text, {
     align: "justify",
-    lineGap: 6,
+    lineGap: 5,
   });
 }
 
@@ -207,53 +207,62 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
         addPageBreak(doc);
 
         // Número do dia
-        doc.fontSize(48).font("Helvetica-Bold").fillColor(COLORS.gold).text(`Dia ${day.day}`, {
+        doc.fontSize(40).font("Helvetica-Bold").fillColor(COLORS.gold).text(`Dia ${day.day}`, {
           align: "center",
         });
 
-        doc.moveDown(0.5);
-        addSectionTitle(doc, day.title);
-        doc.moveDown(1);
-
-        // Versículo
-        doc.fontSize(10).fillColor(COLORS.lightGold).font("Helvetica-Oblique").text(day.verseReference, {
+        doc.moveDown(0.3);
+        doc.fontSize(14).font("Helvetica-Bold").fillColor(COLORS.gold).text(day.title, {
           align: "center",
-        });
-        doc.moveDown(0.5);
-
-        addDivider(doc);
-        doc.moveDown(0.5);
-
-        doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(day.verse, {
-          align: "justify",
           lineGap: 6,
         });
+        doc.moveDown(0.8);
 
-        doc.moveDown(1.5);
+        // Versículo
+        doc.fontSize(9).fillColor(COLORS.lightGold).font("Helvetica-Oblique").text(day.verseReference, {
+          align: "center",
+        });
+        doc.moveDown(0.3);
+
+        addDivider(doc);
+        doc.moveDown(0.3);
+
+        doc.fontSize(10).fillColor(COLORS.lightGray).font("Helvetica").text(day.verse, {
+          align: "justify",
+          lineGap: 5,
+        });
+
+        doc.moveDown(1);
 
         // Reflexão
         addSectionTitle(doc, "Reflexão");
-        doc.moveDown(0.5);
-        addBodyText(doc, day.reflection, 10);
+        doc.moveDown(0.3);
+        doc.fontSize(9.5).fillColor(COLORS.lightGray).font("Helvetica").text(day.reflection, {
+          align: "justify",
+          lineGap: 5,
+        });
 
-        doc.moveDown(1.5);
+        doc.moveDown(1);
 
         // Oração
         addSectionTitle(doc, "Oração");
-        doc.moveDown(0.5);
-        doc.fontSize(10).fillColor(COLORS.lightGray).font("Helvetica-Oblique").text(day.prayer, {
+        doc.moveDown(0.3);
+        doc.fontSize(9.5).fillColor(COLORS.lightGray).font("Helvetica-Oblique").text(day.prayer, {
           align: "justify",
-          lineGap: 6,
+          lineGap: 5,
         });
 
-        doc.moveDown(1.5);
+        doc.moveDown(1);
 
         // Aplicação
         addSectionTitle(doc, "Aplicação Prática");
-        doc.moveDown(0.5);
-        addBodyText(doc, day.application, 10);
+        doc.moveDown(0.3);
+        doc.fontSize(9.5).fillColor(COLORS.lightGray).font("Helvetica").text(day.application, {
+          align: "justify",
+          lineGap: 5,
+        });
 
-        doc.moveDown(1);
+        doc.moveDown(0.5);
         addDivider(doc);
       });
 

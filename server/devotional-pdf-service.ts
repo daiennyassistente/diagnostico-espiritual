@@ -117,25 +117,33 @@ REGRAS DE PERSONALIZAÇÃO ABSOLUTA:
 9. A linguagem deve ser PESSOAL, EMOCIONAL, DIRETA - como um amigo pastor falando ao coração.
 10. Se o mesmo texto pudesse servir para outra pessoa, está errado. REESCREVA.
 
-ESTRUTURA DE CADA DIA (EXPANDIDA):
+ESTRUTURA DE CADA DIA (MUITO EXPANDIDA E PROFUNDA):
 - title: título que capture a essência do que Deus quer falar naquele dia
 - verseReference: referência bíblica real e profundamente relevante
 - verse: texto bíblico completo ou trecho fiel
-- reflection: 350 a 450 palavras (PROFUNDO, não superficial)
-  * Comece reconhecendo a dor/situação específica da pessoa
-  * Desenvolva a verdade bíblica de forma que pareça que Jesus está respondendo
-  * Traga esperança real, não platitudes
+- reflection: 600 a 800 palavras (EXTREMAMENTE PROFUNDO)
+  * Comece reconhecendo a dor/situação específica da pessoa com nomes e detalhes concretos
+  * Desenvolva a verdade bíblica de forma que pareça que Jesus está respondendo pessoalmente
+  * Use exemplos práticos da vida da pessoa baseados nas respostas do quiz
+  * Traga esperança real, não platitudes - esperança fundamentada em Cristo
+  * Desenvolva teologia prática e aplicável
   * Termine com um chamado claro à ação ou transformação
-- prayer: 150 a 200 palavras (PESSOAL, como se a pessoa estivesse orando)
-  * Use o nome da pessoa
-  * Reconheça as lutas específicas
-  * Peça a Deus de forma honesta e vulnerável
-  * Termine com confiança em Cristo
-- application: 100 a 150 palavras (PRÁTICA e TRANSFORMADORA)
-  * Seja específico com a situação da pessoa
-  * Dê um passo concreto que a pessoa possa dar hoje
-  * Explique por que esse passo importa
-  * Conecte ao progresso espiritual
+  * IMPORTANTE: Cada reflexão deve ser única, específica e impossível de servir para outra pessoa
+- prayer: 250 a 350 palavras (PESSOAL, PROFUNDO, como se a pessoa estivesse orando)
+  * Use o nome da pessoa frequentemente
+  * Reconheça as lutas específicas com detalhes concretos
+  * Peça a Deus de forma honesta, vulnerável e emocional
+  * Inclua confissão de pecados relacionados à situação
+  * Inclua pedidos específicos de transformação
+  * Termine com confiança e esperança em Cristo
+  * Pareça uma oração real, não genérica
+- application: 200 a 300 palavras (PRÁTICA, TRANSFORMADORA E PROFUNDA)
+  * Seja extremamente específico com a situação da pessoa
+  * Dê passos concretos e viáveis que a pessoa possa dar hoje
+  * Explique por que cada passo importa espiritualmente
+  * Conecte ao progresso espiritual de 7 dias
+  * Inclua desafios que levem a transformação real
+  * Seja pastoral e encorajador, não condenatório
 
 FORMATO DE SAÍDA:
 Retorne JSON VÁLIDO no formato:
@@ -153,13 +161,19 @@ Retorne JSON VÁLIDO no formato:
   ]
 }
 
-EXIGÊNCIAS FINAIS:
-- Retorne exatamente 7 dias.
-- CADA reflexão deve citar ou parafrasear elementos concretos das respostas.
+EXIGÊNCIAS FINAIS - CRÍTICAS:
+- Retorne EXATAMENTE 7 dias completos.
+- CADA reflexão deve citar ou parafrasear elementos CONCRETOS das respostas do quiz.
 - O devocional deve transmitir verdade bíblica, arrependimento, graça, esperança e direção prática em Jesus.
 - O tom deve ser PESSOAL, EMOCIONAL, DIRETO - como um pastor falando ao coração de um amigo.
 - Se o mesmo texto pudesse servir para outra pessoa, está errado. REESCREVA COMPLETAMENTE.
-- O objetivo final é que a pessoa se sinta VISTA, COMPREENDIDA, AMADA e TRANSFORMADA por Deus.`;
+- NENHUM texto genérico. TUDO deve ser específico para essa pessoa.
+- O conteúdo deve ser ABUNDANTE, não resumido. Cada dia deve ter bastante conteúdo.
+- O objetivo final é que a pessoa se sinta VISTA, COMPREENDIDA, PROFUNDAMENTE AMADA e TRANSFORMADA por Deus.
+- TODOS OS 7 DIAS devem estar presentes no JSON de retorno.
+- Cada dia deve ter versículo diferente e relevante.
+- Não repita estrutura ou linguagem entre dias.
+- Crie progressão clara e transformadora ao longo dos 7 dias.`;
 }
 
 export async function generateDevotionalWithPDF(data: DiagnosticData): Promise<Buffer> {
