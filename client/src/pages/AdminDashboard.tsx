@@ -392,7 +392,6 @@ export function AdminDashboard() {
                     <tr>
                       <th className="px-5 py-4 font-semibold text-foreground">Nome</th>
                       <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Telefone</th>
                       <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Status</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Data da resposta</th>
@@ -409,7 +408,6 @@ export function AdminDashboard() {
                         <tr key={item.id} className="border-t border-border/50 align-top">
                           <td className="px-5 py-4 text-foreground">{nameStr || "Sem nome"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{emailStr || "-"}</td>
-                          <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4">
                             <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
@@ -562,10 +560,10 @@ export function AdminDashboard() {
                     <tr>
                       <th className="px-5 py-4 font-semibold text-foreground">Nome</th>
                       <th className="px-5 py-4 font-semibold text-foreground">E-mail</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Telefone</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">WhatsApp</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Valor</th>
                       <th className="px-5 py-4 font-semibold text-foreground">Status</th>
-                      <th className="px-5 py-4 font-semibold text-foreground">Acoes</th>
+                      <th className="px-5 py-4 font-semibold text-foreground">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
