@@ -448,6 +448,19 @@ export function AdminDashboard() {
                                 }}
                                 isLoading={resendEmailMutation.isPending}
                               />
+                              <ActionButton
+                                icon="⬇️"
+                                title="Download de Devocional"
+                                bgColor="bg-orange-100"
+                                textColor="text-orange-700"
+                                hoverColor="hover:bg-orange-200"
+                                onClick={() => {
+                                  const token = item.id.toString();
+                                  window.open(`/api/download?token=${token}`, '_blank');
+                                  toast.success('Download iniciado!');
+                                }}
+                                isLoading={false}
+                              />
                             </div>
                           </td>
                         </tr>
@@ -596,7 +609,7 @@ export function AdminDashboard() {
                                   if (buyer.phone) {
                                     resendWhatsAppMutation.mutate({
                                       whatsappNumber: buyer.phone.replace(/\D/g, ''),
-                                      pdfUrl: `${window.location.origin}/api/download/${buyer.id}`,
+                                      pdfUrl: `${window.location.origin}/api/download?token=${buyer.id}`,
                                       userName: buyer.name || 'Amigo(a)',
                                     });
                                     toast.success('PDF enviado via WhatsApp!');
@@ -607,6 +620,18 @@ export function AdminDashboard() {
                                 isLoading={resendWhatsAppMutation.isPending}
                               />
                             )}
+                            <ActionButton
+                              icon="⬇️"
+                              title="Download de Devocional"
+                              bgColor="bg-orange-100"
+                              textColor="text-orange-700"
+                              hoverColor="hover:bg-orange-200"
+                              onClick={() => {
+                                window.open(`/api/download?token=${buyer.id}`, '_blank');
+                                toast.success('Download iniciado!');
+                              }}
+                              isLoading={false}
+                            />
                           </div>
                         </td>
                       </tr>
