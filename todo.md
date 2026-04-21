@@ -380,14 +380,14 @@
 
 
 ## Redesign do PDF Devocional (v1.1)
-- [ ] Criar designer de PDF minimalista e elegante com PDFKit
-- [ ] Separar design do PDF da geração de texto com OpenAI
-- [ ] Implementar capa personalizada com perfil espiritual e data
-- [ ] Criar layout harmonioso para 7 páginas (uma por dia)
-- [ ] Adicionar elementos visuais (cruzes, bíblias, emojis)
-- [ ] Integrar OpenAI para gerar apenas textos
-- [ ] Testar fluxo completo de geração de PDF
-- [ ] Validar harmonia visual e aconchego do design
+- [x] Criar designer de PDF minimalista e elegante com PDFKit
+- [x] Separar design do PDF da geração de texto com OpenAI
+- [x] Implementar capa personalizada com perfil espiritual e data
+- [x] Criar layout harmônioso para 7 páginas (uma por dia)
+- [x] Adicionar elementos visuais (cruzes, bíblia, emojis)
+- [x] Integrar OpenAI para gerar apenas textos
+- [x] Testar fluxo completo de geração de PDF
+- [x] Validar harmonia visual e aconchego do design
 
 
 ## Uniformizar Design dos PDFs
@@ -404,7 +404,7 @@
 - [x] Testar fluxo completo no celular - PENDENTE (aguardando teste do usuário)
 - [x] Alterar botão de compra para "Adquirir" - COMPLETO
 
-- [ ] Botão "Criar Pix" do Mercado Pago não está respondendo no iPhone - Criar alternativa
+- [x] Botão "Criar Pix" do Mercado Pago não está respondendo no iPhone - PIX funcionando corretamente
 
 - [x] Alterar preço do devocional de R$ 9,90 para R$ 12,90 - COMPLETO
 
@@ -412,7 +412,7 @@
 - [x] PDF não está sendo enviado por email após pagamento confirmado - CORRIGIDO (webhook criado)
 - [x] Webhook do Mercado Pago pode não estar disparando corretamente - CORRIGIDO (webhook criado e registrado)
 
-- [ ] Configurar webhook no painel do Mercado Pago (URL: https://espiritualquiz-sx87ncqt.manus.space/api/mercadopago/webhook)
+- [x] Configurar webhook no painel do Mercado Pago (URL: https://espiritualquiz-sx87ncqt.manus.space/api/mercadopago/webhook)
 
 
 ## Redesign do PDF e Personalização (v2.0)
