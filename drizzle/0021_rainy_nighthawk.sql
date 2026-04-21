@@ -1,0 +1,1 @@
+ALTER TABLE `quiz_responses` DROP INDEX `quiz_responses_quizId_unique`;
