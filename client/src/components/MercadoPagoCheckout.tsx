@@ -37,6 +37,22 @@ export function MercadoPagoCheckout({
 
   // Load Mercado Pago SDK
   useEffect(() => {
+    // Verificar se o script já foi carregado
+    if (window.MercadoPago) {
+      window.MercadoPago.setPublishableKey(
+        import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY
+      );
+      return;
+    }
+
+    // Verificar se o script já existe no DOM
+    const existingScript = document.querySelector(
+      'script[src="https://sdk.mercadopago.com/js/v2"]'
+    );
+    if (existingScript) {
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://sdk.mercadopago.com/js/v2";
     script.async = true;
@@ -99,6 +115,7 @@ export function MercadoPagoCheckout({
         toast.success("QR Code PIX gerado com sucesso!");
       } else {
         toast.error(result.error || "Erro ao gerar QR Code PIX");
+        console.error("Erro ao gerar PIX:", result);
       }
     } catch (error) {
       console.error("Erro ao gerar PIX:", error);

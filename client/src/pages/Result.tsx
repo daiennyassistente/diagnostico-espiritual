@@ -285,10 +285,16 @@ export default function Result() {
         const link = document.createElement("a");
         link.href = url;
         link.download = `diagnostico-espiritual-${displayName}.pdf`;
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        // Remover o link após um pequeno delay para garantir que o clique foi processado
+        setTimeout(() => {
+          if (document.body.contains(link)) {
+            document.body.removeChild(link);
+          }
+          window.URL.revokeObjectURL(url);
+        }, 100);
         toast.success("PDF baixado com sucesso!");
       }
     } catch (error) {

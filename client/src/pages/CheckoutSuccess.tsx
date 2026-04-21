@@ -100,10 +100,15 @@ export default function CheckoutSuccess() {
             const link = document.createElement("a");
             link.href = url;
             link.download = "Devocional-7-Dias.pdf";
+            link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            setTimeout(() => {
+              if (document.body.contains(link)) {
+                document.body.removeChild(link);
+              }
+              window.URL.revokeObjectURL(url);
+            }, 100);
 
             setPdfGenerated(true);
             toast.success("Devocional baixado com sucesso!");

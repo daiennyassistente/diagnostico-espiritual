@@ -45,10 +45,15 @@ export default function SharePage() {
               const link = document.createElement("a");
               link.href = url;
               link.download = "Diagnostico-Espiritual.pdf";
+              link.style.display = 'none';
               document.body.appendChild(link);
               link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
+              setTimeout(() => {
+                if (document.body.contains(link)) {
+                  document.body.removeChild(link);
+                }
+                URL.revokeObjectURL(url);
+              }, 100);
               toast.success("Resultado baixado com sucesso!");
             }
           },
@@ -81,10 +86,15 @@ export default function SharePage() {
               const link = document.createElement("a");
               link.href = url;
               link.download = "Devocional-7-Dias.pdf";
+              link.style.display = 'none';
               document.body.appendChild(link);
               link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
+              setTimeout(() => {
+                if (document.body.contains(link)) {
+                  document.body.removeChild(link);
+                }
+                URL.revokeObjectURL(url);
+              }, 100);
               toast.success("Devocional baixado com sucesso!");
             }
           },
