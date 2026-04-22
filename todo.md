@@ -858,3 +858,15 @@
 - [ ] Resultado do quiz sendo gerado confuso
 - [ ] Personalização do resultado incorreta
 - [ ] Erro ao tentar adicionar opção PIX
+
+
+## Integração da Conversions API da Meta (2026-04-22)
+- [x] Armazenar Access Token da Conversions API como variável de ambiente
+- [x] Criar arquivo meta-conversions-api.ts com função sendMetaConversionEvent
+- [x] Integrar Conversions API no webhook do Mercado Pago
+- [x] Adicionar disparo do Pixel no frontend (CheckoutSuccess.tsx)
+- [x] Garantir que Pixel (browser) e API (server) funcionem juntos
+- [x] Usar event_id único baseado em transaction_id para evitar duplicação
+- [x] Disparar evento apenas quando pagamento aprovado E email enviado
+- [ ] Testar pagamento real para validar eventos no Gerenciador da Meta
+- [ ] Confirmar que eventos aparecem como "Browser" e "Server" no Meta

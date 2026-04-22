@@ -116,6 +116,17 @@ export default function CheckoutSuccess() {
       });
       setResponses({});
       
+      // Disparar evento Purchase do Pixel da Meta (frontend)
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Purchase', {
+          value: 12.90,
+          currency: 'BRL',
+          content_name: 'Devocional Personalizado',
+          content_type: 'product'
+        });
+        console.log('[Meta Pixel] Evento Purchase disparado no frontend');
+      }
+      
       toast.success("Pagamento confirmado! Seu devocional está pronto.");
     } else {
       // Se não houver dados, redirecionar para o quiz

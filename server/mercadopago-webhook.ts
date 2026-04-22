@@ -3,6 +3,7 @@ import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, upd
 import { generateDevotionalPDF } from "./devotional-generator";
 import { generateDevotionalPDFFromDays } from "./devotional-pdf-service";
 import { sendEmail } from "./email-service";
+import { sendMetaConversionEvent } from "./meta-conversions-api";
 import { payments, buyers, quizResponses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
@@ -11,15 +12,27 @@ async function firePixelPurchaseEvent(
   email: string,
   amount: number,
   productName: string,
-  leadId: number
+  leadId: number,
+  transactionId: string
 ) {
   try {
     console.log(
       `[Meta Pixel] Disparando evento Purchase: email=${email}, amount=R$ ${amount.toFixed(2)}, product=${productName}`
     );
     
-    // Log do evento (será disparado via API de Conversão do Meta em produção)
-    console.log(`[Meta Pixel] Evento Purchase registrado com sucesso`);
+    // Enviar evento via Conversions API (server-side)
+    const result = await sendMetaConversionEvent(
+      email,
+      amount,
+      transactionId,
+      productName
+    );
+    
+    if (result.success) {
+      console.log(`[Meta Conversions API] Evento Purchase enviado com sucesso via API`);
+    } else {
+      console.error(`[Meta Conversions API] Erro ao enviar evento: ${result.error}`);
+    }
   } catch (error: any) {
     console.error(
       `[Meta Pixel] Erro ao disparar evento Purchase: ${error.message}`
@@ -380,7 +393,7 @@ Equipe Diagnóstico Espiritual
     // Disparar evento Purchase do Pixel da Meta APENAS se email foi enviado com sucesso
     // Este código é executado após o try/catch do email, então sabemos que o email foi enviado
     const amount = Math.round(Number(paymentData.transaction_amount || 0) * 100) / 100;
-    await firePixelPurchaseEvent(lead.email, amount, diagnostic.profileName, Number(buyerLeadId));
+    await firePixelPurchaseEvent(lead.email, amount, diagnostic.profileName, Number(buyerLeadId), transactionId);
     console.log(`[Meta Pixel] Evento Purchase disparado com sucesso`);
     console.log(`[Meta Pixel] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL, Email: ${lead.email}`);
     
