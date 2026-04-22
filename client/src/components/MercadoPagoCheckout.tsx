@@ -35,42 +35,10 @@ export function MercadoPagoCheckout({
 
   const createPaymentMutation = trpc.payment.createMercadoPagoPayment.useMutation();
 
-  // Load Mercado Pago SDK
-  useEffect(() => {
-    // Verificar se o script já foi carregado
-    if (window.MercadoPago) {
-      window.MercadoPago.setPublishableKey(
-        import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY
-      );
-      return;
-    }
-
-    // Verificar se o script já existe no DOM
-    const existingScript = document.querySelector(
-      'script[src="https://sdk.mercadopago.com/js/v2"]'
-    );
-    if (existingScript) {
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://sdk.mercadopago.com/js/v2";
-    script.async = true;
-    script.onload = () => {
-      if (window.MercadoPago) {
-        window.MercadoPago.setPublishableKey(
-          import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY
-        );
-      }
-    };
-    document.body.appendChild(script);
-  }, []);
+  // SDK v2 já está carregado no index.html
+  // Não precisa fazer nada aqui - a chave pública é passada ao criar instâncias
 
   const handleCardPayment = async () => {
-    if (!window.MercadoPago) {
-      toast.error("Mercado Pago SDK não carregou");
-      return;
-    }
 
     setIsLoading(true);
     try {

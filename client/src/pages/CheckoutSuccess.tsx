@@ -5,6 +5,21 @@ import { Download, Home, Loader2, CheckCircle, MessageCircle } from "lucide-reac
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
+// Função para disparar evento Purchase do Pixel da Meta
+const firePixelPurchaseEvent = (amount: number, productName: string) => {
+  if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
+    (window as any).fbq('track', 'Purchase', {
+      value: amount,
+      currency: 'BRL',
+      content_name: productName,
+      content_type: 'product'
+    });
+    console.log('[Meta Pixel] Evento Purchase disparado:', { value: amount, currency: 'BRL', product: productName });
+  } else {
+    console.warn('[Meta Pixel] fbq não está disponível');
+  }
+};
+
 export default function CheckoutSuccess() {
   const [location, setLocation] = useLocation();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -17,54 +32,6 @@ export default function CheckoutSuccess() {
 
   const generateDevotionalMutation = trpc.pdf.generateDevocionalPDF.useMutation();
   const resendViaWhatsAppMutation = trpc.admin.resendViaWhatsApp.useMutation();
-
-  useEffect(() => {
-    // Extrair leadId ou token do URL
-    const params = new URLSearchParams(window.location.search);
-    const leadId = params.get('leadId');
-    const token = params.get('token');
-
-    // Recuperar dados do resultado e respostas do localStorage
-    const savedResponses = localStorage.getItem("quizResponses");
-    const savedResult = localStorage.getItem("quizResult");
-    const savedWhatsapp = localStorage.getItem("userWhatsapp");
-    const savedPdfUrl = localStorage.getItem("generatedPdfUrl");
-
-    if (savedWhatsapp) setWhatsappNumber(savedWhatsapp);
-    if (savedPdfUrl) setPdfUrl(savedPdfUrl);
-
-    if (savedResponses && savedResult) {
-      const parsedResponses = JSON.parse(savedResponses);
-      const parsedResult = JSON.parse(savedResult);
-      setResponses(parsedResponses);
-      setResult(parsedResult);
-      setIsLoading(false);
-      
-      // Baixar PDF automaticamente após 1 segundo
-      setTimeout(() => {
-        handleDownloadDevocional();
-      }, 1000);
-    } else if (token || leadId) {
-      // Se houver token (do webhook) ou leadId, mostrar mensagem de sucesso genérica
-      setIsLoading(false);
-      setResult({
-        profileName: "Seu Perfil Espiritual",
-        profileDescription: "Seu diagnóstico foi processado com sucesso.",
-        challenges: [],
-        recommendations: [],
-        strengths: [],
-        nextSteps: []
-      });
-      setResponses({});
-      toast.success("Pagamento confirmado! Seu devocional está pronto.");
-    } else {
-      // Se não houver dados, redirecionar para o quiz
-      toast.error("Dados não encontrados. Redirecionando para o quiz...");
-      setTimeout(() => {
-        setLocation("/quiz");
-      }, 2000);
-    }
-  }, [setLocation]);
 
   const handleDownloadDevocional = async () => {
     // Se já foi gerado, não fazer nada
@@ -125,6 +92,62 @@ export default function CheckoutSuccess() {
     );
   };
 
+  useEffect(() => {
+    // Extrair leadId ou token do URL
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get('leadId');
+    const token = params.get('token');
+
+    // Recuperar dados do resultado e respostas do localStorage
+    const savedResponses = localStorage.getItem("quizResponses");
+    const savedResult = localStorage.getItem("quizResult");
+    const savedWhatsapp = localStorage.getItem("userWhatsapp");
+    const savedPdfUrl = localStorage.getItem("generatedPdfUrl");
+
+    if (savedWhatsapp) setWhatsappNumber(savedWhatsapp);
+    if (savedPdfUrl) setPdfUrl(savedPdfUrl);
+
+    if (savedResponses && savedResult) {
+      const parsedResponses = JSON.parse(savedResponses);
+      const parsedResult = JSON.parse(savedResult);
+      setResponses(parsedResponses);
+      setResult(parsedResult);
+      setIsLoading(false);
+      
+      // Disparar evento Purchase do Meta Pixel
+      const productName = parsedResult.profileName || 'Diagnóstico Espiritual';
+      firePixelPurchaseEvent(12.90, productName);
+      
+      // Baixar PDF automaticamente após 1 segundo
+      setTimeout(() => {
+        handleDownloadDevocional();
+      }, 1000);
+    } else if (token || leadId) {
+      // Se houver token (do webhook) ou leadId, mostrar mensagem de sucesso genérica
+      setIsLoading(false);
+      setResult({
+        profileName: "Seu Perfil Espiritual",
+        profileDescription: "Seu diagnóstico foi processado com sucesso.",
+        challenges: [],
+        recommendations: [],
+        strengths: [],
+        nextSteps: []
+      });
+      setResponses({});
+      
+      // Disparar evento Purchase do Meta Pixel
+      firePixelPurchaseEvent(12.90, 'Diagnóstico Espiritual');
+      
+      toast.success("Pagamento confirmado! Seu devocional está pronto.");
+    } else {
+      // Se não houver dados, redirecionar para o quiz
+      toast.error("Dados não encontrados. Redirecionando para o quiz...");
+      setTimeout(() => {
+        setLocation("/quiz");
+      }, 2000);
+    }
+  }, [setLocation]);
+
   const handleResendViaWhatsApp = async () => {
     if (!whatsappNumber || !pdfUrl) {
       toast.error("Número de WhatsApp ou URL do PDF não disponível");
@@ -156,6 +179,8 @@ export default function CheckoutSuccess() {
     localStorage.removeItem("leadData");
     localStorage.removeItem("userWhatsapp");
     localStorage.removeItem("generatedPdfUrl");
+    
+    // Redirecionar para home
     setLocation("/");
   };
 
