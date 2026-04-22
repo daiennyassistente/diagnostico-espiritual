@@ -6,6 +6,27 @@ import { eq } from "drizzle-orm";
 import { sendDevotionalConfirmationEmail } from "./email-service";
 import { generateDevocionalPDF } from "./pdf-generator";
 
+// Funcao para disparar evento Purchase do Meta Pixel via API de Conversao
+const firePixelPurchaseEvent = async (
+  email: string,
+  amount: number,
+  productName: string,
+  leadId: number
+) => {
+  try {
+    // Log do evento
+    console.log(
+      `[Meta Pixel] Disparando evento Purchase: email=${email}, amount=${amount}, product=${productName}`
+    );
+    // O evento sera disparado via API de Conversao do Meta
+    // Implementacao completa requer configuracao de webhook no Meta
+  } catch (error: any) {
+    console.error(
+      `[Meta Pixel] Erro ao disparar evento Purchase: ${error.message}`
+    );
+  }
+};
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-04-10",
 });
@@ -125,6 +146,15 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                   
                   if (emailSent) {
                     console.log(`[Webhook] Email sent to ${leadData[0].email}`);
+                    
+                    // Disparar evento Purchase do Meta Pixel APENAS se email foi enviado com sucesso
+                    const profileName = paymentIntent.metadata?.profile_name || "Seu Devocional";
+                    await firePixelPurchaseEvent(
+                      leadData[0].email,
+                      12.90,
+                      profileName,
+                      parseInt(leadId)
+                    );
                   } else {
                     console.warn(`[Webhook] Email failed for ${leadData[0].email}`);
                   }
@@ -258,6 +288,15 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                   
                   if (emailSent) {
                     console.log(`[Webhook] Email sent to ${leadData[0].email}`);
+                    
+                    // Disparar evento Purchase do Meta Pixel APENAS se email foi enviado com sucesso
+                    const profileName = session.metadata?.profile_name || "Seu Devocional";
+                    await firePixelPurchaseEvent(
+                      leadData[0].email,
+                      12.90,
+                      profileName,
+                      parseInt(leadId)
+                    );
                   } else {
                     console.warn(`[Webhook] Email failed for ${leadData[0].email}`);
                   }

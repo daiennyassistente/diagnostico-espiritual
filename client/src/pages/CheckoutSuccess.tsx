@@ -5,21 +5,6 @@ import { Download, Home, Loader2, CheckCircle, MessageCircle } from "lucide-reac
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
-// Função para disparar evento Purchase do Pixel da Meta
-const firePixelPurchaseEvent = (amount: number, productName: string) => {
-  if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
-    (window as any).fbq('track', 'Purchase', {
-      value: amount,
-      currency: 'BRL',
-      content_name: productName,
-      content_type: 'product'
-    });
-    console.log('[Meta Pixel] Evento Purchase disparado:', { value: amount, currency: 'BRL', product: productName });
-  } else {
-    console.warn('[Meta Pixel] fbq não está disponível');
-  }
-};
-
 export default function CheckoutSuccess() {
   const [location, setLocation] = useLocation();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -114,10 +99,6 @@ export default function CheckoutSuccess() {
       setResult(parsedResult);
       setIsLoading(false);
       
-      // Disparar evento Purchase do Meta Pixel
-      const productName = parsedResult.profileName || 'Diagnóstico Espiritual';
-      firePixelPurchaseEvent(12.90, productName);
-      
       // Baixar PDF automaticamente após 1 segundo
       setTimeout(() => {
         handleDownloadDevocional();
@@ -134,9 +115,6 @@ export default function CheckoutSuccess() {
         nextSteps: []
       });
       setResponses({});
-      
-      // Disparar evento Purchase do Meta Pixel
-      firePixelPurchaseEvent(12.90, 'Diagnóstico Espiritual');
       
       toast.success("Pagamento confirmado! Seu devocional está pronto.");
     } else {
@@ -179,8 +157,6 @@ export default function CheckoutSuccess() {
     localStorage.removeItem("leadData");
     localStorage.removeItem("userWhatsapp");
     localStorage.removeItem("generatedPdfUrl");
-    
-    // Redirecionar para home
     setLocation("/");
   };
 
