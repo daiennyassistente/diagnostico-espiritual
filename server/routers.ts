@@ -212,11 +212,13 @@ const persistDiagnosticHistory = async (
   leadId: number | undefined,
   result: DiagnosticResult,
 ) => {
-  if (!leadId) {
+  if (!leadId || leadId <= 0) {
+    console.warn("[Diagnostic] leadId inválido ou não fornecido:", leadId);
     return;
   }
 
   try {
+    console.log("[Diagnostic] Salvando diagnóstico para leadId:", leadId);
     await createDiagnosticHistoryEntry({
       leadId,
       profileName: result.profileName,
@@ -226,8 +228,10 @@ const persistDiagnosticHistory = async (
       recommendations: JSON.stringify(result.recommendations),
       nextSteps: JSON.stringify(result.nextSteps),
     });
+    console.log("[Diagnostic] Diagnóstico salvo com sucesso para leadId:", leadId);
   } catch (error) {
-    console.error("Diagnostic history persistence error:", error);
+    console.error("[Diagnostic] Erro ao salvar diagnóstico:", error);
+    throw error;
   }
 };
 
@@ -856,6 +860,7 @@ CRITÉRIO DE QUALIDADE:
 Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, então sua resposta está errada.`;
 
         try {
+          console.log("[AI] Iniciando geracao de diagnostico para leadId:", input.leadId);
           const response = await invokeLLM({
             messages: [
               {

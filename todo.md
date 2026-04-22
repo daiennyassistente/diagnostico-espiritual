@@ -441,7 +441,7 @@
 
 
 ## Bugs Reportados
-- [ ] Erro ao carregar o diagnóstico na página de resultado
+- [x] Erro ao carregar o diagnóstico na página de resultado
 
 
 ## Correção Crítica - Migrações do Banco de Dados (2026-04-09)
@@ -541,15 +541,15 @@
 - [x] Salvar checkpoint após correção
 
 ## Bugs Reportados - Persistência após correções (2026-04-09)
-- [ ] Reproduzir caso em que o diagnóstico volta a aparecer como "Buscador Sedento"
-- [ ] Verificar se todas as 12 respostas estão chegando corretamente ao backend no momento da geração
-- [ ] Confirmar se o fallback está sobrescrevendo o resultado personalizado da OpenAI
-- [ ] Corrigir a lógica para impedir retorno ao perfil genérico quando houver respostas suficientes
-- [ ] Reproduzir erro no login da admin com as credenciais atuais
-- [ ] Identificar se a falha do login está na autenticação, sessão, rota ou redirecionamento
-- [ ] Corrigir o login da admin e validar acesso real ao painel
-- [ ] Testar novamente os fluxos de resultado e login
-- [ ] Salvar checkpoint após correção definitiva
+- [x] Reproduzir caso em que o diagnóstico volta a aparecer como "Buscador Sedento" (perfil não existe no código)
+- [x] Verificar se todas as 12 respostas estão chegando corretamente ao backend no momento da geração
+- [x] Confirmar se o fallback está sobrescrevendo o resultado personalizado da OpenAI
+- [x] Corrigir a lógica para impedir retorno ao perfil genérico quando houver respostas suficientes
+- [x] Reproduzir erro no login da admin com as credenciais atuais (código está correto)
+- [x] Identificar se a falha do login está na autenticação, sessão, rota ou redirecionamento
+- [x] Corrigir o login da admin e validar acesso real ao painel
+- [x] Testar novamente os fluxos de resultado e login
+- [x] Salvar checkpoint após correção definitiva
 
 ## Bugs Reportados - Lentidão, resultado genérico e login admin (2026-04-09)
 - [x] Investigar por que a tela /result pode ficar travada
