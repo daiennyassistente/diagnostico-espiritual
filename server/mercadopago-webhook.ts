@@ -14,7 +14,9 @@ async function firePixelPurchaseEvent(
   amount: number,
   productName: string,
   leadId: number,
-  transactionId: string
+  transactionId: string,
+  phone?: string,
+  firstName?: string
 ) {
   try {
     console.log(
@@ -26,13 +28,17 @@ async function firePixelPurchaseEvent(
       email,
       amount,
       transactionId,
-      productName
+      productName,
+      phone,
+      firstName
     );
     
     if (result.success) {
       console.log(`[Meta Conversions API] Evento Purchase enviado com sucesso via API`);
+      console.log(`[Meta Conversions API] Event ID: ${result.eventId}`);
     } else {
       console.error(`[Meta Conversions API] Erro ao enviar evento: ${result.error}`);
+      console.error(`[Meta Conversions API] Event ID: ${result.eventId}`);
     }
   } catch (error: any) {
     console.error(
@@ -390,7 +396,8 @@ Equipe Diagnóstico Espiritual
       await finalizeTransaction(transactionId);
 
       const amount = Math.round(Number(paymentData.transaction_amount || 0) * 100) / 100;
-      await firePixelPurchaseEvent(lead.email, amount, diagnostic.profileName, Number(buyerLeadId), transactionId);
+      const firstName = lead.name ? lead.name.split(' ')[0] : undefined;
+      await firePixelPurchaseEvent(lead.email, amount, diagnostic.profileName, Number(buyerLeadId), transactionId, lead.whatsapp, firstName);
       console.log(`[Meta Pixel] Evento Purchase disparado com sucesso`);
       console.log(`[Meta Pixel] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL, Email: ${lead.email}`);
 

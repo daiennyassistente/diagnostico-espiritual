@@ -994,3 +994,21 @@
 - [ ] apenas 1 e-mail enviado
 - [ ] redirecionamento automático funcionando
 - [ ] integração Mercado Pago acima de 90%
+
+
+## Integração Meta Pixel e API de Conversões
+
+- [x] Criar arquivo metaPixelTracking.ts com funções de tracking
+- [x] Corrigir event_id no meta-conversions-api.ts para formato purchase_{transactionId}
+- [x] Adicionar suporte a phone e firstName no backend
+- [x] Adicionar logs de resposta da API Meta no backend
+- [x] Implementar evento ViewContent no Quiz.tsx
+- [x] Implementar evento Lead no Quiz.tsx
+- [x] Implementar evento InitiateCheckout no Result.tsx
+- [x] Implementar evento Purchase no CheckoutSuccess.tsx com deduplicação
+- [x] Adicionar Meta Pixel noscript tag no CheckoutSuccess
+- [x] Garantir que transactionId é passado para /sucesso com amount
+- [x] Validar que event_id é idêntico entre frontend e backend (purchase_transactionId)
+- [ ] Testar fluxo completo em produção
+- [ ] Validar eventos no Meta Events Manager
+- [ ] Validar deduplicação entre Browser e Server

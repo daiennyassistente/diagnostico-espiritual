@@ -11,6 +11,7 @@ import { parseStoredLeadData } from "@/lib/leadStorage";
 import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { WhatsAppReferralButton } from "@/components/WhatsAppReferralButton";
+import { trackInitiateCheckout } from "@/lib/metaPixelTracking";
 
 interface AIResult {
   profileName: string;
@@ -331,6 +332,10 @@ export default function Result() {
       toast.error("Não encontramos seu e-mail para iniciar o pagamento.");
       return;
     }
+
+    // Disparar evento InitiateCheckout quando checkout é iniciado
+    trackInitiateCheckout(12.90);
+    console.log('[Result] Evento InitiateCheckout disparado');
 
     setIsCheckingOut(true);
 

@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Download, Home, Loader2, CheckCircle, MessageCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { trackPurchase } from "@/lib/metaPixelTracking";
+
+
 
 export default function CheckoutSuccess() {
   const [location, setLocation] = useLocation();
@@ -83,12 +86,14 @@ export default function CheckoutSuccess() {
     const leadId = params.get('leadId');
     const token = params.get('token');
     const transactionId = params.get('transaction_id');
+    const amount = params.get('amount');
 
     // Recuperar dados do resultado e respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
     const savedResult = localStorage.getItem("quizResult");
     const savedWhatsapp = localStorage.getItem("userWhatsapp");
     const savedPdfUrl = localStorage.getItem("generatedPdfUrl");
+    const savedAmount = localStorage.getItem("purchaseAmount");
 
     if (savedWhatsapp) setWhatsappNumber(savedWhatsapp);
     if (savedPdfUrl) setPdfUrl(savedPdfUrl);
@@ -99,6 +104,13 @@ export default function CheckoutSuccess() {
       setResponses(parsedResponses);
       setResult(parsedResult);
       setIsLoading(false);
+      
+      // Disparar evento Purchase no Meta Pixel com deduplicação
+      if (transactionId && (amount || savedAmount)) {
+        const purchaseAmount = parseFloat(amount || savedAmount || '0');
+        trackPurchase(purchaseAmount, transactionId, parsedResult.profileName || 'Devocional Personalizado');
+        console.log(`[CheckoutSuccess] Meta Pixel Purchase disparado com transactionId: ${transactionId}`);
+      }
       
       // Baixar PDF automaticamente após 1 segundo
       setTimeout(() => {
@@ -116,6 +128,14 @@ export default function CheckoutSuccess() {
         nextSteps: []
       });
       setResponses({});
+      
+      // Disparar evento Purchase no Meta Pixel com deduplicação
+      if (transactionId && (amount || localStorage.getItem('purchaseAmount'))) {
+        const purchaseAmount = parseFloat(amount || localStorage.getItem('purchaseAmount') || '0');
+        trackPurchase(purchaseAmount, transactionId, 'Devocional Personalizado');
+        console.log(`[CheckoutSuccess] Meta Pixel Purchase disparado com transactionId: ${transactionId}`);
+      }
+      
       toast.success("Pagamento confirmado! Seu devocional está pronto.");
     } else {
       // Se não houver dados, redirecionar para o quiz
@@ -157,6 +177,7 @@ export default function CheckoutSuccess() {
     localStorage.removeItem("leadData");
     localStorage.removeItem("userWhatsapp");
     localStorage.removeItem("generatedPdfUrl");
+    localStorage.removeItem("purchaseAmount");
     setLocation("/");
   };
 
@@ -312,6 +333,16 @@ export default function CheckoutSuccess() {
           <p className="text-xs text-foreground/60">
             Suporte disponível por email: suporte@diagnosticoespiritual.com.br
           </p>
+          {/* Meta Pixel noscript tag for tracking */}
+          <noscript>
+            <img 
+              height="1" 
+              width="1" 
+              style={{ display: 'none' }} 
+              src={`https://www.facebook.com/tr?id=${process.env.VITE_ANALYTICS_WEBSITE_ID || ''}&ev=Purchase&noscript=1`}
+              alt=""
+            />
+          </noscript>
         </div>
 
         {/* Mensagem de bênção */}

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { WhatsAppReferralButton } from '@/components/WhatsAppReferralButton';
+import { trackViewContent, trackLead } from '@/lib/metaPixelTracking';
 
 interface QuizStep {
   id: number;
@@ -227,6 +228,7 @@ export default function Quiz() {
     const newUserId = uuidv4();
     return newUserId;
   });
+  const [viewContentTracked, setViewContentTracked] = useState(false);
   const advanceTimeoutRef = useRef<number | null>(null);
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
@@ -243,6 +245,15 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizLeadDraft', JSON.stringify(leadData));
     window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
   }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
+
+  // Disparar evento ViewContent quando o quiz é visualizado
+  useEffect(() => {
+    if (!viewContentTracked && hasStarted && currentStep === 1) {
+      trackViewContent();
+      setViewContentTracked(true);
+      console.log('[Quiz] Evento ViewContent disparado');
+    }
+  }, [viewContentTracked, hasStarted, currentStep]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -433,6 +444,10 @@ export default function Quiz() {
 
         await new Promise(resolve => setTimeout(resolve, 1200));
       }
+
+      // Disparar evento Lead quando o lead é capturado
+      trackLead(leadData.email, leadData.whatsapp.replace(/\D/g, ''));
+      console.log('[Quiz] Evento Lead disparado');
 
       const leadResult = await submitLeadMutation.mutateAsync({
         userId: userId,

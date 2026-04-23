@@ -13,6 +13,7 @@ interface ConversionEvent {
   user_data: {
     em?: string; // Email hashed
     ph?: string; // Phone hashed
+    fn?: string; // First name hashed
   };
   custom_data: {
     value: number;
@@ -36,33 +37,38 @@ export async function sendMetaConversionEvent(
   email: string,
   amount: number,
   transactionId: string,
-  contentName?: string
-): Promise<{ success: boolean; error?: string }> {
+  contentName?: string,
+  phone?: string,
+  firstName?: string
+): Promise<{ success: boolean; error?: string; eventId?: string }> {
   try {
     const accessToken = process.env.META_CONVERSIONS_API_TOKEN;
     if (!accessToken) {
       console.error("[Meta Conversions API] Access token not configured");
-      return { success: false, error: "Access token not configured" };
+      return { success: false, error: "Access token not configured", eventId: undefined };
     }
 
     // Get Pixel ID from environment
     const pixelId = process.env.VITE_ANALYTICS_WEBSITE_ID;
     if (!pixelId) {
       console.error("[Meta Conversions API] Pixel ID not configured");
-      return { success: false, error: "Pixel ID not configured" };
+      return { success: false, error: "Pixel ID not configured", eventId: undefined };
     }
 
     // Create unique event ID based on transaction ID to prevent duplicates
-    const eventId = `${transactionId}-${Date.now()}`;
+    // Format: purchase_{transactionId} for perfect deduplication between frontend and backend
+    const eventId = `purchase_${transactionId}`;
 
     // Prepare conversion event
     const event: ConversionEvent = {
       event_name: "Purchase",
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
-      event_source_url: "https://diagnosticoespiritual.manus.space/checkout-success",
+      event_source_url: "https://diagnosticoespiritual.manus.space/sucesso",
       user_data: {
         em: hashData(email),
+        ...(phone && { ph: hashData(phone) }),
+        ...(firstName && { fn: hashData(firstName) }),
       },
       custom_data: {
         value: amount,
@@ -82,7 +88,7 @@ export async function sendMetaConversionEvent(
         },
         body: JSON.stringify({
           data: [event],
-          test_event_code: process.env.NODE_ENV === "development" ? "TEST123" : undefined,
+          test_event_code: process.env.META_TEST_EVENT_CODE || undefined,
         }),
       }
     );
@@ -91,20 +97,23 @@ export async function sendMetaConversionEvent(
 
     if (!response.ok) {
       console.error("[Meta Conversions API] Error sending event:", result);
+      console.error("[Meta Conversions API] Response:", JSON.stringify(result, null, 2));
       return { success: false, error: result.error?.message || "Failed to send event" };
     }
 
     console.log("[Meta Conversions API] Event sent successfully:", {
       eventId,
-      email,
+      email: email.substring(0, 3) + "***",
       amount,
       transactionId,
+      response: result,
     });
+    console.log("[Meta Conversions API] Full Response:", JSON.stringify(result, null, 2));
 
-    return { success: true };
+    return { success: true, eventId };
   } catch (error: any) {
     console.error("[Meta Conversions API] Exception:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message, eventId: undefined };
   }
 }
 
