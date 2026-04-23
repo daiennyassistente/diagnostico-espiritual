@@ -66,7 +66,9 @@ export function MercadoPagoCheckout({
         if (data.status === "approved") {
           console.log("[MercadoPagoCheckout] Polling - Pagamento aprovado! Redirecionando para /sucesso");
           window.clearInterval(intervalId);
-          window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}`;
+          // Obter o valor da compra do localStorage
+          const purchaseAmount = localStorage.getItem('purchaseAmount') || '12.90';
+          window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(purchaseAmount)}`;
         }
       } catch (error) {
         console.error("Erro ao consultar status do pagamento PIX:", error);

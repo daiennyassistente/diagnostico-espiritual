@@ -82,11 +82,20 @@ export default function CheckoutSuccess() {
 
   useEffect(() => {
     // Extrair leadId, token ou transaction_id do URL
+    // Suporta ambos os formatos: transaction_id (snake_case) e transactionId (camelCase)
     const params = new URLSearchParams(window.location.search);
     const leadId = params.get('leadId');
     const token = params.get('token');
-    const transactionId = params.get('transaction_id');
+    const transactionId = params.get('transaction_id') || params.get('transactionId');
     const amount = params.get('amount');
+    
+    console.log('[CheckoutSuccess] URL params:', {
+      leadId,
+      token,
+      transactionId,
+      amount,
+      fullSearch: window.location.search
+    });
 
     // Recuperar dados do resultado e respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
@@ -108,8 +117,22 @@ export default function CheckoutSuccess() {
       // Disparar evento Purchase no Meta Pixel com deduplicação
       if (transactionId && (amount || savedAmount)) {
         const purchaseAmount = parseFloat(amount || savedAmount || '0');
+        console.log('[CheckoutSuccess] Disparando Purchase:', {
+          transactionId,
+          purchaseAmount,
+          profileName: parsedResult.profileName,
+          eventId: `purchase_${transactionId}`
+        });
         trackPurchase(purchaseAmount, transactionId, parsedResult.profileName || 'Devocional Personalizado');
         console.log(`[CheckoutSuccess] Meta Pixel Purchase disparado com transactionId: ${transactionId}`);
+      } else {
+        console.log('[CheckoutSuccess] Purchase NAO disparado:', {
+          hasTransactionId: !!transactionId,
+          hasAmount: !!(amount || savedAmount),
+          transactionId,
+          amount,
+          savedAmount
+        });
       }
       
       // Baixar PDF automaticamente após 1 segundo
@@ -132,8 +155,20 @@ export default function CheckoutSuccess() {
       // Disparar evento Purchase no Meta Pixel com deduplicação
       if (transactionId && (amount || localStorage.getItem('purchaseAmount'))) {
         const purchaseAmount = parseFloat(amount || localStorage.getItem('purchaseAmount') || '0');
+        console.log('[CheckoutSuccess] Disparando Purchase (fallback):', {
+          transactionId,
+          purchaseAmount,
+          eventId: `purchase_${transactionId}`
+        });
         trackPurchase(purchaseAmount, transactionId, 'Devocional Personalizado');
         console.log(`[CheckoutSuccess] Meta Pixel Purchase disparado com transactionId: ${transactionId}`);
+      } else {
+        console.log('[CheckoutSuccess] Purchase NAO disparado (fallback):', {
+          hasTransactionId: !!transactionId,
+          hasAmount: !!(amount || localStorage.getItem('purchaseAmount')),
+          transactionId,
+          amount
+        });
       }
       
       toast.success("Pagamento confirmado! Seu devocional está pronto.");

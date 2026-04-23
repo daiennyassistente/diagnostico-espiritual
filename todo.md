@@ -1011,6 +1011,10 @@
 - [x] Validar que event_id é idêntico entre frontend e backend (purchase_transactionId)
 - [x] Corrigir erro ReferenceError: process is not defined no CheckoutSuccess.tsx
 - [x] Alterar process.env para import.meta.env para variáveis de ambiente do Vite
+- [x] Adicionar suporte para ambos os parâmetros transaction_id e transactionId no CheckoutSuccess
+- [x] Adicionar logs de debug para rastrear disparo do evento Purchase
+- [x] Adicionar suporte para passar amount na URL do redirecionamento
+- [x] Garantir que transactionId e amount chegam na página /sucesso
 - [ ] Testar fluxo completo em produção
 - [ ] Validar eventos no Meta Events Manager
 - [ ] Validar deduplicação entre Browser e Server
