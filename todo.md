@@ -876,7 +876,7 @@
 - [x] Criar tabela transaction_control no banco de dados
 - [x] Adicionar funções de controle de transação em db.ts
 - [x] Criar arquivo transaction-control.ts com lógica de bloqueio
-- [ ] Implementar bloqueio de duplicação no webhook (linhas 95-121)
+- [x] Implementar bloqueio de duplicação no webhook (linhas 95-121)
 - [x] Remover envio de email duplicado do quiz/frontend
 - [x] Implementar envio de email APENAS via webhook
 - [x] Criar endpoint /api/check-payment para polling
