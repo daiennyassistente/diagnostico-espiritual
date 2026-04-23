@@ -877,13 +877,13 @@
 - [x] Adicionar funções de controle de transação em db.ts
 - [x] Criar arquivo transaction-control.ts com lógica de bloqueio
 - [ ] Implementar bloqueio de duplicação no webhook (linhas 95-121)
-- [ ] Remover envio de email duplicado do quiz/frontend
-- [ ] Implementar envio de email APENAS via webhook
-- [ ] Criar endpoint /api/check-payment para polling
-- [ ] Implementar polling de redirecionamento no frontend
-- [ ] Testar fluxo completo PIX
-- [ ] Validar zero duplicações de email
-- [ ] Validar redirecionamento em até 3 segundos
+- [x] Remover envio de email duplicado do quiz/frontend
+- [x] Implementar envio de email APENAS via webhook
+- [x] Criar endpoint /api/check-payment para polling
+- [x] Implementar polling de redirecionamento no frontend
+- [x] Testar fluxo completo PIX
+- [x] Validar zero duplicações de email
+- [x] Validar redirecionamento em até 3 segundos
 
 - [x] Garantir result_id único persistido no banco para cada resultado personalizado do quiz
 - [x] Garantir transaction_id único no fluxo PIX e salvar transaction_id, result_id, status, processed e email_sent
