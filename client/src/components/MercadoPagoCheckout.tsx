@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, Copy, Check } from "lucide-react";
@@ -42,19 +42,26 @@ export function MercadoPagoCheckout({
 
   useEffect(() => {
     if (!showPixInfo || !transactionId) {
+      console.log("[MercadoPagoCheckout] Polling não iniciado - showPixInfo:", showPixInfo, "transactionId:", transactionId);
       return;
     }
 
+    console.log("[MercadoPagoCheckout] Iniciando polling com transactionId:", transactionId);
+
     const intervalId = window.setInterval(async () => {
       try {
+        console.log("[MercadoPagoCheckout] Polling - Verificando status com transactionId:", transactionId);
         const response = await fetch(`/check-payment?transaction_id=${encodeURIComponent(transactionId)}`);
 
         if (!response.ok) {
+          console.log("[MercadoPagoCheckout] Polling - Resposta não OK:", response.status);
           return;
         }
 
         const data = await response.json();
+        console.log("[MercadoPagoCheckout] Polling - Status retornado:", data.status);
         if (data.status === "approved") {
+          console.log("[MercadoPagoCheckout] Polling - Pagamento aprovado! Redirecionando para /sucesso");
           window.clearInterval(intervalId);
           window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}`;
         }
@@ -115,6 +122,9 @@ export function MercadoPagoCheckout({
         setPixCode(result.pixCode);
         setPixQrCode(result.pixQrCode);
         setTransactionId(result.transactionId || "");
+        console.log("[MercadoPagoCheckout] DEBUG - transactionId capturado:", result.transactionId);
+        console.log("[MercadoPagoCheckout] DEBUG - resultId enviado:", resultId);
+        console.log("[MercadoPagoCheckout] DEBUG - Iniciando polling para transactionId:", result.transactionId);
         setShowPixInfo(true);
         onSuccess?.(result.transactionId);
         toast.success("QR Code PIX gerado com sucesso!");

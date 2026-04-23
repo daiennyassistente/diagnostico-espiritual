@@ -900,3 +900,9 @@
 - [x] Corrigir finalizeTransaction para atualizar status para "approved" (permite redirecionamento no frontend)
 - [x] Atualizar testes de transaction-control para validar atualização de status
 - [x] Validar que endpoint /check-payment retorna "approved" após finalização
+- [x] Adicionar logs de debug no webhook para rastrear transactionId e resultId
+- [x] Adicionar logs de debug no frontend (MercadoPagoCheckout) para rastrear transaction_id capturado
+- [x] Adicionar logs no polling para verificar status retornado
+- [x] Confirmar que webhook usa getDiagnosticById(resultId) para gerar PDF personalizado
+- [x] Confirmar que transaction_id é retornado corretamente do backend
+- [x] Validar que polling funciona com transaction_id válido

@@ -107,6 +107,12 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     const buyerLeadId = transaction.leadId;
     const resultId = transaction.resultId;
     const effectiveQuizId = quizId || transaction.quizId;
+    
+    // DEBUG: Log dos IDs críticos
+    console.log(`[Mercado Pago Webhook] DEBUG - transactionId: ${transactionId}`);
+    console.log(`[Mercado Pago Webhook] DEBUG - resultId: ${resultId}`);
+    console.log(`[Mercado Pago Webhook] DEBUG - leadId: ${buyerLeadId}`);
+    console.log(`[Mercado Pago Webhook] DEBUG - quizId: ${effectiveQuizId}`);
 
     if (paymentData.status !== "approved") {
       await updateTransactionStatus(transactionId, "pending");
@@ -228,6 +234,7 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
       return res.status(200).json({ received: true });
     }
     console.log(`[Mercado Pago Webhook] Resultado personalizado encontrado: ${diagnostic.profileName}`);
+    console.log(`[Mercado Pago Webhook] DEBUG - Usando resultId ${resultId} para gerar PDF personalizado para ${lead.email}`);
 
     // Get quiz responses - ONLY for the specific quiz if quizId is available
     let quizResponse = null;
@@ -345,6 +352,7 @@ Equipe Diagnóstico Espiritual
         }
       }
 
+      console.log(`[Mercado Pago Webhook] DEBUG - Enviando email com PDF gerado a partir de resultId ${resultId}`);
       await sendEmail({
         to: lead.email,
         subject: emailSubject,
@@ -358,6 +366,7 @@ Equipe Diagnóstico Espiritual
         ],
       });
       console.log(`[Mercado Pago Webhook] Email enviado com sucesso para: ${lead.email}`);
+      console.log(`[Mercado Pago Webhook] DEBUG - Email com PDF personalizado (resultId ${resultId}) entregue para ${lead.email}`);
 
       try {
         await updateDevotionalDeliveryStatus(transactionId, "sent");
