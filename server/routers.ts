@@ -964,6 +964,16 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               },
             };
 
+            // DEBUG: Validar dados obrigatórios
+            console.log("[Mercado Pago PIX] DEBUG - Validando dados obrigatórios");
+            console.log("[Mercado Pago PIX] DEBUG - transaction_amount:", paymentData.transaction_amount);
+            console.log("[Mercado Pago PIX] DEBUG - description:", paymentData.description);
+            console.log("[Mercado Pago PIX] DEBUG - payment_method_id:", paymentData.payment_method_id);
+            console.log("[Mercado Pago PIX] DEBUG - email:", paymentData.payer.email);
+            console.log("[Mercado Pago PIX] DEBUG - external_reference:", paymentData.external_reference);
+            console.log("[Mercado Pago PIX] DEBUG - Token presente:", !!process.env.MERCADOPAGO_ACCESS_TOKEN);
+            console.log("[Mercado Pago PIX] DEBUG - Payload completo:", JSON.stringify(paymentData, null, 2));
+
             const response = await fetch("https://api.mercadopago.com/v1/payments", {
               method: "POST",
               headers: {
@@ -974,15 +984,35 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               body: JSON.stringify(paymentData),
             });
 
+            console.log("[Mercado Pago PIX] DEBUG - Response status:", response.status);
+            console.log("[Mercado Pago PIX] DEBUG - Response statusText:", response.statusText);
+
             if (!response.ok) {
-              const error = await response.json();
-              console.error("[Mercado Pago PIX] Error:", error);
-              throw new Error("Erro ao gerar PIX");
+              let errorData: any = {};
+              const responseText = await response.text();
+              console.log("[Mercado Pago PIX] DEBUG - Response text:", responseText);
+              
+              try {
+                errorData = JSON.parse(responseText);
+              } catch (parseError) {
+                console.error("[Mercado Pago PIX] Erro ao fazer parse da resposta de erro");
+              }
+              
+              console.error("[Mercado Pago PIX] Error completo:", JSON.stringify(errorData, null, 2));
+              console.error("[Mercado Pago PIX] Status:", response.status);
+              console.error("[Mercado Pago PIX] StatusText:", response.statusText);
+              throw new Error(`Erro ao gerar PIX: ${response.status} ${response.statusText}`);
             }
 
             const data = await response.json();
+            console.log("[Mercado Pago PIX] DEBUG - Resposta sucesso:", JSON.stringify(data, null, 2));
+            
             const pixCode = data.point_of_interaction?.transaction_data?.qr_code;
             const pixImage = data.point_of_interaction?.transaction_data?.qr_code_base64;
+
+            console.log("[Mercado Pago PIX] DEBUG - PIX Code gerado:", !!pixCode);
+            console.log("[Mercado Pago PIX] DEBUG - PIX Image gerado:", !!pixImage);
+            console.log("[Mercado Pago PIX] DEBUG - transactionId retornando:", transactionId);
 
             // Create payment record
             try {

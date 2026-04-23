@@ -906,3 +906,8 @@
 - [x] Confirmar que webhook usa getDiagnosticById(resultId) para gerar PDF personalizado
 - [x] Confirmar que transaction_id é retornado corretamente do backend
 - [x] Validar que polling funciona com transaction_id válido
+- [x] Corrigir erro 502 na criação de pagamento PIX com Mercado Pago
+- [x] Adicionar logs de debug para validar dados obrigatórios (transaction_amount, description, email, external_reference)
+- [x] Adicionar logs de debug para resposta da API Mercado Pago
+- [x] Adicionar logs de debug para confirmar PIX Code e Image gerados
+- [x] Adicionar logs de debug para confirmar transactionId retornando corretamente
