@@ -25,6 +25,7 @@ import {
   createQuizQuestion,
   deleteQuizQuestion,
 } from "./db";
+import { createNewTransaction } from "./transaction-control";
 
 export interface DiagnosticResult {
   profileName: string;
@@ -929,12 +930,23 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           profileName: z.string(),
           userPhone: z.string(),
           leadId: z.string(),
+          quizId: z.string(),
+          resultId: z.number(),
           paymentMethod: z.enum(["card", "pix"]),
         }),
       )
       .mutation(async ({ input }) => {
         try {
           if (input.paymentMethod === "pix") {
+            const transactionId = crypto.randomUUID();
+
+            await createNewTransaction(
+              transactionId,
+              input.quizId,
+              input.resultId,
+              Number(input.leadId),
+            );
+
             // Create PIX payment
             const paymentData = {
               transaction_amount: 12.90,
@@ -944,7 +956,12 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
                 email: input.email,
                 first_name: "Cliente",
               },
-              external_reference: input.leadId,
+              external_reference: transactionId,
+              metadata: {
+                quizId: input.quizId,
+                resultId: input.resultId,
+                leadId: input.leadId,
+              },
             };
 
             const response = await fetch("https://api.mercadopago.com/v1/payments", {
@@ -986,6 +1003,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               pixCode: pixCode || "",
               pixQrCode: pixImage ? `data:image/png;base64,${pixImage}` : "",
               paymentId: data.id,
+              transactionId,
             };
           } else {
             // For card payments, we'll use the checkout preference

@@ -63,7 +63,27 @@ async function startServer() {
     return res.status(405).json({ error: "Method Not Allowed" });
   });
 
+  app.get(["/check-payment", "/api/check-payment"], async (req, res) => {
+    try {
+      const transactionId = req.query.transaction_id;
 
+      if (!transactionId || typeof transactionId !== "string") {
+        return res.status(400).json({ error: "transaction_id é obrigatório" });
+      }
+
+      const { getTransactionControl } = await import("../db");
+      const transaction = await getTransactionControl(transactionId);
+
+      if (!transaction) {
+        return res.status(404).json({ status: "pending" });
+      }
+
+      return res.json({ status: transaction.status });
+    } catch (error) {
+      console.error("[check-payment] Erro ao consultar transação:", error);
+      return res.status(500).json({ status: "pending" });
+    }
+  });
 
   // Download PDF route (uses parsed JSON from middleware)
   app.get("/api/download", async (req, res) => {

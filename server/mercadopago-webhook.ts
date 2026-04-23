@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
-import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken, checkDevotionalDeliveryExists, createDevotionalDelivery, updateDevotionalDeliveryStatus, getTransactionControl, createTransactionControl, updateTransactionStatus, markTransactionAsProcessed, markTransactionEmailSent } from "./db";
+import { getDiagnosticById, getQuizResponseByLeadId, getLeadById, getDb, checkDevotionalDeliveryExists, createDevotionalDelivery, updateDevotionalDeliveryStatus, getTransactionControl, updateTransactionStatus } from "./db";
 import { generateDevotionalPDF } from "./devotional-generator";
 import { generateDevotionalPDFFromDays } from "./devotional-pdf-service";
 import { sendEmail } from "./email-service";
 import { sendMetaConversionEvent } from "./meta-conversions-api";
-import { isTransactionAlreadyProcessed, createNewTransaction, finalizeTransaction } from "./transaction-control";
+import { finalizeTransaction, hasEmailBeenSent, isTransactionAlreadyProcessed } from "./transaction-control";
 import { payments, buyers, quizResponses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
@@ -86,18 +86,36 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     console.log(`[Mercado Pago Webhook] Payer email: ${paymentData.payer?.email}`);
     console.log(`[Mercado Pago Webhook] Payer first_name: ${paymentData.payer?.first_name}`);
     
-    // Usar o ID do pagamento como transaction_id único
-    const transactionId = String(paymentId);
-    
+    // O transaction_id do fluxo é o external_reference enviado ao Mercado Pago
+    const transactionId = String(paymentData.external_reference || "");
+
     // Extract quizId from metadata
     const quizId = paymentData.metadata?.quizId;
     console.log(`[Mercado Pago Webhook] Quiz ID: ${quizId}`);
 
+    if (!transactionId) {
+      console.log("[Mercado Pago Webhook] Pagamento sem external_reference válido; ignorando processamento");
+      return res.status(200).json({ received: true });
+    }
+
+    const transaction = await getTransactionControl(transactionId);
+    if (!transaction) {
+      console.log(`[Mercado Pago Webhook] Transação ${transactionId} não encontrada; ignorando processamento`);
+      return res.status(200).json({ received: true });
+    }
+
+    const buyerLeadId = transaction.leadId;
+    const resultId = transaction.resultId;
+    const effectiveQuizId = quizId || transaction.quizId;
+
     if (paymentData.status !== "approved") {
+      await updateTransactionStatus(transactionId, "pending");
       console.log(`[Mercado Pago Webhook] Pagamento ainda não aprovado: ${paymentData.status}`);
       return res.status(200).json({ received: true });
     }
-    console.log(`[Mercado Pago Webhook] Pagamento aprovado`);
+
+    await updateTransactionStatus(transactionId, "approved");
+    console.log(`[Mercado Pago Webhook] Pagamento aprovado para transaction_id ${transactionId}`);
     
     // Verificar se já existe uma entrega registrada para este transaction_id
     const existingDelivery = await checkDevotionalDeliveryExists(transactionId);
@@ -105,28 +123,16 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
       console.log(`[Mercado Pago Webhook] Devocional já foi entregue para transaction_id ${transactionId}. Ignorando reprocessamento.`);
       return res.status(200).json({ received: true, message: "Delivery already processed" });
     }
-    
-    // Verificar idempotência: se o pagamento já foi processado, não processar novamente
-    const db = await getDb();
-    if (db && quizId) {
-      const [existingPayment] = await db
-        .select({ paid: quizResponses.paid })
-        .from(quizResponses)
-        .where(eq(quizResponses.quizId, quizId))
-        .limit(1);
-      
-      if (existingPayment && existingPayment.paid === 1) {
-        console.log(`[Mercado Pago Webhook] Pagamento já foi processado para quizId ${quizId}. Ignorando reprocessamento.`);
-        return res.status(200).json({ received: true });
-      }
+
+    if (await isTransactionAlreadyProcessed(transactionId)) {
+      console.log(`[Mercado Pago Webhook] Transação ${transactionId} já está marcada como processada. Ignorando webhook duplicado.`);
+      return res.status(200).json({ received: true, message: "Transaction already processed" });
     }
 
-    // Criar registro de comprador
-    const buyerLeadId = paymentData.external_reference;
-    
-    // Verificar se quizId foi fornecido
-    if (!quizId) {
-      console.warn("[Mercado Pago Webhook] Aviso: quizId não encontrado no metadata. Processando com leadId apenas.");
+    const db = await getDb();
+
+    if (!effectiveQuizId) {
+      console.warn("[Mercado Pago Webhook] Aviso: quizId indisponível no pagamento e na transação.");
     }
     
     if (db && buyerLeadId) {
@@ -165,11 +171,7 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
       }
     }
 
-    if (!buyerLeadId) {
-      console.log("[Mercado Pago Webhook] Pagamento sem external_reference; notificação recebida sem processamento adicional");
-      return res.status(200).json({ received: true });
-    }
-    console.log(`[Mercado Pago Webhook] Lead ID encontrado: ${buyerLeadId}`);
+    console.log(`[Mercado Pago Webhook] Lead ID encontrado na transação: ${buyerLeadId}`);
     
     // Update payment status in database (db já foi obtido acima)
     if (db) {
@@ -220,42 +222,38 @@ export async function handleMercadoPagoWebhook(req: Request, res: Response) {
     }
     console.log(`[Mercado Pago Webhook] Lead encontrado: ${lead.email}`);
 
-    const diagnostic = await getDiagnosticByLeadId(Number(buyerLeadId));
+    const diagnostic = await getDiagnosticById(resultId);
     if (!diagnostic) {
-      console.log(`[Mercado Pago Webhook] Diagnóstico não encontrado para ${buyerLeadId}; notificação recebida sem processamento adicional`);
+      console.log(`[Mercado Pago Webhook] Resultado personalizado ${resultId} não encontrado; notificação recebida sem processamento adicional`);
       return res.status(200).json({ received: true });
     }
-    console.log(`[Mercado Pago Webhook] Diagnóstico encontrado: ${diagnostic.profileName}`);
+    console.log(`[Mercado Pago Webhook] Resultado personalizado encontrado: ${diagnostic.profileName}`);
 
     // Get quiz responses - ONLY for the specific quiz if quizId is available
     let quizResponse = null;
-    if (quizId && db && !quizResponse) {
-      // Buscar apenas o quiz específico com o quizId
+    if (effectiveQuizId && db && !quizResponse) {
       try {
         const [specificQuiz] = await db
           .select()
           .from(quizResponses)
-          .where(eq(quizResponses.quizId, quizId))
+          .where(eq(quizResponses.quizId, effectiveQuizId))
           .limit(1);
         quizResponse = specificQuiz || null;
       } catch (err) {
-        console.error(`[Mercado Pago Webhook] Erro ao buscar quiz com quizId ${quizId}:`, err);
+        console.error(`[Mercado Pago Webhook] Erro ao buscar quiz com quizId ${effectiveQuizId}:`, err);
       }
-      
+
       if (quizResponse) {
-        // Marcar este quiz como pago e registrar que o email foi enviado
         await db
           .update(quizResponses)
           .set({
             paid: 1,
-            emailSent: 1,
             updatedAt: new Date(),
           })
-          .where(eq(quizResponses.quizId, quizId));
-        console.log(`[Mercado Pago Webhook] Quiz ${quizId} marcado como pago e email registrado como enviado`);
+          .where(eq(quizResponses.quizId, effectiveQuizId));
+        console.log(`[Mercado Pago Webhook] Quiz ${effectiveQuizId} marcado como pago`);
       }
     } else {
-      // Fallback: buscar por leadId se quizId não estiver disponível
       quizResponse = await getQuizResponseByLeadId(Number(buyerLeadId));
     }
     
@@ -318,7 +316,11 @@ Equipe Diagnóstico Espiritual
     `;
 
     try {
-      // Criar registro de entrega antes de enviar o email
+      if (await hasEmailBeenSent(transactionId)) {
+        console.log(`[Mercado Pago Webhook] Email já enviado para transaction_id ${transactionId}. Ignorando reenvio.`);
+        return res.status(200).json({ received: true, message: "Email already sent" });
+      }
+
       if (db) {
         try {
           const payment = await db
@@ -326,9 +328,9 @@ Equipe Diagnóstico Espiritual
             .from(payments)
             .where(eq(payments.leadId, Number(buyerLeadId)))
             .limit(1);
-          
+
           const paymentId_db = payment.length > 0 ? payment[0].id : null;
-          
+
           await createDevotionalDelivery({
             transactionId,
             paymentId: paymentId_db || 0,
@@ -342,7 +344,7 @@ Equipe Diagnóstico Espiritual
           console.error(`[Mercado Pago Webhook] Erro ao criar registro de entrega:`, deliveryError);
         }
       }
-      
+
       await sendEmail({
         to: lead.email,
         subject: emailSubject,
@@ -356,50 +358,48 @@ Equipe Diagnóstico Espiritual
         ],
       });
       console.log(`[Mercado Pago Webhook] Email enviado com sucesso para: ${lead.email}`);
-      
-      // Atualizar status de entrega para "sent"
+
       try {
         await updateDevotionalDeliveryStatus(transactionId, "sent");
         console.log(`[Mercado Pago Webhook] Status de entrega atualizado para "sent" para transaction_id ${transactionId}`);
       } catch (updateError) {
         console.error(`[Mercado Pago Webhook] Erro ao atualizar status de entrega:`, updateError);
       }
-      
-      // Mark email as sent if we have quizId
-      if (quizId && db) {
+
+      if (effectiveQuizId && db) {
         try {
           await db
             .update(quizResponses)
             .set({ emailSent: 1 })
-            .where(eq(quizResponses.quizId, quizId));
-          console.log(`[Mercado Pago Webhook] Quiz ${quizId} marcado como email enviado`);
+            .where(eq(quizResponses.quizId, effectiveQuizId));
+          console.log(`[Mercado Pago Webhook] Quiz ${effectiveQuizId} marcado como email enviado`);
         } catch (err) {
           console.error(`[Mercado Pago Webhook] Erro ao marcar email como enviado:`, err);
         }
       }
+
+      await finalizeTransaction(transactionId);
+
+      const amount = Math.round(Number(paymentData.transaction_amount || 0) * 100) / 100;
+      await firePixelPurchaseEvent(lead.email, amount, diagnostic.profileName, Number(buyerLeadId), transactionId);
+      console.log(`[Meta Pixel] Evento Purchase disparado com sucesso`);
+      console.log(`[Meta Pixel] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL, Email: ${lead.email}`);
+
+      console.log(`[Mercado Pago Webhook] Webhook processado com sucesso!`);
+      return res.status(200).json({ received: true, pixelEvent: 'Purchase' });
     } catch (emailError) {
       console.error(`[Mercado Pago Webhook] Erro ao enviar email:`, emailError);
       console.warn(`[Meta Pixel] Evento Purchase NÃO foi disparado porque o email falhou`);
-      
-      // Atualizar status de entrega para "failed"
+
       try {
         await updateDevotionalDeliveryStatus(transactionId, "failed", String(emailError));
         console.log(`[Mercado Pago Webhook] Status de entrega atualizado para "failed" para transaction_id ${transactionId}`);
       } catch (updateError) {
         console.error(`[Mercado Pago Webhook] Erro ao atualizar status de entrega para failed:`, updateError);
       }
-      // Don't fail the webhook if email fails - payment was already processed
     }
 
-    // Disparar evento Purchase do Pixel da Meta APENAS se email foi enviado com sucesso
-    // Este código é executado após o try/catch do email, então sabemos que o email foi enviado
-    const amount = Math.round(Number(paymentData.transaction_amount || 0) * 100) / 100;
-    await firePixelPurchaseEvent(lead.email, amount, diagnostic.profileName, Number(buyerLeadId), transactionId);
-    console.log(`[Meta Pixel] Evento Purchase disparado com sucesso`);
-    console.log(`[Meta Pixel] Valor: R$ ${amount.toFixed(2)}, Moeda: BRL, Email: ${lead.email}`);
-    
-    console.log(`[Mercado Pago Webhook] Webhook processado com sucesso!`);
-    return res.status(200).json({ received: true, pixelEvent: 'Purchase' });
+    return res.status(200).json({ received: true });
   } catch (error) {
     console.error("[Mercado Pago Webhook] Erro crítico:", error);
     return res.status(200).json({ received: true });

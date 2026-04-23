@@ -33,14 +33,16 @@ export async function isTransactionAlreadyProcessed(transactionId: string): Prom
 export async function createNewTransaction(
   transactionId: string,
   quizId: string,
+  resultId: number,
   leadId: number
 ): Promise<void> {
   try {
     await createTransactionControl({
       transactionId,
+      resultId,
       quizId,
       leadId,
-      status: "approved",
+      status: "pending",
       processed: 0,
       emailSent: 0,
       productReleased: 0,

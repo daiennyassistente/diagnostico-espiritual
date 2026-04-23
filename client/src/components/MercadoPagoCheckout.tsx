@@ -8,9 +8,11 @@ import { trpc } from "@/lib/trpc";
 interface MercadoPagoCheckoutProps {
   email: string;
   leadId: string;
+  quizId: string;
+  resultId: number;
   profileName: string;
   userPhone: string;
-  onSuccess?: () => void;
+  onSuccess?: (transactionId?: string) => void;
 }
 
 declare global {
@@ -22,6 +24,8 @@ declare global {
 export function MercadoPagoCheckout({
   email,
   leadId,
+  quizId,
+  resultId,
   profileName,
   userPhone,
   onSuccess,
@@ -30,10 +34,37 @@ export function MercadoPagoCheckout({
   const [paymentMethod, setPaymentMethod] = useState<"card" | "pix">("card");
   const [pixCode, setPixCode] = useState<string>("");
   const [pixQrCode, setPixQrCode] = useState<string>("");
+  const [transactionId, setTransactionId] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [showPixInfo, setShowPixInfo] = useState(false);
 
   const createPaymentMutation = trpc.payment.createMercadoPagoPayment.useMutation();
+
+  useEffect(() => {
+    if (!showPixInfo || !transactionId) {
+      return;
+    }
+
+    const intervalId = window.setInterval(async () => {
+      try {
+        const response = await fetch(`/check-payment?transaction_id=${encodeURIComponent(transactionId)}`);
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+        if (data.status === "approved") {
+          window.clearInterval(intervalId);
+          window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}`;
+        }
+      } catch (error) {
+        console.error("Erro ao consultar status do pagamento PIX:", error);
+      }
+    }, 3000);
+
+    return () => window.clearInterval(intervalId);
+  }, [showPixInfo, transactionId]);
 
   // SDK v2 já está carregado no index.html
   // Não precisa fazer nada aqui - a chave pública é passada ao criar instâncias
@@ -46,6 +77,8 @@ export function MercadoPagoCheckout({
       const result = await createPaymentMutation.mutateAsync({
         email,
         leadId,
+        quizId,
+        resultId,
         profileName,
         userPhone,
         paymentMethod: "card",
@@ -71,6 +104,8 @@ export function MercadoPagoCheckout({
       const result = await createPaymentMutation.mutateAsync({
         email,
         leadId,
+        quizId,
+        resultId,
         profileName,
         userPhone,
         paymentMethod: "pix",
@@ -79,7 +114,9 @@ export function MercadoPagoCheckout({
       if (result.success && result.pixCode && result.pixQrCode) {
         setPixCode(result.pixCode);
         setPixQrCode(result.pixQrCode);
+        setTransactionId(result.transactionId || "");
         setShowPixInfo(true);
+        onSuccess?.(result.transactionId);
         toast.success("QR Code PIX gerado com sucesso!");
       } else {
         toast.error(result.error || "Erro ao gerar QR Code PIX");
@@ -146,6 +183,9 @@ export function MercadoPagoCheckout({
           <p className="text-sm text-gray-600">
             Escaneie o QR Code ou copie o código para fazer o pagamento no seu
             banco.
+          </p>
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+            Assim que o pagamento for aprovado, esta tela verifica automaticamente a confirmação e redireciona para /sucesso em até 3 segundos.
           </p>
           <Button
             onClick={() => setShowPixInfo(false)}

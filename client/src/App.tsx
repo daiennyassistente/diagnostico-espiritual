@@ -23,6 +23,7 @@ function Router() {
       <Route path={"/resultado"} component={Resultado} />
       <Route path={"/result"} component={Result} />
       <Route path={"/checkout-success"} component={CheckoutSuccess} />
+      <Route path={"/sucesso"} component={CheckoutSuccess} />
       <Route path={"/share"} component={SharePage} />
       <Route path={"/admin-login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminDashboard} />

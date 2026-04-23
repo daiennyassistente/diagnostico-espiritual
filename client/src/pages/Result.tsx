@@ -496,11 +496,12 @@ export default function Result() {
                 <MercadoPagoCheckout
                   email={trpcResult.lead?.email || parseStoredLeadData(localStorage.getItem("leadData"))?.email || user?.email || ""}
                   leadId={leadId?.toString() || ""}
+                  quizId={quizId}
+                  resultId={Number((trpcResult.diagnostic as { id?: number } | null)?.id ?? 0)}
                   profileName={result.profileName}
                   userPhone={trpcResult.lead?.whatsapp || parseStoredLeadData(localStorage.getItem("leadData"))?.whatsapp || ""}
                   onSuccess={() => {
                     toast.success("Pagamento processado com sucesso!");
-                    setLocation("/sucesso");
                   }}
                 />
               </div>

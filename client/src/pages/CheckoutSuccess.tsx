@@ -78,10 +78,11 @@ export default function CheckoutSuccess() {
   };
 
   useEffect(() => {
-    // Extrair leadId ou token do URL
+    // Extrair leadId, token ou transaction_id do URL
     const params = new URLSearchParams(window.location.search);
     const leadId = params.get('leadId');
     const token = params.get('token');
+    const transactionId = params.get('transaction_id');
 
     // Recuperar dados do resultado e respostas do localStorage
     const savedResponses = localStorage.getItem("quizResponses");
@@ -103,8 +104,8 @@ export default function CheckoutSuccess() {
       setTimeout(() => {
         handleDownloadDevocional();
       }, 1000);
-    } else if (token || leadId) {
-      // Se houver token (do webhook) ou leadId, mostrar mensagem de sucesso genérica
+    } else if (token || leadId || transactionId) {
+      // Se houver token, leadId ou transaction_id, mostrar mensagem de sucesso genérica
       setIsLoading(false);
       setResult({
         profileName: "Seu Perfil Espiritual",
@@ -115,18 +116,6 @@ export default function CheckoutSuccess() {
         nextSteps: []
       });
       setResponses({});
-      
-      // Disparar evento Purchase do Pixel da Meta (frontend)
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Purchase', {
-          value: 12.90,
-          currency: 'BRL',
-          content_name: 'Devocional Personalizado',
-          content_type: 'product'
-        });
-        console.log('[Meta Pixel] Evento Purchase disparado no frontend');
-      }
-      
       toast.success("Pagamento confirmado! Seu devocional está pronto.");
     } else {
       // Se não houver dados, redirecionar para o quiz

@@ -157,6 +157,7 @@ export type InsertDevotionalDelivery = typeof devotionalDeliveries.$inferInsert;
 export const transactionControl = mysqlTable("transaction_control", {
   id: int("id").autoincrement().primaryKey(),
   transactionId: varchar("transactionId", { length: 255 }).notNull().unique(), // ID único da transação (Mercado Pago payment ID)
+  resultId: int("resultId").notNull(), // ID único do resultado personalizado (diagnostic_history.id)
   quizId: varchar("quizId", { length: 36 }).notNull(), // UUID do quiz
   leadId: int("leadId").notNull(), // ID do lead
   status: mysqlEnum("status", ["pending", "approved", "failed", "cancelled"]).default("pending").notNull(),

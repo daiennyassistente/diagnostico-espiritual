@@ -1239,3 +1239,22 @@ export async function markTransactionProductReleased(transactionId: string) {
     .set({ productReleased: 1 })
     .where(eq(transactionControl.transactionId, transactionId));
 }
+
+
+/**
+ * Obtém um diagnóstico específico pelo resultId (diagnostic_history.id)
+ */
+export async function getDiagnosticById(resultId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(diagnosticHistory)
+    .where(eq(diagnosticHistory.id, resultId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}

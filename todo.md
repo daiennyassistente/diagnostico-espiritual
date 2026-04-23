@@ -884,3 +884,15 @@
 - [ ] Testar fluxo completo PIX
 - [ ] Validar zero duplicações de email
 - [ ] Validar redirecionamento em até 3 segundos
+
+- [x] Garantir result_id único persistido no banco para cada resultado personalizado do quiz
+- [x] Garantir transaction_id único no fluxo PIX e salvar transaction_id, result_id, status, processed e email_sent
+- [x] Vincular o pagamento PIX ao transaction_id via external_reference
+- [x] Ajustar o webhook para processar apenas pagamentos approved buscando a transação por external_reference
+- [x] Impedir reprocessamento no webhook quando processed = true
+- [x] Garantir geração e entrega do PDF personalizado correto com base no result_id da transação
+- [x] Remover qualquer envio de e-mail fora do webhook
+- [x] Garantir no webhook o envio de apenas um e-mail por transação aprovada
+- [x] Criar ou ajustar o endpoint GET /check-payment?transaction_id=XXX para retornar o status da transação
+- [x] Implementar verificação a cada 3 segundos na página de pagamento para redirecionar automaticamente para /sucesso após aprovação
+- [x] Validar que 1 pagamento gera 1 e-mail, 1 entrega e 1 redirecionamento sem duplicação
