@@ -16,6 +16,8 @@ import {
   buyers,
   devotionalDeliveries,
   InsertDevotionalDelivery,
+  transactionControl,
+  InsertTransactionControl,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1144,4 +1146,96 @@ export async function getDevotionalDeliveryByTransactionId(transactionId: string
     .limit(1);
 
   return result.length > 0 ? result[0] : null;
+}
+
+
+/**
+ * Cria um registro de controle de transação
+ */
+export async function createTransactionControl(data: InsertTransactionControl) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(transactionControl).values(data);
+  return result;
+}
+
+/**
+ * Obtém um registro de controle de transação por transaction_id
+ */
+export async function getTransactionControl(transactionId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(transactionControl)
+    .where(eq(transactionControl.transactionId, transactionId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Atualiza o status de uma transação
+ */
+export async function updateTransactionStatus(transactionId: string, status: "pending" | "approved" | "failed" | "cancelled") {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(transactionControl)
+    .set({ status })
+    .where(eq(transactionControl.transactionId, transactionId));
+}
+
+/**
+ * Marca uma transação como processada
+ */
+export async function markTransactionAsProcessed(transactionId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(transactionControl)
+    .set({ processed: 1 })
+    .where(eq(transactionControl.transactionId, transactionId));
+}
+
+/**
+ * Marca email como enviado
+ */
+export async function markTransactionEmailSent(transactionId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(transactionControl)
+    .set({ emailSent: 1 })
+    .where(eq(transactionControl.transactionId, transactionId));
+}
+
+/**
+ * Marca produto como liberado
+ */
+export async function markTransactionProductReleased(transactionId: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(transactionControl)
+    .set({ productReleased: 1 })
+    .where(eq(transactionControl.transactionId, transactionId));
 }

@@ -1,9 +1,10 @@
 import type { Request, Response } from "express";
-import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken, checkDevotionalDeliveryExists, createDevotionalDelivery, updateDevotionalDeliveryStatus } from "./db";
+import { getDiagnosticByLeadId, getQuizResponseByLeadId, getLeadById, getDb, updatePaymentDownloadToken, checkDevotionalDeliveryExists, createDevotionalDelivery, updateDevotionalDeliveryStatus, getTransactionControl, createTransactionControl, updateTransactionStatus, markTransactionAsProcessed, markTransactionEmailSent } from "./db";
 import { generateDevotionalPDF } from "./devotional-generator";
 import { generateDevotionalPDFFromDays } from "./devotional-pdf-service";
 import { sendEmail } from "./email-service";
 import { sendMetaConversionEvent } from "./meta-conversions-api";
+import { isTransactionAlreadyProcessed, createNewTransaction, finalizeTransaction } from "./transaction-control";
 import { payments, buyers, quizResponses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 

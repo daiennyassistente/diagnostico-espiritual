@@ -152,3 +152,20 @@ export const devotionalDeliveries = mysqlTable("devotional_deliveries", {
 
 export type DevotionalDelivery = typeof devotionalDeliveries.$inferSelect;
 export type InsertDevotionalDelivery = typeof devotionalDeliveries.$inferInsert;
+
+// Tabela de controle de transações para evitar duplicações
+export const transactionControl = mysqlTable("transaction_control", {
+  id: int("id").autoincrement().primaryKey(),
+  transactionId: varchar("transactionId", { length: 255 }).notNull().unique(), // ID único da transação (Mercado Pago payment ID)
+  quizId: varchar("quizId", { length: 36 }).notNull(), // UUID do quiz
+  leadId: int("leadId").notNull(), // ID do lead
+  status: mysqlEnum("status", ["pending", "approved", "failed", "cancelled"]).default("pending").notNull(),
+  processed: int("processed").default(0).notNull(), // 0 = não processado, 1 = processado (evita duplicação)
+  emailSent: int("emailSent").default(0).notNull(), // 0 = não enviado, 1 = enviado
+  productReleased: int("productReleased").default(0).notNull(), // 0 = não liberado, 1 = liberado
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TransactionControl = typeof transactionControl.$inferSelect;
+export type InsertTransactionControl = typeof transactionControl.$inferInsert;
