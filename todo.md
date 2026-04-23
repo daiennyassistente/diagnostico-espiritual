@@ -964,6 +964,9 @@
 - [x] Adicionar logs de transactionId e status
 
 ### 7. TESTES DE INTEGRAÇÃO
+- [x] Corrigir URL de /check-payment para /api/check-payment no frontend
+- [x] Adicionar logs DEBUG na chamada da API
+- [x] Adicionar log da URL completa sendo chamada
 - [ ] Testar criação de PIX com dados válidos
 - [ ] Testar webhook com pagamento aprovado
 - [ ] Testar envio de e-mail com PDF personalizado

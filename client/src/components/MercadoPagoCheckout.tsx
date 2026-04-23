@@ -51,7 +51,9 @@ export function MercadoPagoCheckout({
     const intervalId = window.setInterval(async () => {
       try {
         console.log("[MercadoPagoCheckout] Polling - Verificando status com transactionId:", transactionId);
-        const response = await fetch(`/check-payment?transaction_id=${encodeURIComponent(transactionId)}`);
+        const url = `/api/check-payment?transaction_id=${encodeURIComponent(transactionId)}`;
+        console.log("[MercadoPagoCheckout] Polling - Chamando API:", url);
+        const response = await fetch(url);
 
         if (!response.ok) {
           console.log("[MercadoPagoCheckout] Polling - Resposta não OK:", response.status);
@@ -60,6 +62,7 @@ export function MercadoPagoCheckout({
 
         const data = await response.json();
         console.log("[MercadoPagoCheckout] Polling - Status retornado:", data.status);
+        console.log("[MercadoPagoCheckout] Polling - Dados completos:", data);
         if (data.status === "approved") {
           console.log("[MercadoPagoCheckout] Polling - Pagamento aprovado! Redirecionando para /sucesso");
           window.clearInterval(intervalId);
