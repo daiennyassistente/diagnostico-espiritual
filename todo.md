@@ -911,3 +911,71 @@
 - [x] Adicionar logs de debug para resposta da API Mercado Pago
 - [x] Adicionar logs de debug para confirmar PIX Code e Image gerados
 - [x] Adicionar logs de debug para confirmar transactionId retornando corretamente
+
+## AUDITORIA COMPLETA DO FLUXO PIX
+
+### 1. VERIFICAÇÃO DA CRIAÇÃO DO PAGAMENTO (PIX)
+- [x] Validar se requisição contém transaction_amount (number)
+- [x] Validar se requisição contém description (string)
+- [x] Validar se requisição contém payment_method_id = "pix"
+- [x] Validar se requisição contém payer.email válido
+- [x] Validar se requisição contém external_reference = transactionId válido
+- [x] Validar se notification_url está configurada corretamente
+- [x] Adicionar notification_url no payload de criação de PIX
+- [x] Adicionar log de notification_url nos DEBUG
+- [x] Garantir que transactionId não seja undefined, null ou vazio
+- [x] Garantir que transactionId seja salvo no banco antes da criação do pagamento
+- [x] Adicionar log do body enviado para Mercado Pago
+
+### 2. VERIFICAÇÃO DO WEBHOOK
+- [x] Confirmar que webhook está sendo chamado corretamente
+- [x] Confirmar que recebe external_reference como transactionId
+- [x] Confirmar que payment.status === "approved" está sendo validado
+- [x] Garantir que transaction é buscada pelo transactionId
+- [x] Garantir que resultId está presente e correto
+- [x] Adicionar logs de transactionId e resultId
+- [x] Confirmar que getDiagnosticById(resultId) está sendo usado
+- [x] Confirmar que NÃO está usando leadId para gerar PDF
+
+### 3. ENVIO DE E-MAIL
+- [x] Confirmar que e-mail só é enviado dentro do webhook
+- [x] Confirmar que não existe envio no quiz ou frontend
+- [x] Garantir que PDF enviado é baseado no resultId
+- [x] Garantir que não existe caminho fixo (ex: /pdf/devocional.pdf)
+- [x] Validar uso de hasEmailBeenSent()
+- [x] Validar uso de isTransactionAlreadyProcessed()
+
+### 4. FINALIZAÇÃO DA TRANSAÇÃO
+- [x] Confirmar que finalizeTransaction atualiza status = "approved"
+- [x] Confirmar que finalizeTransaction marca processed = true
+- [x] Confirmar que finalizeTransaction marca emailSent = true
+
+### 5. ENDPOINT /check-payment
+- [x] Confirmar que recebe transaction_id corretamente
+- [x] Confirmar que busca no banco
+- [x] Confirmar que retorna status real da transação
+
+### 6. FRONTEND (CRÍTICO)
+- [x] Verificar se transaction_id retornado do backend está sendo salvo em state
+- [x] Verificar se transaction_id NÃO está undefined
+- [x] Confirmar que polling só roda quando transactionId existe
+- [x] Confirmar que polling chama /api/check-payment?transaction_id=...
+- [x] Confirmar que quando status === "approved" redireciona para /sucesso
+- [x] Adicionar logs de transactionId e status
+
+### 7. TESTES DE INTEGRAÇÃO
+- [ ] Testar criação de PIX com dados válidos
+- [ ] Testar webhook com pagamento aprovado
+- [ ] Testar envio de e-mail com PDF personalizado
+- [ ] Testar redirecionamento automático para /sucesso
+- [ ] Testar idempotência (webhook duplicado não envia 2 emails)
+- [ ] Testar erro 502 e logs de debug
+
+### 8. RESULTADO FINAL
+- [ ] PIX gerado sem erro 502
+- [ ] transaction_id válido sendo utilizado em todo fluxo
+- [ ] webhook funcionando corretamente
+- [ ] PDF personalizado sendo enviado
+- [ ] apenas 1 e-mail enviado
+- [ ] redirecionamento automático funcionando
+- [ ] integração Mercado Pago acima de 90%

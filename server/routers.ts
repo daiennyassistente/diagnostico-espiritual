@@ -957,6 +957,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
                 first_name: "Cliente",
               },
               external_reference: transactionId,
+              notification_url: "https://diagnosticoespiritual.manus.space/api/mercadopago/webhook",
               metadata: {
                 quizId: input.quizId,
                 resultId: input.resultId,
@@ -971,6 +972,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
             console.log("[Mercado Pago PIX] DEBUG - payment_method_id:", paymentData.payment_method_id);
             console.log("[Mercado Pago PIX] DEBUG - email:", paymentData.payer.email);
             console.log("[Mercado Pago PIX] DEBUG - external_reference:", paymentData.external_reference);
+            console.log("[Mercado Pago PIX] DEBUG - notification_url:", paymentData.notification_url);
             console.log("[Mercado Pago PIX] DEBUG - Token presente:", !!process.env.MERCADOPAGO_ACCESS_TOKEN);
             console.log("[Mercado Pago PIX] DEBUG - Payload completo:", JSON.stringify(paymentData, null, 2));
 
