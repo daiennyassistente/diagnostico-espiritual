@@ -339,7 +339,7 @@ export default function CheckoutSuccess() {
               height="1" 
               width="1" 
               style={{ display: 'none' }} 
-              src={`https://www.facebook.com/tr?id=${process.env.VITE_ANALYTICS_WEBSITE_ID || ''}&ev=Purchase&noscript=1`}
+              src={`https://www.facebook.com/tr?id=${import.meta.env.VITE_ANALYTICS_WEBSITE_ID || ''}&ev=Purchase&noscript=1`}
               alt=""
             />
           </noscript>

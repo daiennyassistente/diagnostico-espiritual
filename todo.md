@@ -1009,6 +1009,8 @@
 - [x] Adicionar Meta Pixel noscript tag no CheckoutSuccess
 - [x] Garantir que transactionId é passado para /sucesso com amount
 - [x] Validar que event_id é idêntico entre frontend e backend (purchase_transactionId)
+- [x] Corrigir erro ReferenceError: process is not defined no CheckoutSuccess.tsx
+- [x] Alterar process.env para import.meta.env para variáveis de ambiente do Vite
 - [ ] Testar fluxo completo em produção
 - [ ] Validar eventos no Meta Events Manager
 - [ ] Validar deduplicação entre Browser e Server
