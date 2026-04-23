@@ -159,6 +159,11 @@ EXIGÊNCIAS FINAIS:
 - Se o mesmo texto pudesse servir para outra pessoa com respostas diferentes, então sua resposta está errada.`;
 }
 
+export function buildFallbackDevotionalContent(request: DevotionalRequest) {
+  const firstName = getFirstName(request);
+  return buildFallbackDayLibrary(request, firstName);
+}
+
 const buildFallbackDayLibrary = (request: DevotionalRequest, firstName: string) => {
   const responses = request.responses || {};
   const currentState = getResponseValue(responses, 1, "step2") || "uma fase espiritual sensível";
@@ -203,7 +208,7 @@ const buildFallbackDayLibrary = (request: DevotionalRequest, firstName: string) 
       verse: "Perto está o Senhor dos que têm o coração quebrantado e salva os de espírito oprimido.",
       reflection: `${intro}você revelou que sente falta de ${missingWithGod} e que nesta fase Deus tem tratado ${currentTreatment}. Isso mostra que sua necessidade não é superficial. Há áreas internas que pedem cura, arrependimento, restauração e consolação. O evangelho não ignora a ferida; ele entra nela com verdade e graça. Em Jesus, Deus não se aproxima apenas da sua versão forte, mas do seu coração quebrantado. O Senhor usa processos difíceis para expor onde você tem buscado sustento fora dEle, mas Ele faz isso para restaurar, não para destruir. A proximidade de Deus não depende de você parecer bem; ela se manifesta justamente quando você admite a necessidade de socorro. Sua dor pode até ter confundido sua percepção, mas não anulou a fidelidade do Senhor. Cristo continua perto, tratando o que ninguém vê, formando em você uma dependência mais sincera e uma fé menos superficial.`,
       prayer: `Senhor, Tu conheces o que está sendo tratado dentro de mim. Tu sabes onde meu coração está ferido, endurecido ou cansado. Eu não quero resistir ao Teu cuidado. Vem curar o que precisa ser curado, confrontar o que precisa ser confrontado e restaurar o que foi enfraquecido em mim. Que eu não fuja do Teu processo, mas aprenda a permanecer em Ti. Em nome de Jesus, amém.`,
-      application: `Hoje escreva em uma folha: “O que Deus está tratando em mim nesta fase?” Responda com sinceridade usando o que você mesmo(a) disse no quiz sobre ${currentTreatment}. Depois ore por cinco minutos entregando isso a Cristo e pedindo coragem para cooperar com a obra dEle em você.`
+      application: `Hoje escreva em uma folha: "O que Deus está tratando em mim nesta fase?" Responda com sinceridade usando o que você mesmo(a) disse no quiz sobre ${currentTreatment}. Depois ore por cinco minutos entregando isso a Cristo e pedindo coragem para cooperar com a obra dEle em você.`
     },
     {
       day: 4,
@@ -228,57 +233,30 @@ const buildFallbackDayLibrary = (request: DevotionalRequest, firstName: string) 
       title: "Permaneça mesmo sem sentir tudo",
       verseReference: "João 15:5",
       verse: "Eu sou a videira, vós, os ramos. Quem permanece em mim, e eu, nele, esse dá muito fruto; porque sem mim nada podeis fazer.",
-      reflection: `${intro}sua jornada precisa ser construída sobre permanência, não sobre impulso. Talvez em alguns dias você não sinta grandes emoções espirituais, mas isso não significa ausência de Deus. Jesus ensinou que fruto nasce de permanência. Suas respostas mostram que você deseja viver algo verdadeiro com o Senhor, mas a oscilação tem quebrado a continuidade dessa caminhada. Permanecer é voltar a Cristo todos os dias: pela Palavra, pela oração, pela obediência e pela confiança. Não é intensidade sem continuidade; é comunhão sustentada pela graça. Quando você permanece, até áreas cansadas começam a florescer novamente. Seu coração não será fortalecido apenas por experiências marcantes, mas por raízes mais profundas em Jesus. É assim que a fé evangélica amadurece: por meio de relacionamento real com Cristo, e não de ativismo religioso.`,
-      prayer: `Senhor Jesus, eu quero permanecer em Ti. Livra-me da superficialidade, da religiosidade vazia e da pressa de querer resultados sem comunhão. Ensina-me a voltar para Ti todos os dias, mesmo quando minhas emoções estiverem confusas. Firma minhas raízes em Tua Palavra e produz fruto verdadeiro em minha vida. Em nome de Jesus, amém.`,
-      application: `Hoje faça um compromisso simples: voltar a João 15:5 em dois momentos diferentes do dia. Em cada leitura, responda a esta pergunta: “Como posso permanecer em Cristo de modo prático ainda hoje?” Depois obedeça a uma resposta concreta, por menor que pareça.`
+      reflection: `${intro}sua jornada precisa ser construída sobre permanência, não sobre impulso. Talvez em alguns dias você não sinta grandes emoções espirituais, mas isso não significa ausência de Deus. Jesus ensinou que fruto nasce de permanência. Suas respostas mostram que você deseja viver algo verdadeiro com o Senhor, mas a oscilação tem quebrado a continuidade dessa caminhada. Permanecer é voltar a Cristo todos os dias, mesmo quando o sentimento não vem. É obedecer quando a motivação desaparece. É confiar quando a emoção falha. Esse tipo de fidelidade não é fruto de determinação pessoal; é fruto de estar conectado(a) à Videira. Quando você permanece em Cristo, mesmo que seja apenas com um fio de fé, Ele produz fruto em você que você nem consegue medir.`,
+      prayer: `Senhor Jesus, ensina-me a permanecer em Ti mesmo quando não sinto. Que minha fé não dependa de emoções passageiras, mas da Tua fidelidade eterna. Que eu continue conectado(a) a Ti através da Palavra, da oração e da obediência, mesmo nos dias em que tudo parece vazio. Que eu produza fruto não por meu esforço, mas pela Tua vida fluindo em mim. Em nome de Jesus, amém.`,
+      application: `Escreva hoje uma promessa que você fará a Deus: "Vou permanecer em Ti mesmo quando [complete com uma situação específica em que você costuma desistir]." Cole essa promessa em um lugar visível e releia quando a tentação de abandonar vier.`
     },
     {
       day: 7,
-      title: "Recomeço com os olhos em Jesus",
-      verseReference: "Hebreus 12:2",
-      verse: "Olhando firmemente para o Autor e Consumador da fé, Jesus...",
-      reflection: `${intro}ao final destes dias, o ponto principal não é que todos os seus problemas desapareceram, mas que seu olhar foi reposicionado. Seu diagnóstico mostrou um quadro específico: ${request.profileDescription}. Isso continua sendo sério, mas agora precisa ser interpretado à luz de Cristo. O mesmo Jesus que revela sua necessidade é o Jesus que sustenta sua fé, corrige seu caminho e renova sua esperança. O que você deseja viver com Deus não será construído apenas por esforço; será sustentado por um relacionamento contínuo com o Salvador. Se houve pecado, confesse. Se houve frieza, volte. Se houve cansaço, descanse nEle. Se houve distração, reorganize sua vida com prioridade espiritual. Você não termina esta jornada olhando para si mesmo(a), mas para Jesus, o centro da fé cristã, o fundamento da graça e a esperança de verdadeira transformação.`,
-      prayer: `Pai, obrigado porque em Jesus existe caminho de volta, consolo para o cansado e firmeza para quem deseja recomeçar. Eu entrego a Ti minha caminhada e peço que meu coração permaneça fixo em Cristo. Guarda-me da superficialidade, fortalece minha obediência e ajuda-me a viver uma fé bíblica, sincera e perseverante. Que os próximos dias não sejam marcados por promessas vazias, mas por comunhão real contigo. Em nome de Jesus, amém.`,
-      application: `Feche esta semana definindo um compromisso espiritual para os próximos 7 dias com base nas recomendações do seu resultado: ${request.recommendations[0] || "voltar a cultivar uma rotina com Deus"}. Compartilhe essa decisão com alguém de confiança da fé cristã e peça oração para perseverar.`
-    },
-  ] satisfies GeneratedDay[];
+      title: "Renovação e perseverança",
+      verseReference: "Filipenses 3:13-14",
+      verse: "Prossigo para o alvo, para o prêmio da soberana vocação de Deus em Cristo Jesus.",
+      reflection: `${intro}você chegou ao sétimo dia dessa jornada devocional, e isso já é um sinal de que o Espírito Santo está trabalhando em você. Essa semana não foi apenas leitura; foi um convite para voltar a Cristo com sinceridade. Tudo o que você leu, orou e decidiu nesses sete dias não termina aqui; é apenas o começo de uma vida renovada. Perseverança não significa perfeição; significa continuar voltando para Jesus mesmo depois de cair. Significa deixar para trás as falhas do passado e correr para o alvo que Deus colocou diante de você. Seu resultado espiritual mostrou dor, mas também mostrou que ainda existe em você um coração que quer servir a Deus. Essa vontade é real, e Deus honra cada passo que você der em Sua direção. A renovação que você busca não vem de um sentimento momentâneo; vem de uma decisão diária de permanecer em Cristo.`,
+      prayer: `Pai, agradeço por essa semana de encontro com Tua Palavra e Tua graça. Que tudo o que aprendi e senti nestes sete dias não seja esquecido, mas plantado profundamente em meu coração. Que eu continue perseverando, voltando a Ti todos os dias, confiando que Tua graça é suficiente para cada novo amanhecer. Que eu não desista, mas corra para o alvo que Tu colocaste diante de mim em Cristo. Em nome de Jesus, amém.`,
+      application: `Hoje, faça um compromisso concreto para os próximos 30 dias. Escolha uma prática espiritual simples que você vai manter: um tempo de leitura bíblica, uma oração diária, um versículo para meditar. Escreva isso em um papel e compartilhe com alguém de confiança que possa encorajá-lo(a) nessa jornada.`
+    }
+  ];
 };
 
-export function buildFallbackDevotionalContent(request: DevotionalRequest): GeneratedDay[] {
-  const firstName = getFirstName(request);
-  return buildFallbackDayLibrary(request, firstName);
-}
-
-const parseGeneratedDays = (rawContent: unknown): GeneratedDay[] => {
-  const contentStr = typeof rawContent === "string" ? rawContent : JSON.stringify(rawContent);
-  const parsed = JSON.parse(contentStr);
-  const days = Array.isArray(parsed) ? parsed : parsed.days;
-
-  if (!Array.isArray(days) || days.length !== 7) {
-    throw new Error(`Esperado 7 dias de devocional, recebido ${Array.isArray(days) ? days.length : 0}`);
-  }
-
-  return days.map((day, index) => ({
-    day: Number(day.day ?? index + 1),
-    title: String(day.title ?? `Dia ${index + 1}`),
-    verse: String(day.verse ?? ""),
-    verseReference: String(day.verseReference ?? ""),
-    reflection: String(day.reflection ?? ""),
-    prayer: String(day.prayer ?? ""),
-    application: String(day.application ?? ""),
-  }));
-};
-
-export async function generateDevotionalContent(request: DevotionalRequest): Promise<GeneratedDay[]> {
-  const prompt = buildDevotionalPrompt(request);
-
+async function generateDevotionalContent(request: DevotionalRequest): Promise<GeneratedDay[]> {
   try {
+    const prompt = buildDevotionalPrompt(request);
     const response = await invokeLLM({
       messages: [
         {
           role: "system",
-          content:
-            "Você é um pastor conselheiro evangélico que escreve devocionais cristãos personalizados, bíblicos, centrados em Jesus e sempre retorna JSON válido com exatamente 7 dias.",
+          content: "Você é um especialista em criar devocionais cristãos personalizados. Sempre retorne JSON válido.",
         },
         {
           role: "user",
@@ -288,15 +266,13 @@ export async function generateDevotionalContent(request: DevotionalRequest): Pro
       response_format: {
         type: "json_schema",
         json_schema: {
-          name: "devotional_content",
+          name: "devotional_days",
           strict: true,
           schema: {
             type: "object",
             properties: {
               days: {
                 type: "array",
-                minItems: 7,
-                maxItems: 7,
                 items: {
                   type: "object",
                   properties: {
@@ -320,15 +296,17 @@ export async function generateDevotionalContent(request: DevotionalRequest): Pro
       },
     });
 
-    const content = response.choices[0].message.content;
+    const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error("Resposta vazia da IA na geração do devocional");
+      throw new Error("Empty response from LLM");
     }
 
-    return parseGeneratedDays(content);
+    const parsed = JSON.parse(content);
+    return parsed.days || [];
   } catch (error) {
-    console.error("Erro ao gerar conteúdo do devocional com IA, usando fallback personalizado:", error);
-    return buildFallbackDevotionalContent(request);
+    console.warn("[Devotional] Erro ao gerar conteúdo com IA, usando fallback:", error);
+    const firstName = getFirstName(request);
+    return buildFallbackDayLibrary(request, firstName);
   }
 }
 
@@ -337,74 +315,232 @@ export async function generateDevotionalPDF(request: DevotionalRequest): Promise
     try {
       const devotionalDays = await generateDevotionalContent(request);
       const firstName = getFirstName(request);
-      const personalizedTitle = firstName ? `Devocional de ${firstName}` : "Devocional Personalizado";
+      const userNameDisplay = firstName || "Querido(a) filho(a) de Deus";
 
-      const doc = new PDFDocument({ size: "A4", margin: 40 });
+      const doc = new PDFDocument({ size: "A4", margin: 50 });
       const chunks: Buffer[] = [];
+      const pageWidth = doc.page.width - 100;
 
       doc.on("data", (chunk) => chunks.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", reject);
 
-      doc.fontSize(20).font("Helvetica-Bold").text(personalizedTitle);
-      doc.moveDown(0.2);
-      doc.fontSize(15).font("Helvetica").text("7 dias com Jesus, base bíblica e aplicação prática");
+      // ===== CAPA PREMIUM =====
+      // Fundo degradê azul escuro
+      doc.rect(0, 0, doc.page.width, 280).fill("#0B1C3D");
+
+      // Título principal
+      doc.fontSize(32).font("Helvetica-Bold").fillColor("#FFFFFF").text(
+        "Diagnóstico Espiritual",
+        50,
+        80,
+        { width: pageWidth, align: "center" }
+      );
+
+      doc.fontSize(32).font("Helvetica-Bold").fillColor("#C8A951").text(
+        "Personalizado",
+        50,
+        125,
+        { width: pageWidth, align: "center" }
+      );
+
+      // Nome do usuário
       doc.moveDown(0.5);
-      doc.fontSize(11).font("Helvetica").text(`Perfil espiritual identificado: ${normalizePdfText(request.profileName)}`);
-      doc.moveDown(0.5);
-      doc.fontSize(11).font("Helvetica").text(normalizePdfText(request.profileDescription), {
-        align: "justify",
-      });
+      doc.fontSize(18).font("Helvetica").fillColor("#FFFFFF").text(
+        userNameDisplay,
+        50,
+        175,
+        { width: pageWidth, align: "center" }
+      );
+
+      // Versículo na capa
+      doc.fontSize(11).font("Helvetica-Oblique").fillColor("#E8D5B7").text(
+        '"Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei." — Mateus 11:28',
+        50,
+        240,
+        { width: pageWidth, align: "center" }
+      );
+
+      // Volta para cor preta
+      doc.fillColor("#000000");
+
+      // Espaço após capa
+      doc.moveDown(3);
+
+      // ===== PÁGINA DE BOAS-VINDAS =====
+      doc.addPage();
+      doc.fontSize(24).font("Helvetica-Bold").fillColor("#0B1C3D").text("Bem-vindo(a)", 50, 50);
+
+      // Linha separadora
+      doc.moveTo(50, 85).lineTo(pageWidth + 50, 85).stroke("#C8A951");
+
+      doc.moveDown(1);
+      doc.fontSize(11).font("Helvetica").fillColor("#333333").text(
+        normalizePdfText(request.profileDescription),
+        { align: "justify", lineGap: 5 }
+      );
+
       doc.moveDown(0.8);
 
-      if (request.challenges.length > 0) {
-        doc.fontSize(11).font("Helvetica-Bold").text("Desafios percebidos:");
-        doc.fontSize(10).font("Helvetica").text(normalizePdfText(request.challenges.join("; ")), { align: "justify" });
-        doc.moveDown(0.5);
-      }
+      // Caixa com perfil
+      doc.rect(50, doc.y, pageWidth, 80).stroke("#C8A951");
+      doc.fontSize(11).font("Helvetica-Bold").fillColor("#C8A951").text(
+        "Seu Perfil Espiritual",
+        60,
+        doc.y + 10
+      );
+      doc.fontSize(10).font("Helvetica").fillColor("#333333").text(
+        normalizePdfText(request.profileName),
+        60,
+        doc.y + 5,
+        { width: pageWidth - 20 }
+      );
 
-      if (request.recommendations.length > 0) {
-        doc.fontSize(11).font("Helvetica-Bold").text("Direção pastoral inicial:");
-        doc.fontSize(10).font("Helvetica").text(normalizePdfText(request.recommendations.join("; ")), {
-          align: "justify",
+      doc.moveDown(1.5);
+
+      // Desafios
+      if (request.challenges.length > 0) {
+        doc.fontSize(12).font("Helvetica-Bold").fillColor("#0B1C3D").text("Desafios Identificados");
+        doc.moveDown(0.3);
+        request.challenges.forEach((challenge) => {
+          doc.fontSize(10).font("Helvetica").fillColor("#333333").text(
+            `• ${normalizePdfText(challenge)}`,
+            { lineGap: 3 }
+          );
         });
         doc.moveDown(0.5);
       }
 
+      // Recomendações
+      if (request.recommendations.length > 0) {
+        doc.fontSize(12).font("Helvetica-Bold").fillColor("#0B1C3D").text("Direção Pastoral");
+        doc.moveDown(0.3);
+        request.recommendations.forEach((rec) => {
+          doc.fontSize(10).font("Helvetica").fillColor("#333333").text(
+            `• ${normalizePdfText(rec)}`,
+            { lineGap: 3 }
+          );
+        });
+      }
+
+      // ===== PÁGINAS DOS 7 DIAS =====
       devotionalDays.forEach((day, index) => {
-        if (index > 0) {
-          doc.addPage();
-        }
+        doc.addPage();
 
-        doc.fontSize(15).font("Helvetica-Bold").text(`Dia ${day.day} — ${normalizePdfText(day.title)}`);
-        doc.moveDown(0.4);
+        // Cabeçalho do dia
+        doc.fontSize(28).font("Helvetica-Bold").fillColor("#0B1C3D").text(
+          `Dia ${day.day}`,
+          50,
+          50
+        );
 
-        doc.fontSize(11).font("Helvetica-Bold").text("Texto bíblico:");
-        doc.fontSize(10).font("Helvetica").text(normalizePdfText(day.verse), { align: "justify" });
+        doc.fontSize(16).font("Helvetica").fillColor("#C8A951").text(
+          normalizePdfText(day.title),
+          50,
+          85
+        );
+
+        // Linha separadora
+        doc.moveTo(50, 105).lineTo(pageWidth + 50, 105).stroke("#C8A951");
+
+        doc.moveDown(1);
+
+        // Texto bíblico em destaque
+        doc.rect(50, doc.y, pageWidth, 5).fill("#C8A951");
+        doc.moveDown(0.3);
+
+        doc.fontSize(11).font("Helvetica-Oblique").fillColor("#0B1C3D").text(
+          normalizePdfText(day.verse),
+          { align: "center", lineGap: 4 }
+        );
+
+        doc.fontSize(9).font("Helvetica").fillColor("#666666").text(
+          normalizePdfText(day.verseReference),
+          { align: "center" }
+        );
+
+        doc.moveDown(0.5);
+        doc.rect(50, doc.y, pageWidth, 5).fill("#C8A951");
+        doc.moveDown(0.5);
+
+        // Reflexão
+        doc.fontSize(11).font("Helvetica-Bold").fillColor("#0B1C3D").text("Reflexão");
         doc.moveDown(0.2);
-        doc.fontSize(9).font("Helvetica-Oblique").text(normalizePdfText(day.verseReference));
+        doc.fontSize(10).font("Helvetica").fillColor("#333333").text(
+          normalizePdfText(day.reflection),
+          { align: "justify", lineGap: 4 }
+        );
+
         doc.moveDown(0.5);
 
-        doc.fontSize(11).font("Helvetica-Bold").text("Reflexão:");
-        doc.fontSize(10).font("Helvetica").text(normalizePdfText(day.reflection), { align: "justify" });
+        // Oração
+        doc.fontSize(11).font("Helvetica-Bold").fillColor("#0B1C3D").text("Oração");
+        doc.moveDown(0.2);
+        doc.fontSize(10).font("Helvetica-Oblique").fillColor("#333333").text(
+          normalizePdfText(day.prayer),
+          { align: "justify", lineGap: 4 }
+        );
+
         doc.moveDown(0.5);
 
-        doc.fontSize(11).font("Helvetica-Bold").text("Oração:");
-        doc.fontSize(10).font("Helvetica").text(normalizePdfText(day.prayer), { align: "justify" });
-        doc.moveDown(0.5);
+        // Aplicação em caixa destacada
+        doc.rect(50, doc.y, pageWidth, 2).fill("#C8A951");
+        doc.moveDown(0.3);
+        doc.rect(50, doc.y, 4, 60).fill("#C8A951");
 
-        doc.fontSize(11).font("Helvetica-Bold").text("Aplicação para hoje:");
-        doc.fontSize(10).font("Helvetica").text(normalizePdfText(day.application), { align: "justify" });
+        doc.fontSize(11).font("Helvetica-Bold").fillColor("#0B1C3D").text(
+          "Aplicação para Hoje",
+          60,
+          doc.y
+        );
+
+        doc.moveDown(0.3);
+        doc.fontSize(10).font("Helvetica").fillColor("#333333").text(
+          normalizePdfText(day.application),
+          60,
+          doc.y,
+          { width: pageWidth - 20, align: "justify", lineGap: 4 }
+        );
       });
 
+      // ===== PÁGINA DE ENCERRAMENTO =====
       doc.addPage();
-      doc.fontSize(14).font("Helvetica-Bold").text("Encerramento");
+
+      // Fundo claro
+      doc.rect(0, 0, doc.page.width, doc.page.height).fill("#F5F5F5");
+
+      doc.fontSize(24).font("Helvetica-Bold").fillColor("#0B1C3D").text(
+        "Encerramento",
+        50,
+        100,
+        { align: "center" }
+      );
+
       doc.moveDown(0.5);
-      doc.fontSize(11).font("Helvetica").text(
+      doc.moveTo(100, doc.y).lineTo(pageWidth, doc.y).stroke("#C8A951");
+
+      doc.moveDown(1);
+
+      doc.fontSize(11).font("Helvetica").fillColor("#333333").text(
         normalizePdfText(
           "Que esta jornada continue levando seu coração de volta para Jesus, com arrependimento sincero, fé bíblica, constância espiritual e dependência diária da graça de Deus. Persevere na Palavra, na oração e na comunhão cristã."
         ),
-        { align: "justify" }
+        { align: "justify", lineGap: 5 }
+      );
+
+      doc.moveDown(2);
+
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#C8A951").text(
+        "Que Deus abençoe sua jornada!",
+        { align: "center" }
+      );
+
+      doc.moveDown(2);
+
+      // Rodapé
+      doc.fontSize(8).font("Helvetica").fillColor("#999999").text(
+        "Documento gerado automaticamente com base nas suas respostas.",
+        { align: "center" }
       );
 
       doc.end();

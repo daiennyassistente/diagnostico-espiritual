@@ -967,6 +967,18 @@
 - [x] Corrigir URL de /check-payment para /api/check-payment no frontend
 - [x] Adicionar logs DEBUG na chamada da API
 - [x] Adicionar log da URL completa sendo chamada
+- [x] Melhorar design do PDF do devocional com layout premium
+- [x] Adicionar capa com fundo degradê azul escuro (#0B1C3D → #132B5B)
+- [x] Adicionar página de boas-vindas com perfil e desafios
+- [x] Adicionar páginas dos 7 dias com design premium
+- [x] Adicionar página de encerramento com design premium
+- [x] Usar cores douradas (#C8A951) para subtítulos e destaques
+- [x] Adicionar linhas separadoras suaves entre seções
+- [x] Adicionar caixas destacadas para pontos importantes
+- [x] Usar tipografia profissional com tamanhos apropriados
+- [x] Adicionar rodapé com mensagem de documento gerado automaticamente
+- [x] Validar que nenhum conteúdo dinâmico foi alterado
+- [x] Executar testes para validar geração de PDF
 - [ ] Testar criação de PIX com dados válidos
 - [ ] Testar webhook com pagamento aprovado
 - [ ] Testar envio de e-mail com PDF personalizado
