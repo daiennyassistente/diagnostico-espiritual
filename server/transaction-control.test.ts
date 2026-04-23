@@ -5,11 +5,13 @@ const {
   getTransactionControlMock,
   markTransactionAsProcessedMock,
   markTransactionEmailSentMock,
+  updateTransactionStatusMock,
 } = vi.hoisted(() => ({
   createTransactionControlMock: vi.fn(),
   getTransactionControlMock: vi.fn(),
   markTransactionAsProcessedMock: vi.fn(),
   markTransactionEmailSentMock: vi.fn(),
+  updateTransactionStatusMock: vi.fn(),
 }));
 
 vi.mock("./db", () => ({
@@ -17,6 +19,7 @@ vi.mock("./db", () => ({
   getTransactionControl: getTransactionControlMock,
   markTransactionAsProcessed: markTransactionAsProcessedMock,
   markTransactionEmailSent: markTransactionEmailSentMock,
+  updateTransactionStatus: updateTransactionStatusMock,
 }));
 
 import {
@@ -58,11 +61,13 @@ describe("transaction-control", () => {
     await expect(hasEmailBeenSent("txn-email")).resolves.toBe(true);
   });
 
-  it("finaliza a transação marcando email e processamento uma única vez", async () => {
+  it("finaliza a transação atualizando status, marcando email e processamento uma única vez", async () => {
     await finalizeTransaction("txn-final");
 
+    expect(updateTransactionStatusMock).toHaveBeenCalledWith("txn-final", "approved");
     expect(markTransactionEmailSentMock).toHaveBeenCalledWith("txn-final");
     expect(markTransactionAsProcessedMock).toHaveBeenCalledWith("txn-final");
+    expect(updateTransactionStatusMock).toHaveBeenCalledTimes(1);
     expect(markTransactionEmailSentMock).toHaveBeenCalledTimes(1);
     expect(markTransactionAsProcessedMock).toHaveBeenCalledTimes(1);
   });

@@ -896,3 +896,7 @@
 - [x] Criar ou ajustar o endpoint GET /check-payment?transaction_id=XXX para retornar o status da transação
 - [x] Implementar verificação a cada 3 segundos na página de pagamento para redirecionar automaticamente para /sucesso após aprovação
 - [x] Validar que 1 pagamento gera 1 e-mail, 1 entrega e 1 redirecionamento sem duplicação
+- [x] Mapear exatamente os arquivos e trechos alterados no ajuste do fluxo PIX para apresentar ao usuário
+- [x] Corrigir finalizeTransaction para atualizar status para "approved" (permite redirecionamento no frontend)
+- [x] Atualizar testes de transaction-control para validar atualização de status
+- [x] Validar que endpoint /check-payment retorna "approved" após finalização

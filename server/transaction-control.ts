@@ -8,6 +8,7 @@ import {
   createTransactionControl,
   markTransactionAsProcessed,
   markTransactionEmailSent,
+  updateTransactionStatus,
 } from "./db";
 
 /**
@@ -56,9 +57,14 @@ export async function createNewTransaction(
 
 /**
  * Marca uma transação como processada após email enviado
+ * Atualiza o status para "approved" para permitir redirecionamento no frontend
  */
 export async function finalizeTransaction(transactionId: string): Promise<void> {
   try {
+    // Atualizar status para "approved"
+    await updateTransactionStatus(transactionId, "approved");
+    console.log(`[Transaction Control] Status atualizado para "approved": ${transactionId}`);
+
     // Marcar email como enviado
     await markTransactionEmailSent(transactionId);
     console.log(`[Transaction Control] Email marcado como enviado: ${transactionId}`);
