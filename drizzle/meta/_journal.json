@@ -169,6 +169,13 @@
       "when": 1776966378825,
       "tag": "0023_confused_quentin_quire",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1777028545991,
+      "tag": "0024_shiny_wrecker",
+      "breakpoints": true
     }
   ]
 }

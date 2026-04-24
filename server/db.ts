@@ -18,6 +18,8 @@ import {
   InsertDevotionalDelivery,
   transactionControl,
   InsertTransactionControl,
+  visitors,
+  InsertVisitor,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -472,7 +474,7 @@ export async function getAdminDashboardSummary() {
   return {
     kpis: {
       totalUsuarios: safeNumber(userTotals?.total),
-      novosUsuarios30Dias: safeNumber(recentUsers?.total),
+      novosUsuarios30Dias: safeNumber(recentLeads?.total),
       totalLeads: safeNumber(leadTotals?.total),
       leads30Dias: safeNumber(recentLeads?.total),
       totalCompras: safeNumber(paymentTotals?.total),
@@ -1257,4 +1259,86 @@ export async function getDiagnosticById(resultId: number) {
     .limit(1);
 
   return result.length > 0 ? result[0] : null;
+}
+
+
+// ============ VISITOR TRACKING ============
+
+export async function recordVisitor(data: InsertVisitor): Promise<InsertVisitor> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const result = await db.insert(visitors).values(data);
+    console.log(`[Visitor Tracking] Evento registrado: ${data.eventType} - ${data.visitorId}`);
+    return data;
+  } catch (error) {
+    console.error("[Visitor Tracking] Erro ao registrar visitante:", error);
+    throw error;
+  }
+}
+
+export async function getVisitorStats() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const stats = await db
+      .select({
+        eventType: visitors.eventType,
+        count: sql`COUNT(*) as count`,
+        lastEvent: sql`MAX(${visitors.createdAt}) as lastEvent`,
+      })
+      .from(visitors)
+      .groupBy(visitors.eventType);
+
+    return stats;
+  } catch (error) {
+    console.error("[Visitor Tracking] Erro ao obter estatísticas:", error);
+    throw error;
+  }
+}
+
+export async function getRecentVisitors(limit: number = 50) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const recent = await db
+      .select()
+      .from(visitors)
+      .orderBy(desc(visitors.createdAt))
+      .limit(limit);
+
+    return recent;
+  } catch (error) {
+    console.error("[Visitor Tracking] Erro ao obter visitantes recentes:", error);
+    throw error;
+  }
+}
+
+export async function getVisitorsByEventType(eventType: "site_entry" | "quiz_start" | "lead_created") {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const results = await db
+      .select()
+      .from(visitors)
+      .where(eq(visitors.eventType, eventType))
+      .orderBy(desc(visitors.createdAt));
+
+    return results;
+  } catch (error) {
+    console.error("[Visitor Tracking] Erro ao obter visitantes por tipo:", error);
+    throw error;
+  }
 }

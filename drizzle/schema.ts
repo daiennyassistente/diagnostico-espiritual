@@ -170,3 +170,17 @@ export const transactionControl = mysqlTable("transaction_control", {
 
 export type TransactionControl = typeof transactionControl.$inferSelect;
 export type InsertTransactionControl = typeof transactionControl.$inferInsert;
+
+// Tabela para rastrear visitantes que entram no site
+export const visitors = mysqlTable("visitors", {
+  id: int("id").autoincrement().primaryKey(),
+  visitorId: varchar("visitorId", { length: 36 }).notNull().unique(), // UUID único do visitante
+  eventType: mysqlEnum("eventType", ["site_entry", "quiz_start", "lead_created"]).notNull(), // Tipo de evento
+  leadId: int("leadId"), // ID do lead (se preencheu formulário)
+  email: varchar("email", { length: 320 }), // Email (se preencheu)
+  whatsapp: varchar("whatsapp", { length: 20 }), // WhatsApp (se preencheu)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Visitor = typeof visitors.$inferSelect;
+export type InsertVisitor = typeof visitors.$inferInsert;
