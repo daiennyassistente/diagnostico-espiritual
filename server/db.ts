@@ -303,7 +303,7 @@ export async function getAdminUsers() {
     throw new Error("Database not available");
   }
 
-  // Get all leads that have quiz responses (people who took the quiz)
+  // Get all leads (including those who just entered but haven't completed the quiz)
   const records = await db
     .selectDistinct({
       id: leads.id,
@@ -323,7 +323,7 @@ export async function getAdminUsers() {
       END`.as("status"),
     })
     .from(leads)
-    .innerJoin(quizResponses, eq(leads.id, quizResponses.leadId))
+    .leftJoin(quizResponses, eq(leads.id, quizResponses.leadId))
     .leftJoin(payments, eq(leads.id, payments.leadId))
     .orderBy(desc(leads.updatedAt), desc(leads.createdAt));
 
