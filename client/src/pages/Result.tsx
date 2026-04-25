@@ -110,6 +110,9 @@ export default function Result() {
   const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLeadId = urlParams.get('leadId');
+    
     const resolvedLeadId = resolveLeadIdFromSources(
       window.location.search,
       window.localStorage.getItem("quizLeadId"),
@@ -117,6 +120,16 @@ export default function Result() {
 
     if (resolvedLeadId) {
       setLeadId(resolvedLeadId);
+      
+      // Se leadId veio da URL, limpar dados antigos do localStorage
+      // para nao misturar dados de usuarios diferentes
+      if (urlLeadId) {
+        console.log('[Result] leadId vindo da URL, limpando dados antigos do storage');
+        window.localStorage.removeItem("userName");
+        window.localStorage.removeItem("quizResponses");
+        window.sessionStorage.removeItem("userName");
+        window.sessionStorage.removeItem("quizResponses");
+      }
     }
 
     const storedQuizId = sessionStorage.getItem("quizId") || "";
