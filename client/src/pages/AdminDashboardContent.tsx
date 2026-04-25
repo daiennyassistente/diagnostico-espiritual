@@ -466,9 +466,9 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                                 textColor="text-indigo-700"
                                 hoverColor="hover:bg-indigo-200"
                                 onClick={() => {
-                                  const resultLink = `${window.location.origin}/result/${item.id}`;
+                                  const resultLink = `${window.location.origin}/resultado`;
                                   navigator.clipboard.writeText(resultLink);
-                                  toast.success('Link copiado para a área de transferência!');
+                                  toast.success('Link de resultado copiado para a área de transferência!');
                                 }}
                                 isLoading={false}
                               />
