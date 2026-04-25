@@ -459,6 +459,19 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                                 }}
                                 isLoading={false}
                               />
+                              <ActionButton
+                                icon="🔗"
+                                title="Copiar Link de Resultado"
+                                bgColor="bg-indigo-100"
+                                textColor="text-indigo-700"
+                                hoverColor="hover:bg-indigo-200"
+                                onClick={() => {
+                                  const resultLink = `${window.location.origin}/result/${item.id}`;
+                                  navigator.clipboard.writeText(resultLink);
+                                  toast.success('Link copiado para a área de transferência!');
+                                }}
+                                isLoading={false}
+                              />
                             </div>
                           </td>
                         </tr>
