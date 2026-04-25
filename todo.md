@@ -1015,6 +1015,12 @@
 - [x] Adicionar logs de debug para rastrear disparo do evento Purchase
 - [x] Adicionar suporte para passar amount na URL do redirecionamento
 - [x] Garantir que transactionId e amount chegam na página /sucesso
-- [ ] Testar fluxo completo em produção
-- [ ] Validar eventos no Meta Events Manager
-- [ ] Validar deduplicação entre Browser e Server
+- [x] Testar fluxo completo em produção
+- [x] Validar eventos no Meta Events Manager
+- [x] Validar deduplicação entre Browser e Server
+
+## Bug Fix - Mistura de Dados Entre Usuarios (2026-04-25)
+- [x] Corrigir bug onde pagina de resultado mostrava dados de usuario errado quando acessada via link compartilhado
+- [x] Limpar localStorage/sessionStorage quando leadId vem da URL
+- [x] Adicionar logs de debug para rastrear limpeza de dados
+- [x] Testar com multiplos usuarios para validar correcao

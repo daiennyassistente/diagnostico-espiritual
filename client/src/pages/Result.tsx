@@ -222,7 +222,7 @@ export default function Result() {
     };
   }, [trpcResult]);
 
-  const displayName = userName || user?.name || trpcResult?.lead?.name || "você";
+  const displayName = trpcResult?.lead?.name || userName || user?.name || "você";
   const quizInsights = useMemo(() => extractQuizInsights(responses), [responses]);
 
   useEffect(() => {
