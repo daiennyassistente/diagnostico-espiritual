@@ -617,19 +617,18 @@ Equipe Diagnóstico Espiritual
           }
           
           const quizResponse = await getQuizResponseByLeadId(input.leadId);
-          if (!quizResponse) {
-            throw new Error('Quiz response not found');
-          }
+          // Se quizResponse não existe, continuar mesmo assim
+          // O frontend pode gerar o diagnóstico com base nas respostas armazenadas localmente
           
           const diagnostic = await getDiagnosticByLeadId(input.leadId);
           
           // Se o diagnóstico não existe, retornar null para que o frontend gere
           if (!diagnostic) {
-            return {
-              lead,
-              quizResponse,
-              diagnostic: null,
-            };
+          return {
+            lead,
+            quizResponse: quizResponse || null,
+            diagnostic: null,
+          };
           }
           
           // Converter diagnostic JSON strings para objetos

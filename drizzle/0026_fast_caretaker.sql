@@ -1,0 +1,1 @@
+ALTER TABLE `leads` ADD CONSTRAINT `leads_userId_unique` UNIQUE(`userId`);
