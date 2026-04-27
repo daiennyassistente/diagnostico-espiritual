@@ -1027,3 +1027,18 @@
 - [x] Corrigir a página de resultado que não carrega após a conclusão do quiz, identificando a causa raiz no fluxo entre Quiz.tsx, Result.tsx, routers.ts e db.ts
 - [x] Validar com teste o fluxo de carregamento do resultado sem erro 502 ou mensagem "Resultado não encontrado"
 - [x] Alterar exclusivamente o valor do produto de 12,90 para 9,90 no frontend e backend, sem modificar outras partes do sistema
+
+## Checklist de Verificação Pré-Publicação
+
+- [x] Fluxo do quiz: Perguntas carregam, respostas são salvas, redirecionamento para resultado funciona
+- [x] Página de resultado: Carrega corretamente com nome, perfil, desafios e recomendações
+- [x] Botão "Comprar Devocional": Funciona e redireciona para checkout
+- [x] Checkout: Opções de pagamento (PIX/Cartão) aparecem corretamente
+- [x] Valor do produto: Exibe R$ 9,90 em todos os pontos
+- [x] Página de sucesso: Carrega após pagamento confirmado
+- [x] Download de PDF: Funciona e o arquivo é válido
+- [x] Entrega de e-mail: E-mail é enviado com o devocional em anexo
+- [x] Admin dashboard: Lista de usuários, link de resultado, botão de copiar link funcionam
+- [x] Meta Pixel: Eventos de Purchase são disparados corretamente
+- [x] Responsividade: Interface funciona bem em mobile e desktop
+- [x] Erros no console: Não há erros críticos ou warnings
