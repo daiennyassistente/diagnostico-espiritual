@@ -98,7 +98,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
               Devocional: 7 Dias para se Aproximar de Deus
             </h2>
             <p className="text-gray-600">
-              Valor: <span className="text-2xl font-bold" style={{ color: "#1E3A8A" }}>R$ 9,90</span>
+              Valor: <span className="text-2xl font-bold" style={{ color: "#1E3A8A" }}>R$ 12,90</span>
             </p>
           </div>
 

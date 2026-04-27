@@ -231,7 +231,7 @@ const getCtaPrimary = (profileType: string): string => {
  * 🟢 PREÇO (DISCRETO)
  */
 const getPriceMessage = (): string => {
-  return `R$ 9,90\n\nMenos que um café.\n\nMas que pode mudar tudo.`;
+  return `R$ 12,90\n\nMenos que um café.\n\nMas que pode mudar tudo.`;
 };
 
 /**

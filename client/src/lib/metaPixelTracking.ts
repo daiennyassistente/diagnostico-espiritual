@@ -40,7 +40,7 @@ export function trackViewContent(): void {
     content_name: 'Diagnóstico Espiritual Quiz',
     content_type: 'product',
     currency: 'BRL',
-    value: 9.90,
+    value: 12.90,
   });
 }
 
@@ -51,7 +51,7 @@ export function trackLead(email?: string, phone?: string): void {
   trackMetaPixelEvent('Lead', {
     content_name: 'Diagnóstico Espiritual',
     currency: 'BRL',
-    value: 9.90,
+    value: 12.90,
     ...(email && { email }),
     ...(phone && { phone_number: phone }),
   });
@@ -60,7 +60,7 @@ export function trackLead(email?: string, phone?: string): void {
 /**
  * Track InitiateCheckout event (quando usuário inicia checkout)
  */
-export function trackInitiateCheckout(amount: number = 9.90): void {
+export function trackInitiateCheckout(amount: number = 12.90): void {
   trackMetaPixelEvent('InitiateCheckout', {
     content_name: 'Devocional Personalizado',
     content_type: 'product',
