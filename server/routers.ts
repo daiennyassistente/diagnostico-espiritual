@@ -949,7 +949,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
 
             // Create PIX payment
             const paymentData = {
-              transaction_amount: 12.90,
+              transaction_amount: 9.90,
               description: input.profileName,
               payment_method_id: "pix",
               payer: {
@@ -1021,7 +1021,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               const { createPayment } = await import("./db");
               await createPayment({
                 leadId: Number(input.leadId),
-                amount: 12.90,
+                amount: 9.90,
                 currency: "BRL",
                 status: "pending",
                 productName: "Devocional: 7 Dias para se Aproximar de Deus",
@@ -1044,7 +1044,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
                 {
                   title: "Devocional: 7 Dias para se Aproximar de Deus",
                   description: input.profileName,
-                  unit_price: 12.90,
+                  unit_price: 9.90,
                   quantity: 1,
                   currency_id: "BRL",
                 },
@@ -1080,7 +1080,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               const { createPayment } = await import("./db");
               await createPayment({
                 leadId: Number(input.leadId),
-                amount: 12.90,
+                amount: 9.90,
                 currency: "BRL",
                 status: "pending",
                 productName: "Devocional: 7 Dias para se Aproximar de Deus",
@@ -1123,7 +1123,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               {
                 title: "Devocional: 7 Dias para se Aproximar de Deus",
                 description: input.profileName,
-                unit_price: 12.90,
+                unit_price: 9.90,
                 quantity: 1,
                 currency_id: "BRL",
               },
@@ -1175,7 +1175,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
             const { createPayment } = await import("./db");
             await createPayment({
               leadId: Number(input.leadId),
-              amount: 12.90,
+              amount: 9.90,
               currency: "BRL",
               status: "pending",
               productName: "Devocional: 7 Dias para se Aproximar de Deus",

@@ -67,7 +67,7 @@ export function MercadoPagoCheckout({
           console.log("[MercadoPagoCheckout] Polling - Pagamento aprovado! Redirecionando para /sucesso");
           window.clearInterval(intervalId);
           // Obter o valor da compra do localStorage
-          const purchaseAmount = localStorage.getItem('purchaseAmount') || '12.90';
+          const purchaseAmount = localStorage.getItem('purchaseAmount') || '9.90';
           window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(purchaseAmount)}`;
         }
       } catch (error) {
