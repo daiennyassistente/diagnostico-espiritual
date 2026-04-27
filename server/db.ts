@@ -320,7 +320,7 @@ export async function getAdminUsers() {
       lastSignedIn: leads.updatedAt,
       status: sql`CASE 
         WHEN ${payments.status} = 'approved' THEN 'comprou'
-        WHEN ${payments.status} IN ('pending', 'processing') THEN 'pendente'
+        WHEN ${payments.status} IN ('pending') THEN 'pendente'
         ELSE 'quiz'
       END`.as("status"),
     })
