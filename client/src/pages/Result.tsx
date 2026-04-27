@@ -22,6 +22,8 @@ interface AIResult {
   nextSteps: string[];
 }
 
+export const shouldPreserveLocalQuizState = (hasUrlLeadId: boolean, isFreshQuizRedirect: boolean) => hasUrlLeadId && isFreshQuizRedirect;
+
 const clearQuizSessionState = () => {
   sessionStorage.removeItem("quizStep");
   sessionStorage.removeItem("quizResponses");
@@ -79,6 +81,25 @@ const buildResponsesMap = (responses: Record<string, string>) => {
   return mapped;
 };
 
+export const extractBackendResponses = (value: unknown): Record<string, string> | null => {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const entries = Object.entries(value as Record<string, unknown>).filter(
+    ([key, entryValue]) => key.startsWith("step") && typeof entryValue === "string" && entryValue.trim().length > 0,
+  );
+
+  if (entries.length === 0) {
+    return null;
+  }
+
+  return entries.reduce<Record<string, string>>((accumulator, [key, entryValue]) => {
+    accumulator[key] = entryValue as string;
+    return accumulator;
+  }, {});
+};
+
 // Função para disparar evento Purchase do Pixel da Meta
 const firePixelPurchaseEvent = (amount: number, productName: string) => {
   if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
@@ -120,15 +141,16 @@ export default function Result() {
 
     if (resolvedLeadId) {
       setLeadId(resolvedLeadId);
-      
-      // Se leadId veio da URL, limpar dados antigos do localStorage
-      // para nao misturar dados de usuarios diferentes
-      if (urlLeadId) {
-        console.log('[Result] leadId vindo da URL, limpando dados antigos do storage');
+
+      const isFreshQuizRedirect = window.sessionStorage.getItem("quizPendingResultRedirect") === "1";
+
+      // Quando o usuário acabou de sair do quiz, preservamos as respostas locais
+      // para permitir a geração do diagnóstico caso ele ainda não exista no banco.
+      // Em links compartilhados, limpamos apenas o nome local para evitar mistura visual.
+      if (urlLeadId && !shouldPreserveLocalQuizState(Boolean(urlLeadId), isFreshQuizRedirect)) {
+        console.log('[Result] acesso externo ao resultado, limpando apenas nome local');
         window.localStorage.removeItem("userName");
-        window.localStorage.removeItem("quizResponses");
         window.sessionStorage.removeItem("userName");
-        window.sessionStorage.removeItem("quizResponses");
       }
     }
 
@@ -181,8 +203,15 @@ export default function Result() {
     }
   }, [trpcResult]);
 
+  const backendResponses = useMemo(
+    () => extractBackendResponses(trpcResult?.quizResponse),
+    [trpcResult],
+  );
+
   useEffect(() => {
-    if (!trpcResult || trpcResult.diagnostic || !responses || !leadId || isGeneratingDiagnosis) {
+    const responseSource = responses || backendResponses;
+
+    if (!trpcResult || trpcResult.diagnostic || !responseSource || !leadId || isGeneratingDiagnosis) {
       return;
     }
 
@@ -190,7 +219,7 @@ export default function Result() {
 
     generateDiagnosisMutation.mutate(
       {
-        responses: buildResponsesMap(responses),
+        responses: buildResponsesMap(responseSource),
         leadId,
       },
       {
@@ -205,7 +234,13 @@ export default function Result() {
         },
       },
     );
-  }, [generateDiagnosisMutation, isGeneratingDiagnosis, leadId, refetch, responses, trpcResult]);
+  }, [backendResponses, generateDiagnosisMutation, isGeneratingDiagnosis, leadId, refetch, responses, trpcResult]);
+
+  useEffect(() => {
+    if (!responses && backendResponses) {
+      setResponses(backendResponses);
+    }
+  }, [backendResponses, responses]);
 
   const result: AIResult | null = useMemo(() => {
     if (!trpcResult?.diagnostic) {
@@ -223,6 +258,17 @@ export default function Result() {
   }, [trpcResult]);
 
   const displayName = trpcResult?.lead?.name || userName || user?.name || "você";
+
+  useEffect(() => {
+    if (trpcResult?.lead?.name) {
+      setUserName(trpcResult.lead.name);
+    }
+
+    if (window.sessionStorage.getItem("quizPendingResultRedirect") === "1") {
+      window.sessionStorage.removeItem("quizPendingResultRedirect");
+      window.sessionStorage.removeItem("quizPendingResultRedirectAt");
+    }
+  }, [trpcResult]);
   const quizInsights = useMemo(() => extractQuizInsights(responses), [responses]);
 
   useEffect(() => {

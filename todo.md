@@ -1024,3 +1024,5 @@
 - [x] Limpar localStorage/sessionStorage quando leadId vem da URL
 - [x] Adicionar logs de debug para rastrear limpeza de dados
 - [x] Testar com multiplos usuarios para validar correcao
+- [x] Corrigir a página de resultado que não carrega após a conclusão do quiz, identificando a causa raiz no fluxo entre Quiz.tsx, Result.tsx, routers.ts e db.ts
+- [x] Validar com teste o fluxo de carregamento do resultado sem erro 502 ou mensagem "Resultado não encontrado"
