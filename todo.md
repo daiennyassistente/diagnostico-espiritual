@@ -1026,3 +1026,4 @@
 - [x] Testar com multiplos usuarios para validar correcao
 - [x] Corrigir a página de resultado que não carrega após a conclusão do quiz, identificando a causa raiz no fluxo entre Quiz.tsx, Result.tsx, routers.ts e db.ts
 - [x] Validar com teste o fluxo de carregamento do resultado sem erro 502 ou mensagem "Resultado não encontrado"
+- [x] Alterar exclusivamente o valor do produto de 12,90 para 9,90 no frontend e backend, sem modificar outras partes do sistema
