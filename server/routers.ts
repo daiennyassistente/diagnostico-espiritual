@@ -1,6 +1,7 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { sdk } from "./_core/sdk";
 import { getSessionCookieOptions } from "./_core/cookies";
 import type { Response } from "express";
@@ -538,13 +539,28 @@ Equipe Diagnóstico Espiritual
         }),
       )
       .mutation(async ({ input }) => {
-        const result = await createLead({
-          userId: input.userId,
-          whatsapp: input.whatsapp,
-          email: input.email,
-          name: input.name,
-        });
-        return { success: true, leadId: result.id };
+        try {
+          const result = await createLead({
+            userId: input.userId,
+            whatsapp: input.whatsapp,
+            email: input.email,
+            name: input.name,
+          });
+          return { success: true, leadId: result.id };
+        } catch (error: any) {
+          console.error('[submitLead] Error:', error.message);
+          // Se for erro de constraint UNIQUE, retornar erro apropriado
+          if (error.message?.includes('ER_DUP_ENTRY') || error.message?.includes('UNIQUE')) {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'Este lead ja foi criado. Tente novamente.',
+            });
+          }
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Erro ao criar lead: ' + error.message,
+          });
+        }
       }),
 
     submitResponses: publicProcedure
