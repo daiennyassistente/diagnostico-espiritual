@@ -224,11 +224,8 @@ export default function Quiz() {
     return newQuizId;
   });
   const [userId] = useState(() => {
-    // Persistir userId na sessão para evitar duplicatas em retry/double-click
-    const storedUserId = sessionStorage.getItem('quizUserId');
-    if (storedUserId) return storedUserId;
+    // Gerar novo userId a cada entrada, mesmo que seja a mesma pessoa
     const newUserId = uuidv4();
-    sessionStorage.setItem('quizUserId', newUserId);
     return newUserId;
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
@@ -662,10 +659,8 @@ export default function Quiz() {
               </div>
 
               <Button
-                type="submit"
-                disabled={isProcessing || submitLeadMutation.isPending}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                {isProcessing || submitLeadMutation.isPending ? 'Processando...' : 'Ver meu diagnóstico espiritual'}
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold">
+                Ver meu diagnóstico espiritual
               </Button>
 
               <p className="text-center text-xs text-foreground/60">
