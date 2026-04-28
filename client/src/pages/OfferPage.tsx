@@ -215,7 +215,7 @@ export default function OfferPage() {
               <Button
                 onClick={handleCheckout}
                 disabled={timerExpired || isProcessing}
-                className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-5 text-lg font-bold text-white transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed relative z-[60]"
+                className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-5 text-lg font-bold text-white transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? (
                   <>
