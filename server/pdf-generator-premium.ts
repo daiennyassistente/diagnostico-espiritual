@@ -51,74 +51,6 @@ function addSectionTitle(doc: any, text: string) {
   });
 }
 
-function addDiagnosticMessage(doc: any, userName: string, profileName: string, profileDescription: string, strengths: string[], challenges: string[]) {
-  doc.moveDown(1);
-  
-  // Mensagem emocional inicial
-  doc.fontSize(12).fillColor(COLORS.white).font("Helvetica").text(
-    `${userName}, o que você respondeu neste quiz revelou muito mais do que simples palavras. Revelou o clamor do seu coração.`,
-    { align: "justify", lineGap: 8 }
-  );
-  
-  doc.moveDown(0.8);
-  
-  // Descrição do perfil de forma emocional
-  doc.fontSize(11).fillColor(COLORS.lightGray).text(
-    `Você foi identificado como alguém ${profileName.toLowerCase()}. Isso não é um rótulo, é um reconhecimento. É Deus dizendo: "Eu vejo você. Eu entendo sua jornada. Eu conheço cada passo que você deu."`,
-    { align: "justify", lineGap: 6 }
-  );
-  
-  doc.moveDown(1);
-  
-  doc.fontSize(11).fillColor(COLORS.lightGray).text(
-    profileDescription,
-    { align: "justify", lineGap: 6 }
-  );
-  
-  doc.moveDown(1.5);
-  
-  // Forças
-  if (strengths.length > 0) {
-    doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("O que Deus vê em você:", { lineGap: 6 });
-    doc.moveDown(0.3);
-    
-    strengths.forEach((strength) => {
-      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(`✦ ${strength}`, {
-        lineGap: 5,
-      });
-    });
-    
-    doc.moveDown(1);
-  }
-  
-  // Desafios
-  if (challenges.length > 0) {
-    doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("Os desafios que você enfrenta:", { lineGap: 6 });
-    doc.moveDown(0.3);
-    
-    challenges.forEach((challenge) => {
-      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(`◆ ${challenge}`, {
-        lineGap: 5,
-      });
-    });
-    
-    doc.moveDown(1.5);
-  }
-  
-  // Mensagem final da página 2
-  doc.fontSize(11).fillColor(COLORS.lightGray).text(
-    `Nos próximos 7 dias, você não receberá apenas informações. Você receberá um encontro. Um encontro com a verdade de quem você é em Cristo. Um encontro com o amor de Deus que não depende do seu desempenho, mas da Sua fidelidade.`,
-    { align: "justify", lineGap: 6 }
-  );
-  
-  doc.moveDown(1);
-  
-  doc.fontSize(11).fillColor(COLORS.lightGray).text(
-    `Que este devocional seja um espaço onde você se sinta visto, compreendido e profundamente amado por Deus.`,
-    { align: "justify", lineGap: 6 }
-  );
-}
-
 function addBodyText(doc: any, text: string, size: number = 11) {
   doc.fontSize(size).font("Helvetica").fillColor(COLORS.lightGray).text(text, {
     align: "justify",
@@ -160,47 +92,140 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
       });
       doc.on("error", reject);
 
-      // ========== CAPA ==========
+      // ========== CAPA PERSONALIZADA ==========
       doc.rect(0, 0, doc.page.width, doc.page.height).fill(COLORS.darkBg);
-      doc.fillColor(COLORS.gold).fontSize(12).text("Diagnóstico Espiritual", 50, 80, {
+      
+      // Título principal
+      doc.moveDown(2);
+      doc.fillColor(COLORS.gold).fontSize(12).text("Diagnóstico Espiritual", 50, 100, {
         align: "center",
       });
 
-      doc.moveDown(3);
-      addHeader(doc, "Seu Devocional Personalizado", COLORS.gold);
-
+      doc.moveDown(2);
+      addHeader(doc, "Personalizado", COLORS.gold);
+      
       doc.moveDown(1);
-      addSubheader(doc, `7 Dias para se Aproximar de Deus`, COLORS.lightGold);
+      addSubheader(doc, `Para ${content.userName}`, COLORS.lightGold);
 
       doc.moveDown(3);
       addDivider(doc);
 
+      // Mensagem emocional de boas-vindas
       doc.moveDown(2);
-      addBodyText(doc, `Bem-vindo(a), ${content.userName}!`, 14);
-      doc.moveDown(1);
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica-Oblique").text(
+        `"${content.userName}, o que você respondeu neste quiz revelou muito mais do que simples palavras. Revelou o clamor do seu coração."`,
+        { align: "center", lineGap: 8 }
+      );
 
-      addBodyText(
-        doc,
-        `Este devocional foi criado especialmente para você, baseado em suas respostas e em seu perfil espiritual identificado como "${content.profileName}".`,
-        11
+      doc.moveDown(2);
+      
+      // Descrição do perfil com verso bíblico personalizado
+      doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("Seu Perfil Espiritual:", {
+        align: "center",
+      });
+      
+      doc.moveDown(0.5);
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(
+        content.profileName,
+        { align: "center", lineGap: 6 }
       );
 
       doc.moveDown(1.5);
-      addBodyText(doc, `${content.profileDescription}`, 11);
+      addDivider(doc);
+
+      doc.moveDown(1.5);
+      
+      // Mensagem emocional baseada no perfil
+      doc.fontSize(10).fillColor(COLORS.lightGray).font("Helvetica").text(
+        `Você foi identificado como alguém ${content.profileName.toLowerCase()}. Isso não é um rótulo, é um reconhecimento. É Deus dizendo: "Eu vejo você. Eu entendo sua jornada. Eu conheço cada passo que você deu."`,
+        { align: "justify", lineGap: 6 }
+      );
+
+      doc.moveDown(1.5);
+      
+      // Descrição completa do perfil
+      doc.fontSize(10).fillColor(COLORS.lightGray).font("Helvetica").text(
+        content.profileDescription,
+        { align: "justify", lineGap: 6 }
+      );
 
       doc.moveDown(2);
       addDivider(doc);
 
-      doc.moveDown(2);
-      addSectionTitle(doc, "Como usar este devocional");
-      doc.moveDown(0.5);
-      addBodyText(
-        doc,
-        `Reserve um tempo tranquilo cada dia para ler a reflexão, meditar no versículo bíblico, fazer a oração sugerida e aplicar o desafio prático. Este é um espaço sagrado entre você e Deus.`,
-        10
+      // Mensagem final da capa
+      doc.moveDown(1.5);
+      doc.fontSize(9).fillColor(COLORS.lightGray).font("Helvetica-Oblique").text(
+        `Nos próximos 7 dias, você não receberá apenas informações. Você receberá um encontro. Um encontro com a verdade de quem você é em Cristo. Um encontro com o amor de Deus que não depende do seu desempenho, mas da Sua fidelidade.`,
+        { align: "justify", lineGap: 5 }
       );
 
+      // ========== PÁGINA DE BEM-VINDO ==========
+      addPageBreak(doc);
 
+      doc.moveDown(1);
+      addHeader(doc, "Bem-vindo(a)", COLORS.gold);
+      
+      doc.moveDown(1);
+      addSubheader(doc, "Seu diagnóstico foi processado com sucesso", COLORS.lightGold);
+
+      doc.moveDown(2);
+      addDivider(doc);
+
+      doc.moveDown(1.5);
+      
+      // Mensagem emocional personalizada
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(
+        `${content.userName}, você está aqui porque decidiu se aproximar de Deus. Essa decisão é importante. Ela revela um coração que busca verdade, que clama por direção e que deseja experimentar a presença real de Deus em sua vida.`,
+        { align: "justify", lineGap: 6 }
+      );
+
+      doc.moveDown(1.5);
+
+      // Forças
+      if (content.strengths.length > 0) {
+        doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("O que Deus vê em você:", { lineGap: 6 });
+        doc.moveDown(0.5);
+        
+        content.strengths.forEach((strength) => {
+          doc.fontSize(10).fillColor(COLORS.lightGray).font("Helvetica").text(`✦ ${strength}`, {
+            lineGap: 5,
+          });
+        });
+        
+        doc.moveDown(1.5);
+      }
+
+      // Desafios
+      if (content.challenges.length > 0) {
+        doc.fontSize(12).fillColor(COLORS.gold).font("Helvetica-Bold").text("Os desafios que você enfrenta:", { lineGap: 6 });
+        doc.moveDown(0.5);
+        
+        content.challenges.forEach((challenge) => {
+          doc.fontSize(10).fillColor(COLORS.lightGray).font("Helvetica").text(`◆ ${challenge}`, {
+            lineGap: 5,
+          });
+        });
+        
+        doc.moveDown(1.5);
+      }
+
+      doc.moveDown(1);
+      addDivider(doc);
+
+      doc.moveDown(1.5);
+
+      // Mensagem final da página 2
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(
+        `Nos próximos 7 dias, você não receberá apenas informações. Você receberá um encontro. Um encontro com a verdade de quem você é em Cristo. Um encontro com o amor de Deus que não depende do seu desempenho, mas da Sua fidelidade.`,
+        { align: "justify", lineGap: 6 }
+      );
+
+      doc.moveDown(1.5);
+
+      doc.fontSize(11).fillColor(COLORS.lightGray).font("Helvetica").text(
+        `Que este devocional seja um espaço onde você se sinta visto, compreendido e profundamente amado por Deus.`,
+        { align: "justify", lineGap: 6 }
+      );
 
       // ========== DIAS DO DEVOCIONAL ==========
       content.days.forEach((day) => {
@@ -279,10 +304,10 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
         11
       );
 
-      doc.moveDown(1.5);
+      doc.moveDown(2);
       addBodyText(
         doc,
-        `Lembre-se: a jornada espiritual não termina aqui. Continue buscando a Deus com sinceridade, lendo Sua Palavra e vivendo em ediéncia. Que o Espírito Santo guie seus passos e que você experimente a paz, a graça e o amor de Cristo todos os dias de sua vida.`,
+        `Você não está sozinho nesta jornada. O Espírito Santo está aqui para guiar, confortar e transformar seu coração. Que você experimente a paz de Deus que excede todo entendimento.`,
         11
       );
 
@@ -290,30 +315,14 @@ export async function generatePremiumDevotionalPDF(content: DevotionalContent): 
       addDivider(doc);
 
       doc.moveDown(2);
-      doc.fontSize(10).fillColor(COLORS.lightGold).text("Diagnóstico Espiritual", {
-        align: "center",
-      });
-      doc.fontSize(9).fillColor(COLORS.lightGray).text("Um ministério de oração, conselho e esperança em Cristo", {
-        align: "center",
-      });
+      doc.fontSize(10).fillColor(COLORS.lightGold).font("Helvetica-Oblique").text(
+        `"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna." — João 3:16`,
+        { align: "center", lineGap: 6 }
+      );
 
-      doc.moveDown(1);
-      doc.fontSize(8).fillColor(COLORS.darkGray).text(`Gerado em ${new Date().toLocaleDateString("pt-BR")}`, {
-        align: "center",
-      });
-
-      // Finalizar PDF
       doc.end();
     } catch (error) {
       reject(error);
     }
   });
-}
-
-export async function generateDevotionalPDFStream(content: DevotionalContent): Promise<Readable> {
-  const buffer = await generatePremiumDevotionalPDF(content);
-  const readable = new Readable();
-  readable.push(buffer);
-  readable.push(null);
-  return readable;
 }
