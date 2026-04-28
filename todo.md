@@ -1081,3 +1081,16 @@
 - [x] Substituir botão de copiar link de resultado pelo link de oferta no admin
 - [x] Adicionar leadId ao link da página de oferta
 - [x] Testar cópia do link personalizado na página de admin
+
+- [ ] Corrigir o botão "Finalizar minha compra" da página de oferta para abrir modal PIX em vez de redirecionar para checkout externo
+- [ ] Gerar e exibir QR Code PIX e código copia-e-cola no modal da oferta
+- [ ] Implementar verificação automática do pagamento PIX e redirecionamento para a página de sucesso/download
+- [ ] Garantir envio do devocional por e-mail após aprovação do pagamento da oferta
+- [ ] Validar o fluxo PIX da oferta com testes automatizados e verificação no navegador
+
+## Correção do Fluxo PIX da Oferta
+- [x] Corrigir o botão "Finalizar minha compra" para abrir modal PIX sem redirecionar para checkout externo
+- [x] Exibir QR Code PIX e código copia-e-cola em modal centralizado com overlay e botão de fechar
+- [x] Implementar polling automático do pagamento e redirecionamento para a página de sucesso/download após aprovação
+- [x] Garantir que a oferta use o lead específico da URL e cobre o valor promocional de R$ 7,90
+- [x] Validar o fluxo com testes automatizados e verificação no navegador

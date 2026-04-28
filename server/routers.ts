@@ -932,6 +932,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           quizId: z.string(),
           resultId: z.number(),
           paymentMethod: z.enum(["card", "pix"]),
+          amount: z.number().optional().default(9.9),
         }),
       )
       .mutation(async ({ input }) => {
@@ -948,7 +949,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
 
             // Create PIX payment
             const paymentData = {
-              transaction_amount: 9.90,
+              transaction_amount: input.amount,
               description: input.profileName,
               payment_method_id: "pix",
               payer: {
@@ -1020,7 +1021,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               const { createPayment } = await import("./db");
               await createPayment({
                 leadId: Number(input.leadId),
-                amount: 9.90,
+                amount: input.amount,
                 currency: "BRL",
                 status: "pending",
                 productName: "Devocional: 7 Dias para se Aproximar de Deus",
@@ -1043,7 +1044,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
                 {
                   title: "Devocional: 7 Dias para se Aproximar de Deus",
                   description: input.profileName,
-                  unit_price: 9.90,
+                  unit_price: input.amount,
                   quantity: 1,
                   currency_id: "BRL",
                 },
@@ -1079,7 +1080,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               const { createPayment } = await import("./db");
               await createPayment({
                 leadId: Number(input.leadId),
-                amount: 9.90,
+                amount: input.amount,
                 currency: "BRL",
                 status: "pending",
                 productName: "Devocional: 7 Dias para se Aproximar de Deus",
@@ -1103,6 +1104,98 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
         }
       }),
 
+    createOfferPixPayment: publicProcedure
+      .input(
+        z.object({
+          leadId: z.string(),
+        }),
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { getDiagnosticByLeadId, getLeadById, createPayment } = await import("./db");
+          const leadId = Number(input.leadId);
+          const lead = await getLeadById(leadId);
+          const diagnostic = await getDiagnosticByLeadId(leadId);
+
+          if (!lead?.email) {
+            throw new Error("Lead não encontrado ou sem e-mail");
+          }
+
+          if (!diagnostic?.id) {
+            throw new Error("Diagnóstico não encontrado para este lead");
+          }
+
+          const transactionId = crypto.randomUUID();
+          await createNewTransaction(
+            transactionId,
+            "offer-whatsapp",
+            Number(diagnostic.id),
+            leadId,
+          );
+
+          const origin = ctx.req.headers.origin || "https://diagnosticoespiritual.manus.space";
+          const paymentData = {
+            transaction_amount: 7.9,
+            description: "Devocional: 7 Dias para se Aproximar de Deus",
+            payment_method_id: "pix",
+            payer: {
+              email: lead.email,
+              first_name: diagnostic.profileName || lead.name || "Cliente",
+            },
+            external_reference: transactionId,
+            notification_url: `${origin}/api/mercadopago/webhook`,
+            metadata: {
+              quizId: "offer-whatsapp",
+              resultId: Number(diagnostic.id),
+              leadId: input.leadId,
+              source: "offer-page",
+            },
+          };
+
+          const response = await fetch("https://api.mercadopago.com/v1/payments", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+              "X-Idempotency-Key": crypto.randomUUID(),
+            },
+            body: JSON.stringify(paymentData),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("[Mercado Pago Offer PIX] Error:", errorText);
+            throw new Error("Erro ao gerar PIX da oferta");
+          }
+
+          const data = await response.json();
+          const pixCode = data.point_of_interaction?.transaction_data?.qr_code;
+          const pixImage = data.point_of_interaction?.transaction_data?.qr_code_base64;
+
+          await createPayment({
+            leadId,
+            amount: 7.9,
+            currency: "BRL",
+            status: "pending",
+            productName: "Devocional: 7 Dias para se Aproximar de Deus",
+          });
+
+          return {
+            success: true,
+            pixCode: pixCode || "",
+            pixQrCode: pixImage ? `data:image/png;base64,${pixImage}` : "",
+            paymentId: data.id,
+            transactionId,
+          };
+        } catch (error: any) {
+          console.error("[Mercado Pago Offer PIX] Error:", error.message);
+          return {
+            success: false,
+            error: error.message || "Erro ao gerar PIX da oferta",
+          };
+        }
+      }),
+
     createMercadoPagoCheckout: publicProcedure
       .input(
         z.object({
@@ -1111,6 +1204,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           profileName: z.string(),
           userPhone: z.string(),
           leadId: z.string(),
+          amount: z.number().optional().default(12.90),
         }),
       )
       .mutation(async ({ input, ctx }) => {
@@ -1122,7 +1216,7 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
               {
                 title: "Devocional: 7 Dias para se Aproximar de Deus",
                 description: input.profileName,
-                unit_price: 12.90,
+                unit_price: input.amount,
                 quantity: 1,
                 currency_id: "BRL",
               },
@@ -1202,12 +1296,13 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
           profileName: z.string(),
           userPhone: z.string(),
           leadId: z.string(),
+          amount: z.number().optional().default(9.90),
         }),
       )
       .mutation(async ({ input, ctx }) => {
         try {
           const origin = ctx.req.headers.origin || "https://diagnosticoespiritual.manus.space";
-          const price = 9.90;
+          const price = input.amount;
 
           const preference = {
             items: [

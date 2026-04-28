@@ -1,71 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { parseStoredLeadData } from '@/lib/leadStorage';
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+import { parseStoredLeadData } from '@/lib/leadStorage';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { MercadoPagoPixModal } from '@/components/MercadoPagoPixModal';
 
 export default function OfferPage() {
-  const [location, navigate] = useLocation();
-  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
+  const [, navigate] = useLocation();
+  const [timeLeft, setTimeLeft] = useState(30 * 60);
   const [timerExpired, setTimerExpired] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [mercadoPagoReady, setMercadoPagoReady] = useState(false);
-  const [leadId, setLeadId] = useState<number | null>(null);
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [pixCode, setPixCode] = useState('');
+  const [pixQrCode, setPixQrCode] = useState('');
+  const [transactionId, setTransactionId] = useState('');
 
-  // Verificar se veio do WhatsApp
-  const isFromWhatsApp = new URLSearchParams(location.split('?')[1]).get('source') === 'whatsapp';
+  const leadId = useMemo(() => {
+    if (typeof window === 'undefined') return null;
 
-  // Hook para criar checkout do Mercado Pago
-  const createStripeCheckoutMutation = trpc.payment.createStripeCheckout.useMutation();
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('leadId');
+    if (fromUrl) return Number(fromUrl);
 
-  // Tentar ler leadId do localStorage continuamente
-  useEffect(() => {
-    const checkLeadId = () => {
-      const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
-      if (leadData?.leadId) {
-        setLeadId(leadData.leadId);
-        console.log('[OfferPage] leadId carregado:', leadData.leadId);
-      }
-    };
-
-    // Verificar imediatamente
-    checkLeadId();
-
-    // Tentar novamente a cada 500ms por 10 segundos
-    const interval = setInterval(checkLeadId, 500);
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-    }, 10000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
+    const stored = parseStoredLeadData(localStorage.getItem('leadData'));
+    return stored?.leadId ?? null;
   }, []);
 
-  // Carregar SDK do Mercado Pago
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://sdk.mercadopago.com/js/v2';
-    script.async = true;
-    script.onload = () => {
-      if (window.MercadoPago) {
-        window.MercadoPago.setPublishableKey(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '');
-        setMercadoPagoReady(true);
-        console.log('[OfferPage] Mercado Pago SDK carregado');
-      }
-    };
-    document.head.appendChild(script);
-  }, []);
+  const resultQuery = trpc.quiz.getResult.useQuery(
+    { leadId: leadId ?? 0 },
+    { enabled: Boolean(leadId) }
+  );
 
-  // Timer de contagem regressiva
+  const createPayment = trpc.payment.createMercadoPagoPayment.useMutation();
+
   useEffect(() => {
     if (timerExpired) return;
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           setTimerExpired(true);
@@ -75,73 +49,60 @@ export default function OfferPage() {
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [timerExpired]);
 
-  // Formatar tempo para MM:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Abrir Mercado Pago Checkout Pro em modal
-  const handleCheckout = async () => {
-    console.log('[OfferPage] handleCheckout chamado, leadId:', leadId);
-    
+  const handleCheckout = () => {
     if (!leadId) {
-      console.log('[OfferPage] leadId não encontrado');
-      toast.error("Por favor, complete o quiz primeiro para continuar");
+      toast.error('Não foi possível identificar o usuário da oferta');
       navigate('/quiz', { replace: true });
       return;
     }
 
-    if (!mercadoPagoReady) {
-      console.log('[OfferPage] Mercado Pago não está pronto');
-      toast.error("Mercado Pago não carregou. Tente novamente.");
+    if (!resultQuery.data?.lead?.email || !resultQuery.data?.diagnostic?.id) {
+      toast.error('Ainda estamos preparando os dados do pagamento');
       return;
     }
 
-    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
-    if (!leadData?.email) {
-      console.log('[OfferPage] Email não encontrado');
-      toast.error("Email não encontrado");
-      return;
-    }
-
-    console.log('[OfferPage] Iniciando checkout com leadId:', leadId);
     setIsProcessing(true);
+    localStorage.setItem('purchaseAmount', '7.90');
 
-    createStripeCheckoutMutation.mutate(
+    createPayment.mutate(
       {
-        email: leadData.email,
-        profileName: "Diagnóstico Espiritual",
-        userPhone: leadData.whatsapp,
-        leadId: leadId.toString(),
-      },
+        email: resultQuery.data.lead.email,
+        leadId: String(leadId),
+        quizId: 'offer-whatsapp',
+        resultId: Number(resultQuery.data.diagnostic.id),
+        profileName: resultQuery.data.diagnostic.profileName || 'Diagnóstico Espiritual',
+        userPhone: resultQuery.data.lead.whatsapp || '',
+        paymentMethod: 'pix',
+        amount: 7.9,
+      } as any,
       {
         onSuccess: (data: any) => {
-          console.log('[OfferPage] Checkout criado com sucesso:', data);
-          if (data.success && data.preferenceId) {
-            // Abrir Mercado Pago Checkout Pro em modal
-            console.log('[OfferPage] Abrindo Mercado Pago Checkout com preferenceId:', data.preferenceId);
-            const checkout = new window.MercadoPago.Checkout({
-              preference: {
-                id: data.preferenceId,
-              },
-              autoOpen: true,
-            });
-            setIsProcessing(false);
-          } else {
-            console.log('[OfferPage] Erro: preferenceId não retornado');
-            toast.error("Não foi possível abrir o checkout");
-            setIsProcessing(false);
-          }
-        },
-        onError: (error) => {
-          console.error('[OfferPage] Erro ao criar checkout:', error);
           setIsProcessing(false);
-          toast.error("Erro ao criar checkout");
+
+          if (data.success && data.pixCode && data.pixQrCode && data.transactionId) {
+            setPixCode(data.pixCode);
+            setPixQrCode(data.pixQrCode);
+            setTransactionId(data.transactionId);
+            setShowPixModal(true);
+            toast.success('QR Code PIX gerado com sucesso');
+            return;
+          }
+
+          toast.error(data.error || 'Não foi possível gerar o pagamento PIX');
+        },
+        onError: (error: any) => {
+          setIsProcessing(false);
+          console.error('Erro ao gerar PIX da oferta:', error);
+          toast.error('Erro ao gerar o pagamento PIX');
         },
       }
     );
@@ -149,19 +110,17 @@ export default function OfferPage() {
 
   if (timerExpired) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center border-red-200 bg-red-50">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
-            ⏰ Oferta Expirada
-          </h1>
-          <p className="text-gray-700 mb-6">
-            Infelizmente, o tempo para aproveitar essa oferta exclusiva acabou. Mas não se preocupe, você ainda pode adquirir o devocional pelo preço regular.
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
+        <Card className="w-full max-w-md border-red-200 bg-red-50 p-8 text-center">
+          <h1 className="mb-4 text-2xl font-bold text-red-600">⏰ Oferta Expirada</h1>
+          <p className="mb-6 text-gray-700">
+            Infelizmente, o tempo para aproveitar essa oferta exclusiva acabou. Mas você ainda pode voltar ao início e refazer o processo.
           </p>
           <Button
-            onClick={() => navigate('/checkout', { replace: true })}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg"
+            onClick={() => navigate('/', { replace: true })}
+            className="w-full rounded-lg bg-blue-600 py-3 font-bold text-white hover:bg-blue-700"
           >
-            ACESSAR CHECKOUT REGULAR
+            VOLTAR PARA INÍCIO
           </Button>
         </Card>
       </div>
@@ -169,141 +128,93 @@ export default function OfferPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-6 sm:p-8 shadow-xl">
-        {/* Timer - Destaque Principal */}
-        <div className="mb-8 text-center">
-          <div className="inline-block bg-red-600 text-white px-6 py-3 rounded-full font-bold text-lg mb-4">
-            ⏱️ {formatTime(timeLeft)}
+    <>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
+        <Card className="w-full max-w-md p-6 shadow-xl sm:p-8">
+          <div className="mb-8 text-center">
+            <div className="mb-4 inline-block rounded-full bg-red-600 px-6 py-3 text-lg font-bold text-white">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
+            <p className="text-sm font-semibold text-red-600">Essa condição pode sair do ar a qualquer momento</p>
           </div>
-          <p className="text-sm text-red-600 font-semibold">
-            Essa condição pode sair do ar a qualquer momento
-          </p>
-        </div>
 
-        {/* Headline Principal */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-4 leading-tight">
-          Você quase garantiu o seu acesso…
-        </h1>
+          <h1 className="mb-4 text-center text-2xl font-bold leading-tight text-gray-900 sm:text-3xl">
+            Você quase garantiu o seu acesso…
+          </h1>
 
-        <p className="text-center text-lg text-gray-700 mb-6 font-semibold">
-          Não perca isso agora! 🙏
-        </p>
+          <p className="mb-6 text-center text-lg font-semibold text-gray-700">Não perca isso agora!</p>
 
-        {/* Seção de Conexão - Estilo WhatsApp */}
-        <div className="bg-blue-100 border-l-4 border-blue-600 p-4 mb-6 rounded">
-          <p className="text-gray-800 text-sm leading-relaxed">
-            Vi que você chegou até aqui, mas não finalizou… então resolvi te dar mais uma chance. Essa oferta é <strong>exclusiva para quem veio pelo WhatsApp</strong> e <strong>expira em {formatTime(timeLeft)}</strong>.
-          </p>
-        </div>
-
-        {/* Oferta Especial */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 p-6 mb-6 rounded-lg text-center">
-          <p className="text-sm text-gray-600 mb-2">Preço original:</p>
-          <p className="text-2xl font-bold text-gray-400 line-through mb-3">
-            R$ 9,90
-          </p>
-
-          <p className="text-xs text-green-600 font-bold mb-2">OFERTA EXCLUSIVA WHATSAPP</p>
-          <p className="text-4xl font-bold text-green-600 mb-4">
-            R$ 7,90
-          </p>
-
-          <div className="space-y-2 text-sm">
-            <p className="text-gray-700">
-              ✅ <strong>Acesso imediato</strong> ao devocional
-            </p>
-            <p className="text-gray-700">
-              ✅ <strong>Garantia de 7 dias</strong> de satisfação
-            </p>
-            <p className="text-gray-700">
-              ✅ <strong>Suporte completo</strong> por WhatsApp
-            </p>
-          </div>
-        </div>
-
-        {/* Benefícios / Transformação */}
-        <div className="mb-6 space-y-3">
-          <h3 className="font-bold text-gray-900 text-center mb-4">
-            O que você vai receber:
-          </h3>
-
-          <div className="flex items-start gap-3">
-            <span className="text-xl">📖</span>
-            <p className="text-sm text-gray-700">
-              <strong>Devocional personalizado</strong> baseado no seu diagnóstico espiritual
+          <div className="mb-6 rounded border-l-4 border-blue-500 bg-blue-50 p-4">
+            <p className="text-sm text-blue-900">
+              Vi que você chegou até aqui, mas não finalizou. Então resolvi te dar mais uma chance. Essa oferta é <strong>exclusiva para quem veio pelo WhatsApp</strong> e expira em <strong>{formatTime(timeLeft)}</strong>.
             </p>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="text-xl">⚡</span>
-            <p className="text-sm text-gray-700">
-              <strong>Acesso imediato</strong> - Baixe agora mesmo
-            </p>
+          <div className="mb-6 rounded-lg border-2 border-green-400 p-6 text-center">
+            <p className="mb-2 text-sm text-gray-600">Preço original:</p>
+            <p className="mb-3 text-2xl font-bold text-gray-400 line-through">R$ 9,90</p>
+            <p className="mb-2 text-xs font-bold text-green-600">OFERTA EXCLUSIVA WHATSAPP</p>
+            <p className="mb-4 text-4xl font-bold text-green-600">R$ 7,90</p>
+            <div className="space-y-2 text-sm text-gray-700">
+              <p>✅ <strong>Acesso imediato</strong> ao devocional</p>
+              <p>✅ <strong>Garantia de 7 dias</strong> de satisfação</p>
+              <p>✅ <strong>Suporte completo</strong> por WhatsApp</p>
+            </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="text-xl">🛡️</span>
-            <p className="text-sm text-gray-700">
-              <strong>Garantia de 7 dias</strong> - Se não gostar, devolvemos seu dinheiro
-            </p>
+          <div className="mb-6 space-y-3">
+            <h3 className="mb-4 text-center font-bold text-gray-900">O que você vai receber:</h3>
+            <p className="text-sm text-gray-700">📖 <strong>Devocional personalizado</strong> baseado no seu diagnóstico espiritual</p>
+            <p className="text-sm text-gray-700">⚡ <strong>Acesso imediato</strong> para baixar assim que o pagamento for aprovado</p>
+            <p className="text-sm text-gray-700">🛡️ <strong>Garantia de 7 dias</strong> para sua compra</p>
+            <p className="text-sm text-gray-700">💬 <strong>Suporte via WhatsApp</strong> para qualquer dúvida</p>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="text-xl">💬</span>
-            <p className="text-sm text-gray-700">
-              <strong>Suporte via WhatsApp</strong> para qualquer dúvida
-            </p>
+          <div className="mb-6 rounded-lg bg-gray-50 p-4 text-center text-xs text-gray-600">
+            <p className="mb-2">🔒 <strong>Pagamento 100% seguro</strong> com Mercado Pago</p>
+            <p>✓ Você receberá o acesso imediatamente após a confirmação</p>
           </div>
-        </div>
 
-        {/* Quebra de Objeções */}
-        <div className="bg-gray-50 p-4 mb-6 rounded-lg text-center text-xs text-gray-600">
-          <p className="mb-2">
-            🔒 <strong>Pagamento 100% seguro</strong> - Protegido por Mercado Pago
+          <Button
+            onClick={handleCheckout}
+            disabled={timerExpired || !leadId || resultQuery.isLoading || isProcessing}
+            className="mb-3 w-full rounded-lg bg-green-600 py-4 text-lg font-bold text-white transition-all duration-200 hover:scale-105 hover:bg-green-700"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Gerando PIX...
+              </>
+            ) : resultQuery.isLoading ? (
+              '⏳ Carregando...'
+            ) : (
+              '🎁 FINALIZAR MINHA COMPRA'
+            )}
+          </Button>
+
+          <Button
+            onClick={() => navigate('/', { replace: true })}
+            variant="outline"
+            className="w-full rounded-lg border-2 border-gray-300 py-3 font-semibold text-gray-700"
+            disabled={isProcessing}
+          >
+            Não, obrigado
+          </Button>
+
+          <p className="mt-4 text-center text-xs font-semibold text-red-600">
+            ⚠️ Essa oferta é válida apenas por {formatTime(timeLeft)}
           </p>
-          <p>
-            ✓ Você receberá o acesso <strong>imediatamente</strong> após a confirmação
-          </p>
-        </div>
+        </Card>
+      </div>
 
-        {/* CTA Principal */}
-        <Button
-          onClick={handleCheckout}
-          disabled={timerExpired || !leadId || isProcessing || !mercadoPagoReady}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg rounded-lg mb-3 transition-all duration-200 transform hover:scale-105"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Abrindo Pagamento...
-            </>
-          ) : !leadId ? (
-            <>
-              ⏳ Carregando...
-            </>
-          ) : (
-            <>
-              🎁 FINALIZAR MINHA COMPRA
-            </>
-          )}
-        </Button>
-
-        {/* CTA Secundário */}
-        <Button
-          onClick={() => navigate('/', { replace: true })}
-          variant="outline"
-          className="w-full text-gray-700 font-semibold py-3 rounded-lg border-2 border-gray-300"
-          disabled={isProcessing}
-        >
-          Não, obrigado
-        </Button>
-
-        {/* Urgência Final */}
-        <p className="text-center text-xs text-red-600 font-bold mt-4">
-          ⚠️ Essa oferta é válida apenas por {formatTime(timeLeft)}
-        </p>
-      </Card>
-    </div>
+      <MercadoPagoPixModal
+        isOpen={showPixModal}
+        onClose={() => setShowPixModal(false)}
+        qrCode={pixQrCode}
+        pixCode={pixCode}
+        transactionId={transactionId}
+        amount={7.9}
+      />
+    </>
   );
 }
