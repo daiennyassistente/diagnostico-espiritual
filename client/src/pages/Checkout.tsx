@@ -1,4 +1,3 @@
-import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, CreditCard } from "lucide-react";
@@ -7,19 +6,31 @@ import { toast } from "sonner";
 import { parseStoredLeadData } from "@/lib/leadStorage";
 import { useEffect, useState } from "react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useLocation } from "wouter";
 
 interface CheckoutProps {
   profileName?: string;
 }
 
 export default function Checkout({ profileName }: CheckoutProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [leadId, setLeadId] = useState<number | null>(null);
+  const [price, setPrice] = useState(9.90);
+  const [isOfferPrice, setIsOfferPrice] = useState(false);
 
   const createStripeCheckoutMutation = trpc.payment.createStripeCheckout.useMutation();
 
   useEffect(() => {
+    const params = new URLSearchParams(location.split('?')[1]);
+    const offerPrice = params.get('price');
+    const isOffer = params.get('offer') === 'whatsapp';
+    
+    if (offerPrice && isOffer) {
+      setPrice(parseFloat(offerPrice));
+      setIsOfferPrice(true);
+    }
+
     const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
     if (!leadData?.leadId) {
       toast.error("Dados não encontrados. Redirecionando...");
@@ -28,7 +39,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
     }
 
     setLeadId(leadData.leadId);
-  }, [setLocation]);
+  }, [location, setLocation]);
 
   const handleStripePayment = async () => {
     const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
@@ -98,8 +109,16 @@ export default function Checkout({ profileName }: CheckoutProps) {
               Devocional: 7 Dias para se Aproximar de Deus
             </h2>
             <p className="text-gray-600">
-              Valor: <span className="text-2xl font-bold" style={{ color: "#1E3A8A" }}>R$ 12,90</span>
+              {isOfferPrice && (
+                <>
+                  <span className="line-through text-gray-400 mr-2">R$ 9,90</span>
+                </>
+              )}
+              Valor: <span className="text-2xl font-bold" style={{ color: isOfferPrice ? "#16A34A" : "#1E3A8A" }}>R$ {price.toFixed(2)}</span>
             </p>
+            {isOfferPrice && (
+              <p className="text-sm font-bold text-green-600">🎁 Oferta exclusiva do WhatsApp!</p>
+            )}
           </div>
 
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">

@@ -1042,3 +1042,26 @@
 - [x] Meta Pixel: Eventos de Purchase são disparados corretamente
 - [x] Responsividade: Interface funciona bem em mobile e desktop
 - [x] Erros no console: Não há erros críticos ou warnings
+
+## Nova Página de Oferta para Recuperação de Leads do WhatsApp
+
+- [x] Criar página de oferta exclusiva (OfferPage.tsx) com:
+  - [x] Timer de 30 minutos em tempo real
+  - [x] Desconto de R$ 9,90 → R$ 7,90
+  - [x] Bônus: Acesso imediato + Garantia de 7 dias
+  - [x] Linguagem conversacional estilo WhatsApp
+  - [x] Headline: "Você quase garantiu o seu acesso… não perca isso agora"
+  - [x] Mensagem de urgência e segunda chance
+  - [x] Sem menu, sem distrações, foco 100% em conversão
+  - [x] Layout mobile-first responsivo
+  - [x] Botão CTA "FINALIZAR MINHA COMPRA" → checkout com preço especial
+
+- [x] Integrar rota /offer com parâmetro ?source=whatsapp
+
+- [x] Criar checkout com preço especial de R$ 7,90 para leads do WhatsApp
+
+- [x] Gerar link compartilhável para WhatsApp
+
+- [x] Testar fluxo completo: timer, checkout, sucesso
+
+- [x] Validar responsividade em mobile e desktop
