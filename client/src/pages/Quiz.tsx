@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { WhatsAppReferralButton } from '@/components/WhatsAppReferralButton';
-import { trackViewContent, trackLead } from '@/lib/metaPixelTracking';
+import { trackViewContent, trackLead, trackQuizStart } from '@/lib/metaPixelTracking';
 
 interface QuizStep {
   id: number;
@@ -229,6 +229,7 @@ export default function Quiz() {
     return newUserId;
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
+  const [quizStartTracked, setQuizStartTracked] = useState(false);
   const advanceTimeoutRef = useRef<number | null>(null);
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
@@ -245,6 +246,25 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizLeadDraft', JSON.stringify(leadData));
     window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
   }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
+
+  // Autostart do quiz: iniciar automaticamente na primeira pergunta
+  useEffect(() => {
+    if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult) {
+      // Iniciar automaticamente
+      setHasStarted(true);
+      setCurrentStep(1);
+      console.log('[Quiz] Quiz iniciado automaticamente');
+    }
+  }, [hasStarted, currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult]);
+
+  // Disparar evento QuizStart quando o quiz inicia
+  useEffect(() => {
+    if (!quizStartTracked && hasStarted && currentStep === 1) {
+      trackQuizStart();
+      setQuizStartTracked(true);
+      console.log('[Quiz] Evento QuizStart disparado');
+    }
+  }, [quizStartTracked, hasStarted, currentStep]);
 
   // Disparar evento ViewContent quando o quiz é visualizado
   useEffect(() => {
@@ -519,44 +539,7 @@ export default function Quiz() {
 
   const hasPendingResultRedirect = readPendingResultRedirect();
 
-  // Tela de abertura
-  if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult && !hasPendingResultRedirect) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
-        <div className="quiz-card max-w-2xl w-full bg-white">
-          <div className="text-center space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary">
-              Diagnóstico Espiritual
-            </h1>
-            <p className="text-lg text-foreground/80 leading-relaxed">
-              Responda algumas perguntas rápidas para identificar possíveis bloqueios espirituais e descobrir o que pode estar travando sua vida.
-            </p>
-            <p className="text-sm text-foreground/60">
-              Leva menos de 2 minutos e pode te ajudar a enxergar com mais clareza a fase espiritual que você está vivendo agora.
-            </p>
-            <Button
-              onClick={() => {
-                setHasStarted(true);
-                setCurrentStep(1);
-              }}
-              className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg text-lg font-semibold"
-            >
-              Quero começar meu diagnóstico
-            </Button>
-            <div className="pt-4 border-t border-muted">
-              <p className="text-sm text-foreground/60 mb-3">Prefere falar com um especialista?</p>
-              <WhatsAppReferralButton
-                phoneNumber="5585984463738"
-                message="Olá! Gostaria de ser encaminhado para receber mais informações sobre o Diagnóstico Espiritual."
-                label="Encaminhar para WhatsApp"
-                className="flex justify-center"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
   // Tela de processamento
   if (isProcessing || isNavigatingToResult || hasPendingResultRedirect) {

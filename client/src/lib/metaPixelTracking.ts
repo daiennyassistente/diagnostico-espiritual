@@ -33,6 +33,18 @@ export function trackMetaPixelEvent(
 }
 
 /**
+ * Track QuizStart event (quando usuário inicia o quiz automaticamente)
+ */
+export function trackQuizStart(): void {
+  trackMetaPixelEvent('QuizStart', {
+    content_name: 'Diagnóstico Espiritual Quiz',
+    content_type: 'product',
+    currency: 'BRL',
+    value: 12.90,
+  });
+}
+
+/**
  * Track ViewContent event (quando usuário visualiza o quiz)
  */
 export function trackViewContent(): void {

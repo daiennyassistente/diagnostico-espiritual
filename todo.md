@@ -1094,3 +1094,11 @@
 - [x] Implementar polling automático do pagamento e redirecionamento para a página de sucesso/download após aprovação
 - [x] Garantir que a oferta use o lead específico da URL e cobre o valor promocional de R$ 7,90
 - [x] Validar o fluxo com testes automatizados e verificação no navegador
+
+## Autostart do Quiz (Redução de Fricção) - CONCLUÍDO
+- [x] Remover tela inicial do quiz com botão "Quero começar meu diagnóstico"
+- [x] Implementar autostart da primeira pergunta ao carregar a página
+- [x] Disparar evento "Quiz Start" automaticamente ao carregar primeira pergunta
+- [x] Validar que não há delay ou tela em branco no início
+- [x] Testar responsividade mobile com autostart
+- [x] Garantir que eventos Meta Pixel continuam funcionando corretamente
