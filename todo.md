@@ -1102,3 +1102,9 @@
 - [x] Validar que não há delay ou tela em branco no início
 - [x] Testar responsividade mobile com autostart
 - [x] Garantir que eventos Meta Pixel continuam funcionando corretamente
+
+## Melhorias na Página de Oferta Exclusiva - CONCLUÍDO
+- [x] Investigar por que o botão de compra não está funcionando
+- [x] Corrigir o botão de compra para permitir cliques
+- [x] Melhorar o designer visual da página de oferta
+- [x] Testar o fluxo de compra completo
