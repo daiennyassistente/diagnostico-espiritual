@@ -8,12 +8,8 @@ import { useEffect, useState } from "react";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useLocation } from "wouter";
 
-interface CheckoutProps {
-  profileName?: string;
-}
-
-export default function Checkout({ profileName }: CheckoutProps) {
-  const [location, setLocation] = useLocation();
+export default function Checkout() {
+  const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [leadId, setLeadId] = useState<number | null>(null);
   const [price, setPrice] = useState(9.90);
@@ -22,14 +18,22 @@ export default function Checkout({ profileName }: CheckoutProps) {
   const createStripeCheckoutMutation = trpc.payment.createStripeCheckout.useMutation();
 
   useEffect(() => {
-    const params = new URLSearchParams(location.split('?')[1]);
+    // Usar window.location.search em vez de wouter location para capturar query params
+    const params = new URLSearchParams(window.location.search);
     const offerPrice = params.get('price');
     const isOffer = params.get('offer') === 'whatsapp';
     const urlLeadId = params.get('leadId');
     
+    console.log('[Checkout] URL params - offerPrice:', offerPrice, 'isOffer:', isOffer, 'urlLeadId:', urlLeadId);
+    
     if (offerPrice && isOffer) {
-      setPrice(parseFloat(offerPrice));
+      const parsedPrice = parseFloat(offerPrice);
+      console.log('[Checkout] Setting offer price:', parsedPrice);
+      setPrice(parsedPrice);
       setIsOfferPrice(true);
+    } else {
+      console.log('[Checkout] Not an offer, using default price');
+      setIsOfferPrice(false);
     }
 
     // Priorizar leadId da URL, depois do localStorage
@@ -49,7 +53,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
     }
 
     setLeadId(finalLeadId);
-  }, [location, setLocation]);
+  }, []); // Executar apenas uma vez ao montar o componente
 
   const handleMercadoPagoPayment = async () => {
     const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
@@ -65,7 +69,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
     createStripeCheckoutMutation.mutate(
       {
         email,
-        profileName: profileName || "Diagnóstico Espiritual",
+        profileName: "Diagnóstico Espiritual",
         userPhone: whatsapp,
         leadId: leadId?.toString() || "",
       },

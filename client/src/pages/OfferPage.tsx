@@ -3,15 +3,22 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { parseStoredLeadData } from '@/lib/leadStorage';
+import { trpc } from '@/lib/trpc';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 export default function OfferPage() {
   const [location, navigate] = useLocation();
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
   const [timerExpired, setTimerExpired] = useState(false);
   const [leadId, setLeadId] = useState<number | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Verificar se veio do WhatsApp
   const isFromWhatsApp = new URLSearchParams(location.split('?')[1]).get('source') === 'whatsapp';
+
+  // Hook para criar checkout do Mercado Pago
+  const createStripeCheckoutMutation = trpc.payment.createStripeCheckout.useMutation();
 
   // Obter leadId do localStorage
   useEffect(() => {
@@ -45,13 +52,44 @@ export default function OfferPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Redirecionar para checkout com preço especial e leadId
-  const handleCheckout = () => {
+  // Ir direto ao Mercado Pago com preço especial
+  const handleCheckout = async () => {
     if (!leadId) {
       navigate('/quiz', { replace: true });
       return;
     }
-    navigate(`/checkout?offer=whatsapp&price=7.90&leadId=${leadId}`, { replace: true });
+
+    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    if (!leadData?.email) {
+      toast.error("Email não encontrado");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    createStripeCheckoutMutation.mutate(
+      {
+        email: leadData.email,
+        profileName: "Diagnóstico Espiritual",
+        userPhone: leadData.whatsapp,
+        leadId: leadId.toString(),
+      },
+      {
+        onSuccess: (data: any) => {
+          if (data.success && data.checkoutUrl) {
+            // Redirecionar direto para o Mercado Pago
+            window.location.href = data.checkoutUrl;
+          } else {
+            toast.error("Não foi possível abrir o checkout");
+            setIsProcessing(false);
+          }
+        },
+        onError: () => {
+          setIsProcessing(false);
+          toast.error("Erro ao criar checkout");
+        },
+      }
+    );
   };
 
   if (timerExpired) {
@@ -177,10 +215,19 @@ export default function OfferPage() {
         {/* CTA Principal */}
         <Button
           onClick={handleCheckout}
-          disabled={timerExpired || !leadId}
+          disabled={timerExpired || !leadId || isProcessing}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg rounded-lg mb-3 transition-all duration-200 transform hover:scale-105"
         >
-          🎁 FINALIZAR MINHA COMPRA
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Processando...
+            </>
+          ) : (
+            <>
+              🎁 FINALIZAR MINHA COMPRA
+            </>
+          )}
         </Button>
 
         {/* CTA Secundário */}
@@ -188,6 +235,7 @@ export default function OfferPage() {
           onClick={() => navigate('/', { replace: true })}
           variant="outline"
           className="w-full text-gray-700 font-semibold py-3 rounded-lg border-2 border-gray-300"
+          disabled={isProcessing}
         >
           Não, obrigado
         </Button>

@@ -15,6 +15,7 @@ import { AdminLogin } from "./pages/AdminLogin";
 import SharePage from "./pages/SharePage";
 import OfferPage from "./pages/OfferPage";
 
+
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path={"/sucesso"} component={CheckoutSuccess} />
       <Route path={"/share"} component={SharePage} />
       <Route path={"/offer"} component={OfferPage} />
+
       <Route path={"/admin-login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin-legacy"} component={Admin} />

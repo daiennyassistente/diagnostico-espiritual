@@ -1073,3 +1073,6 @@
 - [x] Passar ID único do usuário (leadId) para o checkout do Mercado Pago
 - [x] Garantir que após compra: e-mail seja enviado, página de sucesso apareça, usuário apareça na lista de compradores
 - [x] Criar testes para validar o fluxo completo de oferta WhatsApp com Mercado Pago
+- [x] Remover página de Checkout intermediária
+- [x] Fazer botão "Finalizar Compra" ir direto ao Mercado Pago (sem passar por checkout)
+- [x] Testar fluxo completo: Oferta → Mercado Pago → Pagamento
