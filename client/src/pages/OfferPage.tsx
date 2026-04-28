@@ -2,14 +2,24 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { parseStoredLeadData } from '@/lib/leadStorage';
 
 export default function OfferPage() {
   const [location, navigate] = useLocation();
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
   const [timerExpired, setTimerExpired] = useState(false);
+  const [leadId, setLeadId] = useState<number | null>(null);
 
   // Verificar se veio do WhatsApp
   const isFromWhatsApp = new URLSearchParams(location.split('?')[1]).get('source') === 'whatsapp';
+
+  // Obter leadId do localStorage
+  useEffect(() => {
+    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+    if (leadData?.leadId) {
+      setLeadId(leadData.leadId);
+    }
+  }, []);
 
   // Timer de contagem regressiva
   useEffect(() => {
@@ -35,9 +45,13 @@ export default function OfferPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Redirecionar para checkout com preço especial
+  // Redirecionar para checkout com preço especial e leadId
   const handleCheckout = () => {
-    navigate('/checkout?offer=whatsapp&price=7.90', { replace: true });
+    if (!leadId) {
+      navigate('/quiz', { replace: true });
+      return;
+    }
+    navigate(`/checkout?offer=whatsapp&price=7.90&leadId=${leadId}`, { replace: true });
   };
 
   if (timerExpired) {
@@ -153,7 +167,7 @@ export default function OfferPage() {
         {/* Quebra de Objeções */}
         <div className="bg-gray-50 p-4 mb-6 rounded-lg text-center text-xs text-gray-600">
           <p className="mb-2">
-            🔒 <strong>Pagamento 100% seguro</strong> - Protegido por Stripe
+            🔒 <strong>Pagamento 100% seguro</strong> - Protegido por Mercado Pago
           </p>
           <p>
             ✓ Você receberá o acesso <strong>imediatamente</strong> após a confirmação
@@ -163,7 +177,7 @@ export default function OfferPage() {
         {/* CTA Principal */}
         <Button
           onClick={handleCheckout}
-          disabled={timerExpired}
+          disabled={timerExpired || !leadId}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg rounded-lg mb-3 transition-all duration-200 transform hover:scale-105"
         >
           🎁 FINALIZAR MINHA COMPRA

@@ -1206,46 +1206,81 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
       )
       .mutation(async ({ input, ctx }) => {
         try {
-          const Stripe = await import("stripe");
-          const stripe = new Stripe.default(process.env.STRIPE_SECRET_KEY || "");
           const origin = ctx.req.headers.origin || "https://diagnosticoespiritual.manus.space";
+          const price = 9.90;
 
-          const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["pix"],
-            line_items: [
+          const preference = {
+            items: [
               {
-                price_data: {
-                  currency: "brl",
-                  product_data: {
-                    name: "Devocional: 7 Dias para se Aproximar de Deus",
-                    description: input.profileName,
-                  },
-                  unit_amount: 990,
-                },
+                title: "Devocional: 7 Dias para se Aproximar de Deus",
+                description: input.profileName,
+                unit_price: price,
                 quantity: 1,
+                currency_id: "BRL",
               },
             ],
-            mode: "payment",
-            customer_email: input.email,
-            success_url: `${origin}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${origin}/checkout`,
-            client_reference_id: input.leadId,
-            metadata: {
+            payer: {
               email: input.email,
+              phone: {
+                number: input.userPhone,
+              },
+            },
+            back_urls: {
+              success: `${origin}/checkout-success`,
+              failure: `${origin}/checkout`,
+              pending: `${origin}/checkout-pending`,
+            },
+            auto_return: "approved",
+            notification_url: `${origin}/api/mercadopago/webhook`,
+            external_reference: input.leadId,
+            payment_methods: {
+              installments: 1,
+            },
+            metadata: {
               profileName: input.profileName,
               userPhone: input.userPhone,
-              user_id: input.leadId,
-              client_reference_id: input.leadId,
             },
+          };
+
+          const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+            },
+            body: JSON.stringify(preference),
           });
+
+          if (!response.ok) {
+            const error = await response.json();
+            console.error("[Mercado Pago] API Error:", error);
+            throw new Error(`Mercado Pago API error: ${error.message}`);
+          }
+
+          const data = await response.json();
+          console.log("[Mercado Pago] Preference created:", data.id);
+
+          try {
+            const { createPayment } = await import("./db");
+            await createPayment({
+              leadId: Number(input.leadId),
+              amount: price,
+              currency: "BRL",
+              status: "pending",
+              productName: "Devocional: 7 Dias para se Aproximar de Deus",
+            });
+            console.log("[Mercado Pago] Payment record created for lead:", input.leadId);
+          } catch (dbError) {
+            console.error("[Mercado Pago] Failed to create payment record:", dbError);
+          }
 
           return {
             success: true,
-            checkoutUrl: session.url,
-            sessionId: session.id,
+            checkoutUrl: data.init_point,
+            preferenceId: data.id,
           };
         } catch (error: any) {
-          console.error("Stripe checkout error:", error);
+          console.error("Mercado Pago checkout error:", error.message);
           throw new Error("Erro ao criar sessão de pagamento");
         }
       }),

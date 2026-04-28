@@ -1065,3 +1065,11 @@
 - [x] Testar fluxo completo: timer, checkout, sucesso
 
 - [x] Validar responsividade em mobile e desktop
+
+## Bug - Página de Oferta com Stripe
+
+- [x] Corrigir erro ao clicar em "Finalizar Compra" na página de oferta
+- [x] Substituir Stripe por Mercado Pago na página de oferta
+- [x] Passar ID único do usuário (leadId) para o checkout do Mercado Pago
+- [x] Garantir que após compra: e-mail seja enviado, página de sucesso apareça, usuário apareça na lista de compradores
+- [x] Criar testes para validar o fluxo completo de oferta WhatsApp com Mercado Pago

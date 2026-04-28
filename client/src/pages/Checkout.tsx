@@ -25,23 +25,33 @@ export default function Checkout({ profileName }: CheckoutProps) {
     const params = new URLSearchParams(location.split('?')[1]);
     const offerPrice = params.get('price');
     const isOffer = params.get('offer') === 'whatsapp';
+    const urlLeadId = params.get('leadId');
     
     if (offerPrice && isOffer) {
       setPrice(parseFloat(offerPrice));
       setIsOfferPrice(true);
     }
 
-    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
-    if (!leadData?.leadId) {
+    // Priorizar leadId da URL, depois do localStorage
+    let finalLeadId = urlLeadId ? parseInt(urlLeadId) : null;
+    
+    if (!finalLeadId) {
+      const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+      if (leadData?.leadId) {
+        finalLeadId = leadData.leadId;
+      }
+    }
+
+    if (!finalLeadId) {
       toast.error("Dados não encontrados. Redirecionando...");
       setLocation("/quiz");
       return;
     }
 
-    setLeadId(leadData.leadId);
+    setLeadId(finalLeadId);
   }, [location, setLocation]);
 
-  const handleStripePayment = async () => {
+  const handleMercadoPagoPayment = async () => {
     const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
     if (!leadData?.email) {
       toast.error("Email não encontrado");
@@ -128,10 +138,10 @@ export default function Checkout({ profileName }: CheckoutProps) {
           </div>
 
           <Button
-            onClick={handleStripePayment}
+            onClick={handleMercadoPagoPayment}
             disabled={isProcessing}
             className="w-full py-6 text-lg font-semibold"
-            style={{ backgroundColor: "#FFC700", color: "#000" }}
+            style={{ backgroundColor: isOfferPrice ? "#16A34A" : "#FFC700", color: isOfferPrice ? "#fff" : "#000" }}
           >
             {isProcessing ? (
               <>
@@ -141,13 +151,13 @@ export default function Checkout({ profileName }: CheckoutProps) {
             ) : (
               <>
                 <CreditCard className="mr-2 h-5 w-5" />
-                Pagar com Cartão
+                {isOfferPrice ? "🎁 Pagar com Mercado Pago" : "Pagar com Mercado Pago"}
               </>
             )}
           </Button>
 
           <p className="text-xs text-gray-500 text-center">
-            Você será redirecionado para o Stripe para completar o pagamento de forma segura
+            Você será redirecionado para o Mercado Pago para completar o pagamento de forma segura
           </p>
         </Card>
 
@@ -157,7 +167,7 @@ export default function Checkout({ profileName }: CheckoutProps) {
             🔒 Segurança Garantida
           </h3>
           <ul className="text-sm text-gray-700 space-y-2">
-            <li>✓ Pagamento processado pelo Stripe (empresa líder em segurança de pagamentos)</li>
+            <li>✓ Pagamento processado pelo Mercado Pago (empresa líder em segurança de pagamentos)</li>
             <li>✓ Seus dados de cartão nunca são armazenados em nossos servidores</li>
             <li>✓ Conformidade com PCI DSS (padrão de segurança internacional)</li>
             <li>✓ Transação criptografada e protegida</li>
