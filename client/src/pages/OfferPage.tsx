@@ -11,8 +11,9 @@ export default function OfferPage() {
   const [location, navigate] = useLocation();
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
   const [timerExpired, setTimerExpired] = useState(false);
-  const [leadId, setLeadId] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [mercadoPagoReady, setMercadoPagoReady] = useState(false);
+  const [leadId, setLeadId] = useState<number | null>(null);
 
   // Verificar se veio do WhatsApp
   const isFromWhatsApp = new URLSearchParams(location.split('?')[1]).get('source') === 'whatsapp';
@@ -20,12 +21,44 @@ export default function OfferPage() {
   // Hook para criar checkout do Mercado Pago
   const createStripeCheckoutMutation = trpc.payment.createStripeCheckout.useMutation();
 
-  // Obter leadId do localStorage
+  // Tentar ler leadId do localStorage continuamente
   useEffect(() => {
-    const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
-    if (leadData?.leadId) {
-      setLeadId(leadData.leadId);
-    }
+    const checkLeadId = () => {
+      const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
+      if (leadData?.leadId) {
+        setLeadId(leadData.leadId);
+        console.log('[OfferPage] leadId carregado:', leadData.leadId);
+      }
+    };
+
+    // Verificar imediatamente
+    checkLeadId();
+
+    // Tentar novamente a cada 500ms por 10 segundos
+    const interval = setInterval(checkLeadId, 500);
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  // Carregar SDK do Mercado Pago
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://sdk.mercadopago.com/js/v2';
+    script.async = true;
+    script.onload = () => {
+      if (window.MercadoPago) {
+        window.MercadoPago.setPublishableKey(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '');
+        setMercadoPagoReady(true);
+        console.log('[OfferPage] Mercado Pago SDK carregado');
+      }
+    };
+    document.head.appendChild(script);
   }, []);
 
   // Timer de contagem regressiva
@@ -52,19 +85,31 @@ export default function OfferPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Ir direto ao Mercado Pago com preço especial
+  // Abrir Mercado Pago Checkout Pro em modal
   const handleCheckout = async () => {
+    console.log('[OfferPage] handleCheckout chamado, leadId:', leadId);
+    
     if (!leadId) {
+      console.log('[OfferPage] leadId não encontrado');
+      toast.error("Por favor, complete o quiz primeiro para continuar");
       navigate('/quiz', { replace: true });
+      return;
+    }
+
+    if (!mercadoPagoReady) {
+      console.log('[OfferPage] Mercado Pago não está pronto');
+      toast.error("Mercado Pago não carregou. Tente novamente.");
       return;
     }
 
     const leadData = parseStoredLeadData(localStorage.getItem("leadData"));
     if (!leadData?.email) {
+      console.log('[OfferPage] Email não encontrado');
       toast.error("Email não encontrado");
       return;
     }
 
+    console.log('[OfferPage] Iniciando checkout com leadId:', leadId);
     setIsProcessing(true);
 
     createStripeCheckoutMutation.mutate(
@@ -76,15 +121,25 @@ export default function OfferPage() {
       },
       {
         onSuccess: (data: any) => {
-          if (data.success && data.checkoutUrl) {
-            // Redirecionar direto para o Mercado Pago
-            window.location.href = data.checkoutUrl;
+          console.log('[OfferPage] Checkout criado com sucesso:', data);
+          if (data.success && data.preferenceId) {
+            // Abrir Mercado Pago Checkout Pro em modal
+            console.log('[OfferPage] Abrindo Mercado Pago Checkout com preferenceId:', data.preferenceId);
+            const checkout = new window.MercadoPago.Checkout({
+              preference: {
+                id: data.preferenceId,
+              },
+              autoOpen: true,
+            });
+            setIsProcessing(false);
           } else {
+            console.log('[OfferPage] Erro: preferenceId não retornado');
             toast.error("Não foi possível abrir o checkout");
             setIsProcessing(false);
           }
         },
-        onError: () => {
+        onError: (error) => {
+          console.error('[OfferPage] Erro ao criar checkout:', error);
           setIsProcessing(false);
           toast.error("Erro ao criar checkout");
         },
@@ -215,13 +270,17 @@ export default function OfferPage() {
         {/* CTA Principal */}
         <Button
           onClick={handleCheckout}
-          disabled={timerExpired || !leadId || isProcessing}
+          disabled={timerExpired || !leadId || isProcessing || !mercadoPagoReady}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg rounded-lg mb-3 transition-all duration-200 transform hover:scale-105"
         >
           {isProcessing ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Processando...
+              Abrindo Pagamento...
+            </>
+          ) : !leadId ? (
+            <>
+              ⏳ Carregando...
             </>
           ) : (
             <>

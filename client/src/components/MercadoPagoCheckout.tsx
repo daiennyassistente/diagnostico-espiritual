@@ -17,7 +17,7 @@ interface MercadoPagoCheckoutProps {
 
 declare global {
   interface Window {
-    MercadoPago?: any;
+    MercadoPago: any;
   }
 }
 

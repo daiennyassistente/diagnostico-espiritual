@@ -13,7 +13,7 @@ interface MercadoPagoSecureFieldsProps {
 
 declare global {
   interface Window {
-    MercadoPago?: any;
+    MercadoPago: any;
   }
 }
 

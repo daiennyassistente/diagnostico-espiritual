@@ -460,15 +460,15 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                                 isLoading={false}
                               />
                               <ActionButton
-                                icon="🔗"
-                                title="Copiar Link de Resultado"
-                                bgColor="bg-indigo-100"
-                                textColor="text-indigo-700"
-                                hoverColor="hover:bg-indigo-200"
+                                icon="🎁"
+                                title="Copiar Link de Oferta"
+                                bgColor="bg-green-100"
+                                textColor="text-green-700"
+                                hoverColor="hover:bg-green-200"
                                 onClick={() => {
-                                  const resultLink = `${window.location.origin}/result?leadId=${item.id}`;
-                                  navigator.clipboard.writeText(resultLink);
-                                  toast.success('Link de resultado copiado para a área de transferência!');
+                                  const offerLink = `${window.location.origin}/offer?leadId=${item.id}`;
+                                  navigator.clipboard.writeText(offerLink);
+                                  toast.success('Link de oferta copiado para a área de transferência!');
                                 }}
                                 isLoading={false}
                               />

@@ -1076,3 +1076,8 @@
 - [x] Remover página de Checkout intermediária
 - [x] Fazer botão "Finalizar Compra" ir direto ao Mercado Pago (sem passar por checkout)
 - [x] Testar fluxo completo: Oferta → Mercado Pago → Pagamento
+
+## Funcionalidade - Link Personalizado de Oferta
+- [x] Substituir botão de copiar link de resultado pelo link de oferta no admin
+- [x] Adicionar leadId ao link da página de oferta
+- [x] Testar cópia do link personalizado na página de admin
