@@ -19,11 +19,6 @@ interface QuizStep {
 const QUIZ_STEPS: QuizStep[] = [
   {
     id: 1,
-    question: 'Qual é o seu nome?',
-    options: [], // Campo de texto livre
-  },
-  {
-    id: 2,
     question: 'Como você se sente espiritualmente hoje?',
     options: [
       'Próxima de Deus',
@@ -34,7 +29,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 3,
+    id: 2,
     question: 'O que mais tem dificultado sua constância com Deus?',
     options: [
       'Distrações',
@@ -46,7 +41,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 4,
+    id: 3,
     question: 'Como está sua rotina com a Palavra?',
     options: [
       'Frequente e profunda',
@@ -57,7 +52,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 5,
+    id: 4,
     question: 'Como você descreveria sua vida de oração hoje?',
     options: [
       'Sincera, mas instável',
@@ -68,7 +63,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 6,
+    id: 5,
     question: 'O que você mais sente falta hoje na sua vida com Deus?',
     options: [
       'Intimidade',
@@ -80,7 +75,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 7,
+    id: 6,
     question: 'O que você sente que mais tem sido tratado em você nessa fase?',
     options: [
       'Disciplina',
@@ -93,7 +88,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 8,
+    id: 7,
     question: 'O que você mais deseja viver com Deus agora?',
     options: [
       'Voltar ao secreto',
@@ -104,7 +99,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 9,
+    id: 8,
     question: 'Quanto tempo por dia você consegue dedicar com intencionalidade?',
     options: [
       '5 minutos',
@@ -114,7 +109,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 10,
+    id: 9,
     question: 'Qual é sua maior dificuldade?',
     options: [
       'Emocional',
@@ -125,7 +120,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 11,
+    id: 10,
     question: 'Como você se descreve espiritualmente neste momento?',
     options: [
       'Com fome de Deus',
@@ -137,7 +132,7 @@ const QUIZ_STEPS: QuizStep[] = [
     ],
   },
   {
-    id: 12,
+    id: 11,
     question: 'Algo que você queira acrescentar ou desabafar?',
     options: [], // Campo de texto livre
   },
@@ -206,7 +201,7 @@ export default function Quiz() {
   const [isProcessing, setIsProcessing] = useState(() => readRecentProcessingFlag());
   const [processingStep, setProcessingStep] = useState(() => readSessionNumber('quizProcessingStep', 0));
   const [leadData, setLeadData] = useState(() =>
-    readSessionJSON('quizLeadDraft', { whatsapp: '', email: '' })
+    readSessionJSON('quizLeadDraft', { name: '', whatsapp: '', email: '' })
   );
   const [hasStarted, setHasStarted] = useState(() => {
     const storedStarted = readSessionJSON<boolean>('quizHasStarted', false);
@@ -421,7 +416,7 @@ export default function Quiz() {
   const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!leadData.whatsapp || !leadData.email) {
+    if (!leadData.name || !leadData.whatsapp || !leadData.email) {
       toast.error('Por favor, preencha todos os campos');
       return;
     }
@@ -473,7 +468,7 @@ export default function Quiz() {
         userId: userId,
         whatsapp: leadData.whatsapp.replace(/\D/g, ''),
         email: leadData.email,
-        name: responses[0], // Nome da primeira pergunta (índice 0)
+        name: leadData.name,
       });
 
       if (leadResult.success && leadResult.leadId) {
@@ -606,6 +601,20 @@ export default function Quiz() {
             </div>
 
             <form onSubmit={handleSubmitLead} className="space-y-4">
+              <div>
+                <Label htmlFor="name" className="text-foreground font-medium mb-2 block">
+                  Nome
+                </Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Seu nome"
+                  value={leadData.name}
+                  onChange={(e) => setLeadData({ ...leadData, name: e.target.value })}
+                  className="border-2 border-muted focus:border-primary rounded-lg px-4 py-3 bg-card/90"
+                />
+              </div>
+
               <div>
                 <Label htmlFor="whatsapp" className="text-foreground font-medium mb-2 block">
                   Número WhatsApp
