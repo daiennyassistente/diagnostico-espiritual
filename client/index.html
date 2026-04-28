@@ -1,18 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="description" content="Descubra seu perfil espiritual com nosso quiz interativo. Diagnóstico personalizado em minutos." />
+    <meta name="theme-color" content="#FFFFFF" />
     <title>Diagnóstico Espiritual - Quiz Interativo</title>
-    <!-- Meta Pixel Code -->
-    <script>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://connect.facebook.net" />
+    <link rel="preconnect" href="https://sdk.mercadopago.com" />
+    <link rel="dns-prefetch" href="https://connect.facebook.net" />
+    <link rel="dns-prefetch" href="https://sdk.mercadopago.com" />
+    
+    <!-- Meta Pixel Code (async) -->
+    <script async>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};n.push=n;n.loaded=!0;n.version='2.0';
     n.queue=[];t=b.createElement(e);t.async=!0;
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
@@ -25,13 +31,11 @@
 
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <!-- Mercado Pago SDK -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <script type="module" src="/src/main.tsx" defer></script>
+    <!-- Mercado Pago SDK (async, non-critical) -->
+    <script async src="https://sdk.mercadopago.com/js/v2"></script>
+    <!-- Analytics (deferred) -->
+    <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>
 
 </html>

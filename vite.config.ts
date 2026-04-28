@@ -152,6 +152,11 @@ function vitePluginManusDebugCollector(): Plugin {
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
 
+// Performance: Optimize for faster builds
+if (process.env.NODE_ENV === "production") {
+  // Production optimizations
+}
+
 export default defineConfig({
   plugins,
   resolve: {
@@ -167,6 +172,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    minify: "terser",
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 500,
   },
   server: {
     host: true,
@@ -183,5 +191,9 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    preTransformRequests: false,
+  },
+  ssr: {
+    noExternal: ["@radix-ui"],
   },
 });

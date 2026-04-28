@@ -27,13 +27,16 @@ export function MercadoPagoPixModal({
   useEffect(() => {
     if (!isOpen || !transactionId || paymentConfirmed) return;
 
+    let isMounted = true;
     const intervalId = window.setInterval(async () => {
+      if (!isMounted) return;
+      
       try {
         const response = await fetch(`/api/check-payment?transaction_id=${encodeURIComponent(transactionId)}`);
         if (!response.ok) return;
 
         const data = await response.json();
-        if (data.status === 'approved') {
+        if (data.status === 'approved' && isMounted) {
           window.clearInterval(intervalId);
           setPaymentConfirmed(true);
           toast.success('Pagamento aprovado com sucesso!');
@@ -43,25 +46,36 @@ export function MercadoPagoPixModal({
       }
     }, 3000);
 
-    return () => window.clearInterval(intervalId);
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
   }, [isOpen, transactionId, paymentConfirmed]);
 
   useEffect(() => {
     if (!paymentConfirmed) return;
 
+    let isMounted = true;
     const countdown = window.setInterval(() => {
+      if (!isMounted) return;
+      
       setSecondsUntilRedirect((prev) => {
         if (prev <= 1) {
           window.clearInterval(countdown);
-          setIsRedirecting(true);
-          window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(amount.toFixed(2))}`;
+          if (isMounted) {
+            setIsRedirecting(true);
+            window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(amount.toFixed(2))}`;
+          }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => window.clearInterval(countdown);
+    return () => {
+      isMounted = false;
+      window.clearInterval(countdown);
+    };
   }, [paymentConfirmed, transactionId, amount]);
 
   const handleCopyPixCode = async () => {
@@ -69,7 +83,8 @@ export function MercadoPagoPixModal({
       await navigator.clipboard.writeText(pixCode);
       setCopied(true);
       toast.success('Código copiado');
-      window.setTimeout(() => setCopied(false), 2000);
+      const timeoutId = window.setTimeout(() => setCopied(false), 2000);
+      return () => window.clearTimeout(timeoutId);
     } catch (error) {
       console.error('Erro ao copiar código PIX:', error);
       toast.error('Não foi possível copiar o código PIX');

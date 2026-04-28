@@ -1110,3 +1110,16 @@
 - [x] Testar o fluxo de compra completo
 - [x] Alterar garantia de 7 dias para 2 dias
 - [x] Corrigir problema do botão de compra não respondendo (z-index issue)
+
+
+## Otimização de Performance (Carregamento < 2s)
+- [x] Corrigir erro do PIX (removeChild) no MercadoPagoPixModal
+- [x] Otimizar index.html com preconnect, dns-prefetch, async/defer
+- [x] Otimizar vite.config.ts com minificação e CSS code splitting
+- [x] Adicionar meta tags e descrição
+- [ ] Mapear todas as páginas/rotas e identificar páginas não utilizadas (aguardando confirmação)
+- [ ] Comprimir e otimizar todas as imagens (WebP/AVIF)
+- [ ] Implementar lazy loading para imagens fora da tela
+- [ ] Implementar cache de recursos
+- [ ] Testar com PageSpeed Insights e Lighthouse
+- [ ] Validar que nenhuma funcionalidade foi quebrada
