@@ -66,22 +66,23 @@ export default function OfferPage() {
       return;
     }
 
-    if (!resultQuery.data?.lead?.email || !resultQuery.data?.diagnostic?.id) {
-      toast.error('Ainda estamos preparando os dados do pagamento');
-      return;
-    }
+    // Usar dados do lead se disponível, senão usar fallback do localStorage
+    const email = resultQuery.data?.lead?.email || localStorage.getItem('leadEmail') || 'nao-informado@oferta.com';
+    const phone = resultQuery.data?.lead?.whatsapp || localStorage.getItem('leadPhone') || '';
+    const diagnosticId = resultQuery.data?.diagnostic?.id || 1;
+    const profileName = resultQuery.data?.diagnostic?.profileName || 'Diagnóstico Espiritual';
 
     setIsProcessing(true);
     localStorage.setItem('purchaseAmount', '7.90');
 
     createPayment.mutate(
       {
-        email: resultQuery.data.lead.email,
+        email: email,
         leadId: String(leadId),
         quizId: 'offer-whatsapp',
-        resultId: Number(resultQuery.data.diagnostic.id),
-        profileName: resultQuery.data.diagnostic.profileName || 'Diagnóstico Espiritual',
-        userPhone: resultQuery.data.lead.whatsapp || '',
+        resultId: Number(diagnosticId),
+        profileName: profileName,
+        userPhone: phone,
         paymentMethod: 'pix',
         amount: 7.9,
       } as any,
@@ -163,7 +164,7 @@ export default function OfferPage() {
               <p className="mb-6 text-5xl font-bold text-green-600">R$ 7,90</p>
               <div className="space-y-3 text-base text-gray-700">
                 <p>✅ <strong>Acesso imediato</strong> ao devocional</p>
-                <p>✅ <strong>Garantia de 7 dias</strong> de satisfação</p>
+                <p>✅ <strong>Garantia de 2 dias</strong> de satisfação</p>
                 <p>✅ <strong>Suporte completo</strong> por WhatsApp</p>
               </div>
             </div>
@@ -189,7 +190,7 @@ export default function OfferPage() {
                 <div className="flex gap-3">
                   <span className="text-2xl">🛡️</span>
                   <div>
-                    <p className="font-bold text-gray-900">Garantia de 7 dias</p>
+                    <p className="font-bold text-gray-900">Garantia de 2 dias</p>
                     <p className="text-sm text-gray-600">Satisfação garantida</p>
                   </div>
                 </div>
@@ -213,8 +214,8 @@ export default function OfferPage() {
             <div className="space-y-3">
               <Button
                 onClick={handleCheckout}
-                disabled={timerExpired || !leadId || isProcessing}
-                className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-5 text-lg font-bold text-white transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={timerExpired || isProcessing}
+                className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-5 text-lg font-bold text-white transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed relative z-[60]"
               >
                 {isProcessing ? (
                   <>

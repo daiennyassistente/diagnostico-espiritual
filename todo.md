@@ -1108,3 +1108,5 @@
 - [x] Corrigir o botão de compra para permitir cliques
 - [x] Melhorar o designer visual da página de oferta
 - [x] Testar o fluxo de compra completo
+- [x] Alterar garantia de 7 dias para 2 dias
+- [x] Corrigir problema do botão de compra não respondendo (z-index issue)
