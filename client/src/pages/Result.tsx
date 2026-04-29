@@ -432,14 +432,31 @@ export default function Result() {
             <div>
               <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
               <h1 className="text-3xl md:text-4xl font-bold text-primary mt-2">
-                {displayName}, seu perfil atual aponta para <span className="text-primary">{result.profileName}</span>
+                ⚠️ Possível bloqueio espiritual identificado
               </h1>
             </div>
           </div>
 
-          <p className="text-lg leading-8 text-slate-700 whitespace-pre-line">
-            {result.profileDescription}
-          </p>
+          <div className="space-y-4">
+            <p className="text-lg leading-8 text-slate-700">
+              Suas respostas indicam sinais de desgaste espiritual e falta de direção.
+            </p>
+            <p className="text-lg leading-8 text-slate-700">
+              Isso pode estar impedindo seu avanço e sua paz interior.
+            </p>
+            <p className="text-lg leading-8 text-slate-700 font-semibold text-primary">
+              Existe uma forma de mudar isso 🙏
+            </p>
+          </div>
+
+          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+            <p className="text-base text-slate-700">
+              <strong>Seu perfil atual:</strong> {result.profileName}
+            </p>
+            <p className="text-base text-slate-700 mt-2">
+              {result.profileDescription}
+            </p>
+          </div>
         </section>
 
 
@@ -506,7 +523,7 @@ export default function Result() {
             ) : (
               <>
                 <Zap className="w-5 h-5 mr-2" />
-                Quero receber meu devocional personalizado
+                🔐 Ver solução completa
               </>
             )}
           </Button>

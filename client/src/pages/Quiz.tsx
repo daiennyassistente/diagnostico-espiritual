@@ -720,6 +720,13 @@ export default function Quiz() {
             )}
           </div>
 
+          {/* Microcopy de confiança */}
+          <div className="text-center mb-6">
+            <p className="text-xs text-foreground/60">
+              Suas respostas são 100% confidenciais 🙏
+            </p>
+          </div>
+
           {/* Navigation */}
           <div className="flex gap-4 justify-between">
             <Button
@@ -734,7 +741,7 @@ export default function Quiz() {
               onClick={handleNext}
               className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              {currentStep === QUIZ_STEPS.length ? 'Finalizar' : 'Próximo'} →
+              {currentStep === QUIZ_STEPS.length ? 'Finalizar' : 'Continuar'} →
             </Button>
           </div>
         </div>
@@ -742,7 +749,71 @@ export default function Quiz() {
     );
   }
 
-   // Fallback: se nenhum estado foi atingido, mostrar a tela inicial
+  // Tela inicial (antes do quiz começar)
+  if (!hasStarted && currentStep === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 spiritual-background">
+        <div className="quiz-card max-w-2xl w-full bg-white">
+          <div className="space-y-8 text-center">
+            {/* Ícone/Emoji */}
+            <div className="text-6xl">🙏</div>
+
+            {/* Título principal */}
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold text-primary">
+                Existe algo invisível travando sua vida...
+              </h1>
+              <p className="text-lg text-foreground/80 font-medium">
+                Descubra em menos de 2 minutos se há um bloqueio espiritual impedindo sua paz e direção 🙏
+              </p>
+            </div>
+
+            {/* Texto de apoio */}
+            <div className="bg-accent/5 rounded-lg p-4 border border-accent/20">
+              <p className="text-sm text-foreground/70">
+                ✨ Mais de 1.000 pessoas já fizeram esse diagnóstico
+              </p>
+            </div>
+
+            {/* Bullets */}
+            <div className="space-y-3 text-left">
+              <div className="flex items-center gap-3">
+                <span className="text-accent text-xl">✔</span>
+                <span className="text-foreground">Rápido</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-accent text-xl">✔</span>
+                <span className="text-foreground">Confidencial</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-accent text-xl">✔</span>
+                <span className="text-foreground">Resultado imediato ⚡</span>
+              </div>
+            </div>
+
+            {/* Botão principal */}
+            <Button
+              onClick={() => {
+                setHasStarted(true);
+                setCurrentStep(1);
+                trackQuizStart();
+              }}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-lg text-lg font-semibold"
+            >
+              🔍 Começar diagnóstico
+            </Button>
+
+            {/* Texto de confiança */}
+            <p className="text-xs text-foreground/60">
+              Suas respostas são 100% confidenciais 🙏
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback: se nenhum estado foi atingido, mostrar a tela inicial
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
       <div className="quiz-card max-w-2xl w-full bg-white">
