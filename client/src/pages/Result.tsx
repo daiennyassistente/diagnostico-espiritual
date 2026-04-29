@@ -474,32 +474,9 @@ export default function Result() {
         </section>
 
         <section className="quiz-card mb-8 text-center bg-white border border-accent/40">
-          <p className="text-lg leading-8 text-slate-700 font-semibold text-primary">
+          <p className="text-lg leading-8 text-slate-700 font-semibold text-primary mb-6">
             Existe uma forma de mudar isso 🙏
           </p>
-        </section>
-
-        {result.nextSteps.length > 0 && (
-          <section className="quiz-card mb-8 border border-accent/40 bg-[linear-gradient(135deg,#1E4E8C_0%,#17406F_100%)] text-primary-foreground">
-            <p className="text-sm uppercase tracking-[0.25em] text-primary-foreground/70 mb-3">Seu próximo passo</p>
-            <h2 className="text-2xl font-semibold mb-4">Comece por aqui</h2>
-            <p className="text-lg leading-8">{result.nextSteps[0]}</p>
-          </section>
-        )}
-
-        <section className="quiz-card mb-10 bg-white border-[#D7C08A] text-[#27405F]">
-          <h2 className="text-2xl font-semibold text-primary mb-4">Seu devocional de 7 dias foi pensado para este momento</h2>
-          <p className="text-base leading-7 mb-6">
-            Em vez de um material genérico, o próximo passo é receber um plano devocional alinhado ao seu perfil atual,
-            aos bloqueios que surgiram e ao ritmo que você disse conseguir manter agora.
-          </p>
-
-          <div className="grid gap-3 md:grid-cols-3 mb-8 text-sm">
-            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Textos e reflexões conectados ao seu perfil espiritual atual.</div>
-            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Aplicações práticas baseadas nas dificuldades que você relatou.</div>
-            <div className="rounded-xl bg-white/90 border border-[#E6D4AE] px-4 py-4">Um caminho simples para voltar à constância sem sobrecarga espiritual.</div>
-          </div>
-
           <Button
             size="lg"
             className="w-full text-lg font-bold"
@@ -519,7 +496,6 @@ export default function Result() {
               </>
             )}
           </Button>
-
           <p className="text-center text-sm mt-4 text-slate-600">
             R$ 9,90. Pagamento seguro e envio do pdf por e-mail<br />
             <span className="text-xs mt-2 block">Não esqueça de olhar a sua caixa de spam</span>
