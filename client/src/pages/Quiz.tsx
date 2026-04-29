@@ -225,6 +225,10 @@ export default function Quiz() {
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
   const [quizStartTracked, setQuizStartTracked] = useState(false);
+  const [showInitialScreen, setShowInitialScreen] = useState(() => {
+    const storedShowInitial = readSessionJSON<boolean>('quizShowInitialScreen', true);
+    return storedShowInitial;
+  });
   const advanceTimeoutRef = useRef<number | null>(null);
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
@@ -242,12 +246,11 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
   }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
 
-  // Autostart do quiz: iniciar automaticamente na primeira pergunta
+  // Autostart do quiz: mostrar tela inicial primeiro
   useEffect(() => {
     if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult) {
-      // Iniciar automaticamente
+      // Apenas marcar como iniciado, mas não avançar para a primeira pergunta
       setHasStarted(true);
-      setCurrentStep(1);
       console.log('[Quiz] Quiz iniciado automaticamente');
     }
   }, [hasStarted, currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult]);
@@ -659,6 +662,61 @@ export default function Quiz() {
                 Suas respostas serão usadas apenas para gerar seu diagnóstico personalizado.
               </p>
             </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela inicial do quiz
+  if (hasStarted && currentStep === 0 && showInitialScreen) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 spiritual-background">
+        <div className="quiz-card max-w-2xl w-full bg-white">
+          <div className="space-y-6 text-center">
+            {/* Título */}
+            <h1 className="text-3xl md:text-4xl font-bold text-primary">
+              Existe algo invisível travando sua vida...
+            </h1>
+
+            {/* Subtítulo */}
+            <p className="text-lg text-foreground/80">
+              Descubra em menos de 2 minutos se há um bloqueio espiritual impedindo sua paz e direção 🙏
+            </p>
+
+            {/* Texto de apoio */}
+            <p className="text-sm text-foreground/60">
+              ✨ Mais de 1.000 pessoas já fizeram esse diagnóstico
+            </p>
+
+            {/* Bullets */}
+            <div className="space-y-3 my-8">
+              <div className="flex items-center justify-center gap-2 text-foreground">
+                <span className="text-lg">✔</span>
+                <span>Rápido</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-foreground">
+                <span className="text-lg">✔</span>
+                <span>Confidencial</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-foreground">
+                <span className="text-lg">✔</span>
+                <span>Resultado imediato ⚡</span>
+              </div>
+            </div>
+
+            {/* Botão principal */}
+            <Button
+              onClick={() => {
+                setShowInitialScreen(false);
+                setCurrentStep(1);
+                trackQuizStart();
+                setQuizStartTracked(true);
+              }}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-6 font-bold"
+            >
+              🔍 Começar diagnóstico
+            </Button>
           </div>
         </div>
       </div>
