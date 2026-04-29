@@ -173,25 +173,25 @@ export const buildFallbackDiagnosis = (responses: Record<string, string>): Diagn
       `${intro}hoje você se percebe como ${formatAnswerSnippet(spiritualSelfDescription || currentState, 'alguém em busca de respostas espirituais')}. O que mais tem dificultado sua constância com Deus é ${formatAnswerSnippet(mainDifficulty, 'uma pressão interna que tem drenado sua constância')}, e isso aparece na sua rotina com a Palavra, que está ${formatAnswerSnippet(bibleRoutine, 'oscilante')}, e na sua vida de oração, hoje ${formatAnswerSnippet(prayerLife, 'fragilizada')}. Você sente falta de ${formatAnswerSnippet(missingWithGod, 'mais intimidade com Deus')} e deseja viver ${formatAnswerSnippet(desireWithGod, 'uma aproximação mais profunda com Deus')}, o que mostra que ainda existe sede real dentro de você. ${buildTimeBasedRecommendation(availableTime)}${additionalSentence}`.trim(),
     strengths: [
       desireWithGod
-        ? `Desejo claro: viver ${normalizeResponse(desireWithGod)} com Deus.`
-        : "Existe desejo genuíno de se aproximar mais de Deus.",
+        ? `Desejo: ${normalizeResponse(desireWithGod)}.`
+        : "Desejo genuíno de se aproximar de Deus.",
       currentTreatment
-        ? `Sensibilidade: Deus está tratando ${normalizeResponse(currentTreatment)} nesta fase.`
-        : "Você demonstra sensibilidade para perceber o que Deus está tratando em você.",
+        ? `Sensibilidade: Deus está tratando ${normalizeResponse(currentTreatment)}.`
+        : "Sensibilidade para perceber o trabalho de Deus.",
       spiritualSelfDescription || currentState
-        ? `Honestidade: você se reconhece como ${formatAnswerSnippet(spiritualSelfDescription || currentState, 'alguém em processo')}.`
-        : "Você tem honestidade espiritual para reconhecer sua fase atual.",
+        ? `Honestidade: você se reconhece como ${normalizeResponse(spiritualSelfDescription || currentState)}.`
+        : "Honestidade para reconhecer sua fase.",
     ],
     challenges: [
       mainDifficulty
         ? `Bloqueio: ${normalizeResponse(mainDifficulty)}.`
-        : "Existe um bloqueio recorrente afetando sua constância.",
+        : "Bloqueio recorrente afetando constância.",
       biggestDifficulty
-        ? `Dificuldade prática: ${normalizeResponse(biggestDifficulty)}.`
-        : "Há uma dificuldade prática impedindo avanço consistente.",
+        ? `Dificuldade: ${normalizeResponse(biggestDifficulty)}.`
+        : "Dificuldade prática impedindo avanço.",
       bibleRoutine || prayerLife
         ? `Rotina frágil: Palavra (${normalizeResponse(bibleRoutine || 'oscilante')}) e oração (${normalizeResponse(prayerLife || 'instável')}).`
-        : "Sua rotina espiritual perdeu consistência entre Palavra e oração.",
+        : "Rotina espiritual perdeu consistência.",
     ],
     recommendations: [
       buildTimeBasedRecommendation(availableTime),
