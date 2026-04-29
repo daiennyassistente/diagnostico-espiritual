@@ -352,6 +352,13 @@ export default function CheckoutSuccess() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Button
+            onClick={() => window.open('https://wa.me/5585984463738?text=Ol%C3%A1%21%20Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20meu%20devocional%20personalizado.', '_blank')}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-6 text-lg"
+          >
+            <MessageCircle className="w-5 h-5 mr-2" />
+            Falar com Suporte via WhatsApp
+          </Button>
+          <Button
             onClick={handleBackToHome}
             className="w-full"
             variant="outline"
