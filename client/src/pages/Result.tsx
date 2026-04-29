@@ -432,7 +432,7 @@ export default function Result() {
             <div>
               <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
               <h1 className="text-3xl md:text-4xl font-bold text-primary mt-2">
-                Seu Diagnóstico Espiritual
+                ⚠️ Possível bloqueio espiritual identificado
               </h1>
             </div>
           </div>
@@ -450,22 +450,22 @@ export default function Result() {
 
 
         <section className="grid gap-6 md:grid-cols-2 mb-8">
-          <Card className="p-6 border-[#D7C08A] bg-[#FFF9EE]">
+          <Card className="p-6 border-accent/40 bg-white backdrop-blur">
             <h2 className="text-2xl font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
-            <ul className="space-y-3 text-[#27405F]">
+            <ul className="space-y-3">
               {result.strengths.map((item, index) => (
-                <li key={index} className="rounded-lg bg-white/85 px-4 py-3 border border-[#E5D5B1]">
+                <li key={index} className="rounded-lg bg-primary/5 px-4 py-3 border border-primary/20 text-foreground">
                   {item}
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card className="p-6 border-[#D7C08A] bg-[#F8F1E0]">
+          <Card className="p-6 border-accent/40 bg-white backdrop-blur">
             <h2 className="text-2xl font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
-            <ul className="space-y-3 text-[#27405F]">
+            <ul className="space-y-3">
               {result.challenges.map((item, index) => (
-                <li key={index} className="rounded-lg bg-white/85 px-4 py-3 border border-[#E5D5B1]">
+                <li key={index} className="rounded-lg bg-primary/5 px-4 py-3 border border-primary/20 text-foreground">
                   {item}
                 </li>
               ))}
