@@ -13,8 +13,7 @@ import Admin from "./pages/Admin";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminLogin } from "./pages/AdminLogin";
 import SharePage from "./pages/SharePage";
-import OfferPage from "./pages/OfferPage";
-
+import { OfferPage } from "./pages/Offer";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes

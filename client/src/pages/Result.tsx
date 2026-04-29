@@ -491,13 +491,13 @@ export default function Result() {
             size="lg"
             className="w-full text-lg font-bold"
             style={{ backgroundColor: "#FFC700", color: "#17395F" }}
-            onClick={() => setShowCheckout(true)}
+            onClick={() => setLocation("/offer")}
             disabled={false}
           >
             {isCheckingOut ? (
               <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Abrindo pagamento...
+                Carregando...
               </>
             ) : (
               <>
