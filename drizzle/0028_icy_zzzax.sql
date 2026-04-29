@@ -1,0 +1,1 @@
+ALTER TABLE `diagnostic_history` DROP COLUMN `emotionalMessage`;

@@ -30,6 +30,7 @@ import { createNewTransaction } from "./transaction-control";
 export interface DiagnosticResult {
   profileName: string;
   profileDescription: string;
+  emotionalMessage?: string;
   strengths: string[];
   challenges: string[];
   recommendations: string[];

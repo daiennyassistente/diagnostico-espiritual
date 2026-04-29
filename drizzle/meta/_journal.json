@@ -190,6 +190,20 @@
       "when": 1777303398468,
       "tag": "0026_fast_caretaker",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1777468605772,
+      "tag": "0027_sticky_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1777469104686,
+      "tag": "0028_icy_zzzax",
+      "breakpoints": true
     }
   ]
 }

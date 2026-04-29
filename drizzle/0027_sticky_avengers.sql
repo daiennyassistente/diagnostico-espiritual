@@ -1,0 +1,1 @@
+ALTER TABLE `diagnostic_history` ADD `emotionalMessage` text;

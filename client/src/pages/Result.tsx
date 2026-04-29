@@ -441,6 +441,7 @@ export default function Result() {
             <p className="text-sm text-slate-700">
               <strong>Seu perfil:</strong> {result.profileName}
             </p>
+
           </div>
         </section>
 

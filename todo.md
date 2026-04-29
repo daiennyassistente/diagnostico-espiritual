@@ -142,6 +142,15 @@
 - [x] Remover apenas emojis e caracteres problemáticos
 - [x] Corrigir labels do PDF (Introdução, Versículo, Reflexão, Oração, Aplicação, Próximo Passo)
 
+## Correção de Banco de Dados - Remoção de emotionalMessage
+- [x] Remover coluna emotionalMessage do schema (drizzle/schema.ts)
+- [x] Gerar migração SQL com drizzle-kit generate
+- [x] Aplicar migração ao banco de dados
+- [x] Remover referências a emotionalMessage em server/routers.ts
+- [x] Remover referências a emotionalMessage em client/src/pages/Result.tsx
+- [x] Validar que não há mais erros de compilação TypeScript
+- [x] Testar fluxo completo do quiz até resultado
+
 ## Funcionalidades Adiadas para Versão Futura (v2)
 - [ ] Compartilhamento por link com fallback para clipboard
 - [ ] Histórico de diagnósticos
