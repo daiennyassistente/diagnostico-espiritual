@@ -439,10 +439,7 @@ export default function Result() {
 
           <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
             <p className="text-sm text-slate-700">
-              <strong>Seu perfil atual:</strong> {result.profileName}
-            </p>
-            <p className="text-sm text-slate-700 mt-2">
-              {result.profileDescription}
+              <strong>Seu perfil:</strong> {result.profileName}
             </p>
           </div>
         </section>
@@ -510,16 +507,7 @@ export default function Result() {
           </Button>
         </section>
 
-        <section className="mb-10 text-center">
-          <div className="border-t border-muted pt-6">
-            <p className="text-sm text-foreground/60 mb-3">Prefere falar com um especialista?</p>
-            <WhatsAppReferralButton
-              phoneNumber="5585984463738"
-              message="Olá! Gostaria de ser encaminhado para receber mais informações sobre o Diagnóstico Espiritual."
-              label="Encaminhar para WhatsApp"
-            />
-          </div>
-        </section>
+
 
         <section className="text-center text-sm text-gray-500">
           <p>Seu resultado estará disponível por mais {formatTimeLeft(timeLeft)}</p>
