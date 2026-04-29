@@ -431,17 +431,17 @@ export default function Result() {
             <Sparkles className="w-6 h-6 text-primary mt-1" />
             <div>
               <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
-              <h1 className="text-3xl md:text-4xl font-bold text-primary mt-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-primary mt-2">
                 ⚠️ Possível bloqueio espiritual identificado
               </h1>
             </div>
           </div>
 
           <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-            <p className="text-base text-slate-700">
+            <p className="text-sm text-slate-700">
               <strong>Seu perfil atual:</strong> {result.profileName}
             </p>
-            <p className="text-base text-slate-700 mt-2">
+            <p className="text-sm text-slate-700 mt-2">
               {result.profileDescription}
             </p>
           </div>
@@ -451,7 +451,7 @@ export default function Result() {
 
         <section className="grid gap-6 md:grid-cols-2 mb-8">
           <Card className="p-6 border-accent/40 bg-white backdrop-blur">
-            <h2 className="text-2xl font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
+            <h2 className="text-lg font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
             <ul className="space-y-3">
               {result.strengths.map((item, index) => (
                 <li key={index} className="rounded-lg bg-primary/5 px-4 py-3 border border-primary/20 text-foreground">
@@ -462,7 +462,7 @@ export default function Result() {
           </Card>
 
           <Card className="p-6 border-accent/40 bg-white backdrop-blur">
-            <h2 className="text-2xl font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
+            <h2 className="text-lg font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
             <ul className="space-y-3">
               {result.challenges.map((item, index) => (
                 <li key={index} className="rounded-lg bg-primary/5 px-4 py-3 border border-primary/20 text-foreground">
@@ -474,7 +474,7 @@ export default function Result() {
         </section>
 
         <section className="quiz-card mb-8 text-center bg-white border border-accent/40">
-          <p className="text-lg leading-8 text-slate-700 font-semibold text-primary mb-6">
+          <p className="text-base leading-7 text-slate-700 font-semibold text-primary mb-6">
             Existe uma forma de mudar isso 🙏
           </p>
           <Button
