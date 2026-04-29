@@ -432,21 +432,9 @@ export default function Result() {
             <div>
               <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
               <h1 className="text-3xl md:text-4xl font-bold text-primary mt-2">
-                ⚠️ Possível bloqueio espiritual identificado
+                Seu Diagnóstico Espiritual
               </h1>
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <p className="text-lg leading-8 text-slate-700">
-              Suas respostas indicam sinais de desgaste espiritual e falta de direção.
-            </p>
-            <p className="text-lg leading-8 text-slate-700">
-              Isso pode estar impedindo seu avanço e sua paz interior.
-            </p>
-            <p className="text-lg leading-8 text-slate-700 font-semibold text-primary">
-              Existe uma forma de mudar isso 🙏
-            </p>
           </div>
 
           <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
@@ -485,7 +473,11 @@ export default function Result() {
           </Card>
         </section>
 
-
+        <section className="quiz-card mb-8 text-center bg-white border border-accent/40">
+          <p className="text-lg leading-8 text-slate-700 font-semibold text-primary">
+            Existe uma forma de mudar isso 🙏
+          </p>
+        </section>
 
         {result.nextSteps.length > 0 && (
           <section className="quiz-card mb-8 border border-accent/40 bg-[linear-gradient(135deg,#1E4E8C_0%,#17406F_100%)] text-primary-foreground">
