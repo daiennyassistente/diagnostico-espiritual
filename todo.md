@@ -1132,3 +1132,12 @@
 - [ ] Implementar cache de recursos
 - [ ] Testar com PageSpeed Insights e Lighthouse
 - [ ] Validar que nenhuma funcionalidade foi quebrada
+
+## Microcopy Emocional Personalizado na Página de Resultado
+- [x] Criar função generateProfileEmotionalMicrocopy
+- [x] Implementar personalização por perfil espiritual
+- [x] Implementar personalização por respostas do quiz
+- [x] Garantir limite de 3 linhas máximo
+- [x] Integrar microcopy na página de resultado
+- [x] Criar testes unitários
+- [x] Validar funcionamento completo

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { readStoredQuizState, resolveLeadIdFromSources } from "@/lib/resultState";
 import { extractQuizInsights } from "@/lib/resultPersonalization";
 import { parseStoredLeadData } from "@/lib/leadStorage";
+import { generateProfileEmotionalMicrocopy, extractMicrocopyData } from "@/lib/profileEmotionalMicrocopy";
 import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { WhatsAppReferralButton } from "@/components/WhatsAppReferralButton";
@@ -441,7 +442,18 @@ export default function Result() {
             <p className="text-sm text-slate-700">
               <strong>Seu perfil:</strong> {result.profileName}
             </p>
-
+            {responses && (() => {
+              const microcopyData = extractMicrocopyData(responses, result.profileName);
+              if (microcopyData) {
+                const emotionalText = generateProfileEmotionalMicrocopy(microcopyData);
+                return (
+                  <p className="text-sm text-slate-700 mt-3 leading-relaxed whitespace-pre-line italic text-primary/80">
+                    {emotionalText}
+                  </p>
+                );
+              }
+              return null;
+            })()}
           </div>
         </section>
 
