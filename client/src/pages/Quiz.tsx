@@ -818,14 +818,19 @@ export default function Quiz() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 spiritual-background">
         <div className="quiz-card max-w-2xl w-full bg-white">
           <div className="space-y-8 text-center">
-            {/* Ícone/Emoji */}
-            <div className="text-6xl">🙏</div>
+            {/* Título com badge */}
+            <div className="inline-block bg-primary/10 border border-primary/30 rounded-full px-4 py-2">
+              <p className="text-sm font-semibold text-primary">Diagnóstico Gratuito</p>
+            </div>
 
             {/* Título principal */}
             <div className="space-y-4">
               <h1 className="text-4xl font-bold text-primary">
                 Existe algo invisível travando sua vida...
               </h1>
+              <p className="text-lg text-primary/80 font-semibold">
+                baseado na Bíblia
+              </p>
               <p className="text-lg text-foreground/80 font-medium">
                 Descubra em menos de 2 minutos se há um bloqueio espiritual impedindo sua paz e direção 🙏
               </p>
