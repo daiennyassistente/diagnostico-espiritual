@@ -234,13 +234,13 @@ export default function CheckoutSuccess() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-accent/20 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-12 h-12 md:w-16 md:h-16 text-accent" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-primary/10 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-12 h-12 md:w-16 md:h-16 text-primary" />
               </div>
             </div>
           </div>
 
-          <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl md:text-4xl font-bold text-primary mb-2">
             Pagamento Confirmado! 🎉
           </h1>
           <p className="text-base md:text-lg text-accent font-semibold mb-4">
@@ -249,23 +249,23 @@ export default function CheckoutSuccess() {
         </div>
 
         {/* Mensagem de sucesso */}
-        <div className="mb-8 p-4 md:p-6 bg-secondary rounded-lg border border-muted">
+        <div className="mb-8 p-4 md:p-6 bg-secondary/40 rounded-lg border border-border">
           <p className="text-foreground text-base md:text-lg leading-relaxed mb-4">
             Obrigado por sua compra! Seu devocional personalizado de 7 dias foi criado especialmente para sua jornada espiritual.
           </p>
-          <p className="text-foreground text-sm italic border-l-4 border-accent pl-4">
+          <p className="text-foreground text-sm italic border-l-4 border-primary pl-4">
             "Este é o começo de uma transformação real. Que Deus abençoe cada dia de sua jornada."
           </p>
         </div>
 
         {/* Detalhes do devocional */}
-        <div className="mb-8 p-4 md:p-6 bg-accent/5 rounded-lg border border-accent/20">
-          <h2 className="text-base md:text-lg font-semibold text-foreground mb-4">
+        <div className="mb-8 p-4 md:p-6 bg-primary/5 rounded-lg border border-primary/20">
+          <h2 className="text-base md:text-lg font-semibold text-primary mb-4">
             📖 Seu Devocional Inclui:
           </h2>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <span className="text-accent text-xl mt-1 flex-shrink-0">✓</span>
+              <span className="text-primary text-xl mt-1 flex-shrink-0">✓</span>
               <div className="min-w-0">
                 <p className="font-semibold text-foreground text-sm md:text-base">7 Dias de Reflexões Personalizadas</p>
                 <p className="text-xs md:text-sm text-foreground/80">Baseado no seu perfil espiritual e desafios</p>
@@ -300,7 +300,7 @@ export default function CheckoutSuccess() {
           <Button
             onClick={handleDownloadDevocional}
             disabled={isGeneratingPDF || pdfGenerated}
-            className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-4 md:py-6 text-sm md:text-base"
+            className="w-full bg-accent hover:bg-accent/80 text-accent-foreground font-bold py-4 md:py-6 text-sm md:text-base"
           >
             {isGeneratingPDF ? (
               <>
@@ -342,8 +342,8 @@ export default function CheckoutSuccess() {
         </div>
 
         {!whatsappNumber && (
-          <div className="mb-6 md:mb-8 p-3 md:p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <p className="text-xs md:text-sm text-amber-800">
+          <div className="mb-6 md:mb-8 p-3 md:p-4 bg-muted/50 border border-border rounded-lg">
+            <p className="text-xs md:text-sm text-foreground/70">
               💡 Para reenviar o PDF via WhatsApp, atualize seu número na próxima compra.
             </p>
           </div>
@@ -370,7 +370,7 @@ export default function CheckoutSuccess() {
         </div>
 
         {/* Informações de suporte */}
-        <div className="text-center p-3 md:p-4 bg-secondary/50 rounded-lg">
+        <div className="text-center p-3 md:p-4 bg-secondary/30 rounded-lg border border-border">
           <p className="text-xs text-foreground/70 mb-2">
             ✓ Suporte disponível por 7 dias após a compra
           </p>
@@ -394,7 +394,7 @@ export default function CheckoutSuccess() {
           <p className="text-foreground italic text-xs md:text-sm">
             "Que o Senhor te abençoe e te guarde durante estes 7 dias de transformação espiritual."
           </p>
-          <p className="text-accent font-semibold mt-2 text-xs md:text-sm">Números 6:24</p>
+          <p className="text-primary font-semibold mt-2 text-xs md:text-sm">Números 6:24</p>
         </div>
       </div>
     </div>
