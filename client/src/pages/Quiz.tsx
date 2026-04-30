@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { WhatsAppReferralButton } from '@/components/WhatsAppReferralButton';
 import { trackViewContent, trackLead, trackQuizStart } from '@/lib/metaPixelTracking';
+import { useMetaQuizEvents } from '@/hooks/useMetaQuizEvents';
 
 interface QuizStep {
   id: number;
@@ -222,6 +223,13 @@ export default function Quiz() {
     // Gerar novo userId a cada entrada, mesmo que seja a mesma pessoa
     const newUserId = uuidv4();
     return newUserId;
+  });
+
+  // Integrar eventos de quiz com Meta CAPI
+  useMetaQuizEvents({
+    hasStarted,
+    isQuizComplete: currentStep >= QUIZ_STEPS.length,
+    leadData,
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
   const [quizStartTracked, setQuizStartTracked] = useState(false);
