@@ -70,10 +70,10 @@ export function OfferWhatsAppPage() {
         {/* Hero Section */}
         <section className="mb-8 text-center">
           <div className="mb-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-3 leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground shadow-none font-bold mb-3 leading-tight">
               🎁 Você Quase Garantiu Seu Acesso...
             </h1>
-            <p className="text-lg text-slate-700">
+            <p className="text-lg text-foreground shadow-none font-bold">
               Não perca essa chance! Seu devocional personalizado está esperando por você.
             </p>
           </div>
@@ -81,40 +81,40 @@ export function OfferWhatsAppPage() {
 
         {/* Main Offer Card */}
         <section className="mb-8">
-          <Card className="p-6 border-3 border-yellow-400 bg-gradient-to-br from-yellow-50 to-white shadow-lg">
+          <Card className="p-6 border-3 border-yellow-400 bg-secondary/30 backdrop-blur-md shadow-none border-border">
             {/* Price Section */}
             <div className="text-center mb-6">
-              <p className="text-sm text-slate-600 mb-2">Preço normal: R$ 9,90</p>
+              <p className="text-sm text-muted-foreground shadow-none mb-2">Preço normal: R$ 9,90</p>
               <div className="flex items-center justify-center gap-3">
-                <div className="text-4xl font-bold text-primary line-through opacity-50">R$ 9,90</div>
+                <div className="text-4xl font-bold text-foreground shadow-none font-bold line-through opacity-50">R$ 9,90</div>
                 <div className="text-5xl font-bold text-red-600">R$ 7,90</div>
               </div>
               <p className="text-sm font-bold text-green-600 mt-2">✓ Economize R$ 2,00 (20% OFF)</p>
             </div>
 
             {/* What You Get */}
-            <div className="mb-6 bg-white rounded-lg p-4">
-              <h2 className="text-lg font-bold text-primary mb-3">Você vai receber:</h2>
+            <div className="mb-6 bg-secondary/50 rounded-lg p-4 shadow-none border border-border">
+              <h2 className="text-lg font-bold text-foreground shadow-none font-bold mb-3">Você vai receber:</h2>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">7 Dias de Devocional 100% Personalizado</span>
+                  <Check className="w-5 h-5 text-foreground shadow-none font-bold flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground shadow-none font-bold">7 Dias de Devocional 100% Personalizado</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">Meditações Bíblicas Profundas</span>
+                  <Check className="w-5 h-5 text-foreground shadow-none font-bold flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground shadow-none font-bold">Meditações Bíblicas Profundas</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">Orações Transformadoras</span>
+                  <Check className="w-5 h-5 text-foreground shadow-none font-bold flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground shadow-none font-bold">Orações Transformadoras</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">PDF para Baixar Imediatamente</span>
+                  <Check className="w-5 h-5 text-foreground shadow-none font-bold flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground shadow-none font-bold">PDF para Baixar Imediatamente</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">Suporte por WhatsApp</span>
+                  <Check className="w-5 h-5 text-foreground shadow-none font-bold flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground shadow-none font-bold">Suporte por WhatsApp</span>
                 </li>
               </ul>
             </div>
@@ -123,7 +123,7 @@ export function OfferWhatsAppPage() {
             <Button
               size="lg"
               className="w-full text-sm md:text-lg font-bold py-6 mb-4"
-              style={{ backgroundColor: "#FFC700", color: "#17395F" }}
+              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
               onClick={handleCheckout}
               disabled={isExpired}
             >
@@ -133,31 +133,31 @@ export function OfferWhatsAppPage() {
             </Button>
 
             {/* Trust Badges */}
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-muted-foreground shadow-none text-center">
               ✓ Acesso Imediato | ✓ Pagamento Seguro via Pix | ✓ Sem Cobranças Recorrentes
             </p>
           </Card>
         </section>
 
         {/* Urgency Section */}
-        <section className="mb-8 bg-primary/10 rounded-lg p-6 border border-primary/30">
-          <h3 className="font-bold text-primary text-center mb-4">⏰ Por que agir AGORA?</h3>
+        <section className="mb-8 bg-secondary/30 rounded-lg p-6 border border-border shadow-none">
+          <h3 className="font-bold text-foreground shadow-none font-bold text-center mb-4">⏰ Por que agir AGORA?</h3>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <span className="text-lg font-bold text-primary">1</span>
-              <p className="text-sm text-slate-700"><strong>Essa oferta é exclusiva</strong> - Válida apenas para quem recebeu via WhatsApp</p>
+              <span className="text-lg font-bold text-foreground shadow-none font-bold">1</span>
+              <p className="text-sm text-foreground shadow-none font-bold"><strong>Essa oferta é exclusiva</strong> - Válida apenas para quem recebeu via WhatsApp</p>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-lg font-bold text-primary">2</span>
-              <p className="text-sm text-slate-700"><strong>Tempo limitado</strong> - Expira em 30 minutos</p>
+              <span className="text-lg font-bold text-foreground shadow-none font-bold">2</span>
+              <p className="text-sm text-foreground shadow-none font-bold"><strong>Tempo limitado</strong> - Expira em 30 minutos</p>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-lg font-bold text-primary">3</span>
-              <p className="text-sm text-slate-700"><strong>Desconto de 20%</strong> - Economize R$ 2,00</p>
+              <span className="text-lg font-bold text-foreground shadow-none font-bold">3</span>
+              <p className="text-sm text-foreground shadow-none font-bold"><strong>Desconto de 20%</strong> - Economize R$ 2,00</p>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-lg font-bold text-primary">4</span>
-              <p className="text-sm text-slate-700"><strong>Acesso imediato</strong> - Comece hoje mesmo</p>
+              <span className="text-lg font-bold text-foreground shadow-none font-bold">4</span>
+              <p className="text-sm text-foreground shadow-none font-bold"><strong>Acesso imediato</strong> - Comece hoje mesmo</p>
             </li>
           </ul>
         </section>
@@ -167,7 +167,7 @@ export function OfferWhatsAppPage() {
           <Button
             size="lg"
             className="w-full text-lg font-bold py-6"
-            style={{ backgroundColor: "#FFC700", color: "#17395F" }}
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
             onClick={handleCheckout}
             disabled={isExpired}
           >
@@ -175,7 +175,7 @@ export function OfferWhatsAppPage() {
             {isExpired ? "Oferta Expirada" : "GARANTIR MEU ACESSO AGORA"}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-          <p className="text-xs text-slate-600 mt-3">
+          <p className="text-xs text-muted-foreground shadow-none mt-3">
             Pagamento 100% seguro via Pix • Sem cobranças recorrentes
           </p>
         </section>

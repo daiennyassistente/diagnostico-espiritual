@@ -288,7 +288,7 @@ export default function Result() {
     return (
       <div className="min-h-screen flex items-center justify-center spiritual-background">
         <div className="text-center relative z-10">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-foreground shadow-none" />
           <p className="text-foreground text-lg">Carregando seu diagnóstico...</p>
         </div>
       </div>
@@ -299,7 +299,7 @@ export default function Result() {
     return (
       <div className="min-h-screen flex items-center justify-center spiritual-background">
         <Card className="max-w-md mx-auto p-8 text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-foreground shadow-none" />
           <h2 className="text-2xl font-semibold mb-2">Estamos preparando seu resultado</h2>
           <p className="text-muted-foreground">
             Estamos cruzando suas respostas para montar um diagnóstico coerente com o que você viveu no quiz.
@@ -427,19 +427,19 @@ export default function Result() {
   return (
     <div className="spiritual-background min-h-screen py-10 px-4">
       <div className="container max-w-5xl">
-        <section className="quiz-card mb-8 border border-accent/40 bg-white backdrop-blur">
+        <section className="quiz-card mb-8 border border-accent/40 bg-secondary/30 backdrop-blur-md shadow-none border-border">
           <div className="flex items-start gap-3 mb-4">
-            <Sparkles className="w-6 h-6 text-primary mt-1" />
+            <Sparkles className="w-6 h-6 text-foreground shadow-none mt-1" />
             <div>
-              <p className="text-sm uppercase tracking-[0.25em] text-primary/70">Diagnóstico espiritual</p>
-              <h1 className="text-2xl md:text-3xl font-bold text-primary mt-2">
+              <p className="text-sm uppercase tracking-[0.25em] text-foreground shadow-none/70">Diagnóstico espiritual</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground shadow-none mt-2">
                 ⚠️ Possível bloqueio espiritual identificado
               </h1>
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-            <p className="text-sm text-slate-700">
+          <div className="mt-6 p-4 bg-secondary/50 shadow-none border border-border shadow-none rounded-lg">
+            <p className="text-sm text-foreground shadow-none font-bold">
               <strong>Seu perfil:</strong> {result.profileName}
             </p>
             {responses && (() => {
@@ -447,7 +447,7 @@ export default function Result() {
               if (microcopyData) {
                 const emotionalText = generateProfileEmotionalMicrocopy(microcopyData);
                 return (
-                  <p className="text-sm text-slate-700 mt-3 leading-relaxed whitespace-pre-line italic text-primary/80">
+                  <p className="text-sm text-foreground shadow-none font-bold mt-3 leading-relaxed whitespace-pre-line italic text-foreground shadow-none/80">
                     {emotionalText}
                   </p>
                 );
@@ -460,22 +460,22 @@ export default function Result() {
 
 
         <section className="grid gap-6 md:grid-cols-2 mb-8">
-          <Card className="p-6 border-accent/40 bg-white backdrop-blur">
-            <h2 className="text-lg font-semibold text-primary mb-4">Pontos de força que apareceram em você</h2>
+          <Card className="p-6 border-accent/40 bg-secondary/30 backdrop-blur-md shadow-none border-border">
+            <h2 className="text-lg font-semibold text-foreground shadow-none mb-4">Pontos de força que apareceram em você</h2>
             <ul className="space-y-3">
               {result.strengths.map((item, index) => (
-                <li key={index} className="rounded-lg bg-primary/5 px-4 py-3 border border-primary/20 text-foreground">
+                <li key={index} className="rounded-lg bg-secondary/50 shadow-none px-4 py-3 border border-border shadow-none text-foreground">
                   {item}
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card className="p-6 border-accent/40 bg-white backdrop-blur">
-            <h2 className="text-lg font-semibold text-primary mb-4">Bloqueios que mais pesam hoje</h2>
+          <Card className="p-6 border-accent/40 bg-secondary/30 backdrop-blur-md shadow-none border-border">
+            <h2 className="text-lg font-semibold text-foreground shadow-none mb-4">Bloqueios que mais pesam hoje</h2>
             <ul className="space-y-3">
               {result.challenges.map((item, index) => (
-                <li key={index} className="rounded-lg bg-primary/5 px-4 py-3 border border-primary/20 text-foreground">
+                <li key={index} className="rounded-lg bg-secondary/50 shadow-none px-4 py-3 border border-border shadow-none text-foreground">
                   {item}
                 </li>
               ))}
@@ -483,14 +483,14 @@ export default function Result() {
           </Card>
         </section>
 
-        <section className="quiz-card mb-8 text-center bg-white border border-accent/40">
-          <p className="text-base leading-7 text-slate-700 font-semibold text-primary mb-6">
+        <section className="quiz-card mb-8 text-center bg-secondary/30 border-border shadow-none">
+          <p className="text-base leading-7 text-foreground shadow-none font-bold font-semibold text-foreground shadow-none mb-6">
             Existe uma forma de mudar isso 🙏
           </p>
           <Button
             size="lg"
             className="w-full text-sm md:text-lg font-bold"
-            style={{ backgroundColor: "#FFC700", color: "#17395F" }}
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
             onClick={() => setLocation(`/offer?leadId=${leadId}`)}
             disabled={false}
           >
@@ -522,7 +522,7 @@ export default function Result() {
 
 
 
-        <section className="text-center text-sm text-gray-500">
+        <section className="text-center text-sm text-muted-foreground shadow-none">
           <p>Seu resultado estará disponível por mais {formatTimeLeft(timeLeft)}</p>
         </section>
 
@@ -534,7 +534,7 @@ export default function Result() {
                   <h2 className="text-xl font-bold">Pagamento</h2>
                   <button
                     onClick={() => setShowCheckout(false)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-muted-foreground shadow-none hover:text-gray-700"
                   >
                     ✕
                   </button>

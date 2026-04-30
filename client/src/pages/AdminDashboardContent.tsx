@@ -48,7 +48,7 @@ export function getAdminUserStatusMeta(item: any): {
     return {
       key: "bought",
       label: "✓ Comprou",
-      badgeClass: "bg-emerald-100 text-emerald-800",
+      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
     };
   }
 
@@ -56,7 +56,7 @@ export function getAdminUserStatusMeta(item: any): {
     return {
       key: "pending",
       label: "⏳ Pendente",
-      badgeClass: "bg-amber-100 text-amber-800",
+      badgeClass: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
     };
   }
 
@@ -64,7 +64,7 @@ export function getAdminUserStatusMeta(item: any): {
     return {
       key: "quiz_abandoned",
       label: "Quiz Abandonado",
-      badgeClass: "bg-rose-100 text-rose-800",
+      badgeClass: "bg-rose-500/20 text-rose-400 border border-rose-500/30",
     };
   }
 
@@ -72,14 +72,14 @@ export function getAdminUserStatusMeta(item: any): {
     return {
       key: "quiz_completed",
       label: "Quiz Completo",
-      badgeClass: "bg-emerald-100 text-emerald-800",
+      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
     };
   }
 
   return {
     key: "quiz_started",
     label: "Início Quiz",
-    badgeClass: "bg-blue-100 text-blue-800",
+    badgeClass: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
   };
 }
 
@@ -128,11 +128,11 @@ const roleBadgeClass = (role: string) =>
 const paymentBadgeClass = (status: string) => {
   switch (status) {
     case "succeeded":
-      return "bg-emerald-100 text-emerald-800";
+      return "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
     case "pending":
-      return "bg-amber-100 text-amber-800";
+      return "bg-amber-500/20 text-amber-400 border border-amber-500/30";
     case "failed":
-      return "bg-rose-100 text-rose-800";
+      return "bg-rose-500/20 text-rose-400 border border-rose-500/30";
     default:
       return "bg-muted text-muted-foreground";
   }
@@ -164,7 +164,7 @@ function SectionHeading({
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <Card className="rounded-[28px] border border-dashed border-border/80 bg-white/90 p-10 text-center shadow-sm">
+    <Card className="rounded-[28px] border border-dashed border-border/80 bg-secondary/30 backdrop-blur-md shadow-none border-border p-10 text-center shadow-sm">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
         <BookHeart className="h-6 w-6" />
       </div>
@@ -188,7 +188,7 @@ function MetricCard({
   helper: string;
 }) {
   return (
-    <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-sm">
+    <Card className="rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border p-6 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
@@ -343,7 +343,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
           {Array.from({ length: 4 }).map((_, index) => (
             <Card
               key={index}
-              className="h-36 animate-pulse rounded-[28px] border border-border/60 bg-white/90 shadow-sm"
+              className="h-36 animate-pulse rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border shadow-sm"
             />
           ))}
         </div>
@@ -374,14 +374,14 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
               placeholder="Buscar por nome, email ou telefone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-muted-foreground">Status</label>
               <select
                 value={userStatusFilter}
                 onChange={(e) => setUserStatusFilter(e.target.value as AdminUserStatusKey)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="all">Todos os status</option>
                 <option value="quiz_started">Início Quiz</option>
@@ -397,7 +397,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -406,7 +406,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             {(userStatusFilter !== "all" || startDate || endDate) && (
@@ -416,7 +416,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                   setStartDate("");
                   setEndDate("");
                 }}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground hover:bg-muted transition-colors"
               >
                 Limpar filtros
               </button>
@@ -453,7 +453,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
               description="Assim que pessoas responderem o quiz, elas aparecerão aqui com suas informações de contato e data de resposta."
             />
           ) : (
-            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white/90 shadow-lg">
+            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border shadow-lg">
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead className="bg-secondary/70 text-left">
@@ -580,7 +580,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 placeholder="Digite email ou nome..."
                 value={buyerSearchQuery}
                 onChange={(e) => setBuyerSearchQuery(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -589,7 +589,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -598,7 +598,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             {(startDate || endDate || buyerSearchQuery) && (
@@ -608,7 +608,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                   setEndDate("");
                   setBuyerSearchQuery("");
                 }}
-                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+                className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground hover:bg-muted transition-colors"
               >
                 Limpar filtros
               </button>
@@ -642,7 +642,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
               description="Assim que alguém completar a compra do devocional, os dados aparecerão aqui com status de pagamento e informações de transação."
             />
           ) : (
-            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-white/90 shadow-lg">
+            <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border shadow-lg">
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead className="bg-secondary/70 text-left">
@@ -763,7 +763,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -772,7 +772,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           {(startDate || endDate) && (
@@ -781,7 +781,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 setStartDate("");
                 setEndDate("");
               }}
-              className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
+              className="px-4 py-2 rounded-lg border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border text-foreground hover:bg-muted transition-colors"
             >
               Limpar datas
             </button>
@@ -823,7 +823,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+          <Card className="rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border p-6 shadow-lg">
             <h3 className="mb-4 text-lg font-semibold text-foreground">Leads e compras por dia</h3>
             <p className="mb-4 text-sm text-muted-foreground">Evolução do funil com base nas entradas reais dos últimos 30 dias.</p>
             <ResponsiveContainer width="100%" height={300}>
@@ -839,7 +839,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
             </ResponsiveContainer>
           </Card>
 
-          <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+          <Card className="rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border p-6 shadow-lg">
             <h3 className="mb-4 text-lg font-semibold text-foreground">Distribuição de perfis</h3>
             <p className="mb-4 text-sm text-muted-foreground">Perfis espirituais mais recorrentes entre os diagnósticos salvos.</p>
             {(!summary?.perfilDistribuicao || summary.perfilDistribuicao.length === 0) ? (
@@ -870,7 +870,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
           </Card>
         </div>
 
-        <Card className="rounded-[28px] border border-border/60 bg-white/90 p-6 shadow-lg">
+        <Card className="rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border p-6 shadow-lg">
           <h3 className="mb-4 text-lg font-semibold text-foreground">Receita diária confirmada</h3>
           <p className="mb-4 text-sm text-muted-foreground">Valores aprovados no checkout do devocional, ligados aos compradores reais.</p>
           <ResponsiveContainer width="100%" height={300}>
@@ -895,7 +895,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {latestDiagnostics.map((diag) => (
-                <Card key={diag.id} className="rounded-[28px] border border-border/60 bg-white/90 p-5 shadow-sm">
+                <Card key={diag.id} className="rounded-[28px] border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border p-5 shadow-sm">
                   <p className="font-semibold text-foreground">{diag.profileName}</p>
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{diag.profileDescription}</p>
                   <p className="mt-3 text-xs text-muted-foreground">{formatDateTime(diag.createdAt)}</p>
