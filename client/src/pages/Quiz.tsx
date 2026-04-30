@@ -104,6 +104,7 @@ const readSessionNumber = (key: string, fallback: number) => {
 
 export default function Quiz() {
   const [, setLocation] = useLocation();
+  const processingTimerRef = useRef<number | null>(null);
   const [currentStep, setCurrentStep] = useState(() => readSessionNumber('quizCurrentStep', 0));
   const [responses, setResponses] = useState<Record<number, string>>(() => readSessionJSON<Record<number, string>>('quizResponsesDraft', {}));
   const [showLeadForm, setShowLeadForm] = useState(() => readSessionJSON<boolean>('quizShowLeadForm', false));
@@ -113,6 +114,8 @@ export default function Quiz() {
   const [hasStarted, setHasStarted] = useState(() => readSessionJSON<boolean>('quizHasStarted', false));
   const [hasClickedFinish, setHasClickedFinish] = useState(() => readSessionJSON<boolean>('quizHasClickedFinish', false));
   const [showInitialScreen, setShowInitialScreen] = useState(() => readSessionJSON<boolean>('quizShowInitialScreen', true));
+  const createLeadMutation = trpc.quiz.submitLead.useMutation();
+  const submitResponsesMutation = trpc.quiz.submitResponses.useMutation();
 
   useMetaQuizEvents({
     hasStarted: hasStarted,
@@ -154,6 +157,89 @@ export default function Quiz() {
     setTimeout(handleNext, 300);
   };
 
+  const handleLeadInputChange = (field: 'name' | 'whatsapp' | 'email', value: string) => {
+    setLeadData((previous) => ({ ...previous, [field]: value }));
+  };
+
+  const handleSubmitLead = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const name = leadData.name.trim();
+    const whatsapp = leadData.whatsapp.trim();
+    const email = leadData.email.trim();
+
+    if (!name || !whatsapp || !email) {
+      return;
+    }
+
+    const quizId = window.sessionStorage.getItem('quizId') || uuidv4();
+    window.sessionStorage.setItem('quizId', quizId);
+    window.sessionStorage.setItem('userName', name);
+    window.localStorage.setItem('userName', name);
+    window.localStorage.setItem('quizResponses', JSON.stringify(responses));
+    window.localStorage.setItem('leadData', JSON.stringify({ name, whatsapp, email }));
+
+    setHasClickedFinish(true);
+    setIsProcessing(true);
+    setProcessingStep(0);
+
+    try {
+      const leadResult = await createLeadMutation.mutateAsync({
+        userId: quizId,
+        name,
+        whatsapp,
+        email,
+      });
+
+      const newLeadId = leadResult.leadId;
+      window.localStorage.setItem('quizLeadId', String(newLeadId));
+      window.localStorage.setItem('leadData', JSON.stringify({ name, whatsapp, email, leadId: newLeadId }));
+      setProcessingStep(1);
+
+      await submitResponsesMutation.mutateAsync({
+        quizId,
+        leadId: newLeadId,
+        step1: responses[0],
+        step2: responses[1],
+        step3: responses[2],
+        step4: responses[3],
+        step5: responses[4],
+        step6: responses[5],
+        step7: responses[6],
+        step8: responses[7],
+        step9: responses[8],
+        step10: responses[9],
+        step11: responses[10],
+      });
+
+      setProcessingStep(2);
+      trackViewContent();
+
+      if (processingTimerRef.current) {
+        window.clearTimeout(processingTimerRef.current);
+      }
+
+      processingTimerRef.current = window.setTimeout(() => {
+        setProcessingStep(3);
+        window.sessionStorage.setItem('quizPendingResultRedirect', '1');
+        window.sessionStorage.setItem('quizPendingResultRedirectAt', String(Date.now()));
+        setLocation(`/result?leadId=${newLeadId}`);
+      }, 600);
+    } catch (error) {
+      console.error('Erro ao finalizar quiz:', error);
+      setIsProcessing(false);
+      setHasClickedFinish(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (processingTimerRef.current) {
+        window.clearTimeout(processingTimerRef.current);
+      }
+    };
+  }, []);
+
   if (isProcessing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 spiritual-background">
@@ -178,20 +264,20 @@ export default function Quiz() {
               <h2 className="text-3xl font-bold text-foreground mb-2">Seu diagnóstico está pronto</h2>
               <p className="text-muted-foreground">Informe seus dados para receber seu resultado e a orientação personalizada para esta fase.</p>
             </div>
-            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setIsProcessing(true); }}>
+            <form className="space-y-4" onSubmit={handleSubmitLead}>
               <div>
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" placeholder="Seu nome" className="bg-secondary/50 border-border text-foreground" />
+                <Input id="name" value={leadData.name} onChange={(e) => handleLeadInputChange('name', e.target.value)} placeholder="Seu nome" className="bg-secondary/50 border-border text-foreground" />
               </div>
               <div>
                 <Label htmlFor="whatsapp">Número WhatsApp</Label>
-                <Input id="whatsapp" placeholder="+55 (11) 99999-9999" className="bg-secondary/50 border-border text-foreground" />
+                <Input id="whatsapp" value={leadData.whatsapp} onChange={(e) => handleLeadInputChange('whatsapp', e.target.value)} placeholder="+55 (11) 99999-9999" className="bg-secondary/50 border-border text-foreground" />
               </div>
               <div>
                 <Label htmlFor="email">E-mail</Label>
-                <Input id="email" placeholder="seu@email.com" className="bg-secondary/50 border-border text-foreground" />
+                <Input id="email" type="email" value={leadData.email} onChange={(e) => handleLeadInputChange('email', e.target.value)} placeholder="seu@email.com" className="bg-secondary/50 border-border text-foreground" />
               </div>
-              <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold py-6">
+              <Button type="submit" disabled={createLeadMutation.isPending || submitResponsesMutation.isPending} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold py-6">
                 Ver meu diagnóstico espiritual
               </Button>
             </form>

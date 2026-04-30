@@ -1249,3 +1249,4 @@
 - [x] Garantir que "Quiz Abandonado" represente apenas quem saiu sem terminar o quiz
 - [x] Garantir que "Quiz Completo" represente quem apertou no botão "Finalizar"
 - [x] Validar os gatilhos e o mapeamento final dos três status
+- [x] Investigar e corrigir exclusivamente o problema atual que impede a geração/carregamento do resultado do quiz
