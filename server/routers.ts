@@ -24,6 +24,7 @@ import {
   updateQuizQuestion,
   createQuizQuestion,
   deleteQuizQuestion,
+  getAllQuizParticipants,
 } from "./db";
 import { createNewTransaction } from "./transaction-control";
 
@@ -353,6 +354,9 @@ export const appRouter = router({
     }),
     users: adminProcedure.query(async () => {
       return await getAdminUsers();
+    }),
+    allQuizParticipants: adminProcedure.query(async () => {
+      return await getAllQuizParticipants();
     }),
     buyers: adminProcedure.query(async () => {
       return await getAdminBuyers();

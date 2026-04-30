@@ -92,6 +92,13 @@ export async function sendQuizMetaEvent(
       },
     };
 
+    console.log(`[Meta Quiz Events] Preparando evento ${eventName}:`, {
+      event_name: event.event_name,
+      event_id: event.event_id,
+      user_data: event.user_data,
+      custom_data: event.custom_data,
+    });
+
     // Send to Meta Conversions API
     const response = await fetch(
       `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`,
@@ -108,6 +115,12 @@ export async function sendQuizMetaEvent(
     );
 
     const result = await response.json();
+
+    console.log(`[Meta Quiz Events] Meta CAPI Response (${eventName}):`, {
+      status: response.status,
+      statusText: response.statusText,
+      result: JSON.stringify(result, null, 2),
+    });
 
     if (!response.ok) {
       console.error("[Meta Quiz Events] Error sending event:", result);

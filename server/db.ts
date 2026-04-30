@@ -334,6 +334,27 @@ export async function getAdminUsers() {
   return await enrichUsersWithQuizStatus(records);
 }
 
+export async function getAllQuizParticipants() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Get all quiz participants from quiz_events (anyone who clicked "Começar diagnóstico")
+  const records = await db
+    .selectDistinct({
+      leadId: quizEvents.leadId,
+      status: quizEvents.eventName,
+      actionTime: quizEvents.createdAt,
+      reason: quizEvents.reason,
+    })
+    .from(quizEvents)
+    .where(eq(quizEvents.eventName, "QuizStarted"))
+    .orderBy(desc(quizEvents.createdAt));
+
+  return records;
+}
+
 export async function getAdminBuyers() {
   const db = await getDb();
   if (!db) {
