@@ -37,6 +37,25 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
+// Meta Pixel: Track Quiz Abandonment
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    if (window.quizStarted && !window.quizCompleted) {
+      if (typeof window.fbq !== 'undefined') {
+        window.fbq('trackCustom', 'QuizAbandon');
+      }
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && window.quizStarted && !window.quizCompleted) {
+      if (typeof window.fbq !== 'undefined') {
+        window.fbq('trackCustom', 'QuizAbandon');
+      }
+    }
+  });
+}
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({

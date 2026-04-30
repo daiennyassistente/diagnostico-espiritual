@@ -11,6 +11,15 @@ import { WhatsAppReferralButton } from '@/components/WhatsAppReferralButton';
 import { trackViewContent, trackLead } from '@/lib/metaPixelTracking';
 import { useMetaQuizEvents } from '@/hooks/useMetaQuizEvents';
 
+// Declare global window properties for Meta Pixel tracking
+declare global {
+  interface Window {
+    quizStarted?: boolean;
+    quizCompleted?: boolean;
+    fbq?: (action: string, eventName: string, data?: any) => void;
+  }
+}
+
 interface QuizStep {
   id: number;
   question: string;
@@ -371,6 +380,14 @@ export default function Quiz() {
     } else {
       setHasClickedFinish(true);
       setShowLeadForm(true);
+      
+      // Meta Pixel: Track Lead (Quiz Completed)
+      if (typeof window !== 'undefined' && !window.quizCompleted) {
+        window.quizCompleted = true;
+        if (typeof window.fbq !== 'undefined') {
+          window.fbq('track', 'Lead');
+        }
+      }
     }
   };
 
@@ -865,7 +882,14 @@ export default function Quiz() {
                 setHasClickedFinish(false);
                 setHasStarted(true);
                 setCurrentStep(1);
-                // [Otimização] console.log removido
+                
+                // Meta Pixel: Track QuizStart
+                if (typeof window !== 'undefined' && !window.quizStarted) {
+                  window.quizStarted = true;
+                  if (typeof window.fbq !== 'undefined') {
+                    window.fbq('trackCustom', 'QuizStart');
+                  }
+                }
               }}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-lg text-sm md:text-lg font-semibold"
             >
