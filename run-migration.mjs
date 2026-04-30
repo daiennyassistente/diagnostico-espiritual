@@ -1,5 +1,10 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -8,15 +13,22 @@ if (!DATABASE_URL) {
 }
 
 const connection = await mysql.createConnection(DATABASE_URL);
-const db = drizzle(connection);
 
 try {
-  console.log("Executando migração: DROP COLUMN emotionalMessage");
-  await connection.execute("ALTER TABLE `diagnostic_history` DROP COLUMN `emotionalMessage`");
+  console.log("Aplicando migração: CREATE TABLE quiz_events");
+  const sqlFile = path.join(__dirname, "drizzle/0029_jittery_kree.sql");
+  const sql = fs.readFileSync(sqlFile, "utf-8");
+  
+  // Split by semicolon and execute each statement
+  const statements = sql.split(";").filter(s => s.trim());
+  for (const statement of statements) {
+    await connection.execute(statement);
+  }
+  
   console.log("✓ Migração aplicada com sucesso!");
 } catch (error) {
-  if (error.code === "ER_CANT_DROP_FIELD_OR_KEY") {
-    console.log("⚠ Coluna já foi removida anteriormente");
+  if (error.code === "ER_TABLE_EXISTS_ERROR") {
+    console.log("⚠ Tabela quiz_events já existe");
   } else {
     console.error("Erro ao executar migração:", error.message);
     process.exit(1);

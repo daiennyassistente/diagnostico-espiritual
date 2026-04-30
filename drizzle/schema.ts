@@ -184,3 +184,21 @@ export const visitors = mysqlTable("visitors", {
 
 export type Visitor = typeof visitors.$inferSelect;
 export type InsertVisitor = typeof visitors.$inferInsert;
+
+// Tabela para rastrear eventos de quiz (QuizStarted, QuizCompleted, QuizAbandoned)
+export const quizEvents = mysqlTable("quiz_events", {
+  id: int("id").autoincrement().primaryKey(),
+  leadId: int("leadId").notNull(), // Referência ao lead
+  eventName: mysqlEnum("eventName", ["QuizStarted", "QuizCompleted", "QuizAbandoned"]).notNull(),
+  eventId: varchar("eventId", { length: 255 }).notNull().unique(), // ID único do evento para deduplicação
+  userEmail: varchar("userEmail", { length: 320 }), // Email do usuário
+  userPhone: varchar("userPhone", { length: 20 }), // Telefone do usuário
+  profileName: varchar("profileName", { length: 255 }), // Nome do perfil (para QuizCompleted)
+  currentStep: int("currentStep"), // Passo atual do quiz (para QuizAbandoned)
+  totalSteps: int("totalSteps"), // Total de passos (para QuizAbandoned)
+  reason: varchar("reason", { length: 255 }), // Motivo do abandono (inactivity, page_unload, tab_hidden)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type QuizEvent = typeof quizEvents.$inferSelect;
+export type InsertQuizEvent = typeof quizEvents.$inferInsert;

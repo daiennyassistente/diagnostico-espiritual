@@ -652,6 +652,43 @@ Equipe Diagnóstico Espiritual
         }
       }),
 
+    sendMetaEvent: publicProcedure
+      .input(
+        z.object({
+          eventName: z.enum(["QuizStarted", "QuizCompleted", "QuizAbandoned"]),
+          leadId: z.number(),
+          email: z.string().optional(),
+          phone: z.string().optional(),
+          profileName: z.string().optional(),
+          currentStep: z.number().optional(),
+          totalSteps: z.number().optional(),
+          reason: z.string().optional(),
+          firstName: z.string().optional(),
+          sourceUrl: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        try {
+          const { sendQuizMetaEvent } = await import("./meta-quiz-events");
+          const result = await sendQuizMetaEvent(
+            input.eventName,
+            input.leadId,
+            input.email,
+            input.phone,
+            input.profileName,
+            input.currentStep,
+            input.totalSteps,
+            input.reason,
+            input.firstName,
+            input.sourceUrl
+          );
+          return result;
+        } catch (error: any) {
+          console.error("Error sending meta event:", error);
+          throw new Error(`Erro ao enviar evento Meta: ${error.message}`);
+        }
+      }),
+
     sendDevotionalEmail: publicProcedure
       .input(
         z.object({

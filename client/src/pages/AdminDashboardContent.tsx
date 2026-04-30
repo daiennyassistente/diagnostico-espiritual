@@ -425,7 +425,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                             <div className="flex gap-2">
                               {whatsappStr && (
                                 <a
-                                  href={`https://wa.me/${whatsappStr.split('').filter((c) => /[0-9]/.test(c)).join('')}`}
+                                  href={`https://wa.me/${whatsappStr.split('').filter((c: string) => /[0-9]/.test(c)).join('')}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"

@@ -1141,3 +1141,49 @@
 - [x] Integrar microcopy na página de resultado
 - [x] Criar testes unitários
 - [x] Validar funcionamento completo
+
+
+## Status de Quiz no Painel Admin - CONCLUÍDO
+- [x] Criar tabela quiz_events no banco de dados para rastrear eventos de quiz
+- [x] Adicionar função saveQuizEvent para salvar eventos (QuizStarted, QuizCompleted, QuizAbandoned)
+- [x] Adicionar função getLatestQuizStatusForAdmin com prioridade (Concluído > Abandonado > Iniciado)
+- [x] Integrar enriquecimento de status na função getAdminUsers
+- [x] Exibir status de quiz na tabela de usuários do admin (coluna quizStatus)
+- [x] Criar testes unitários para quiz-events-db.ts (11 testes passando)
+- [x] Criar testes unitários para admin-quiz-status.ts (7 testes passando)
+- [x] Validar que status é atualizado quando eventos Meta CAPI são disparados
+- [x] Testar fluxo completo: Quiz Iniciado → Quiz Concluído → Status atualizado no admin
+
+## Integração Meta Conversions API (CAPI) - Eventos de Quiz - CONCLUÍDO
+- [x] Criar serviço de integração com Meta CAPI no backend (server/meta-quiz-events.ts)
+- [x] Implementar função para coletar dados do usuário (IP, user_agent, fbc, fbp)
+- [x] Implementar função para gerar event_id único por evento
+- [x] Criar procedimento tRPC para disparar eventos no backend
+- [x] Implementar hook useMetaQuizEvents no frontend
+- [x] Disparar evento "QuizStarted" quando usuário inicia o quiz
+- [x] Disparar evento "QuizCompleted" quando usuário completa o quiz
+- [x] Implementar detecção de abandono com beforeunload e visibilitychange
+- [x] Disparar evento "QuizAbandoned" com sendBeacon para garantir disparo
+- [x] Adicionar timeout de inatividade para detectar abandono (10 minutos configurável)
+- [x] Criar testes unitários para Meta CAPI (16 testes passando)
+- [x] Validar que eventos aparecem no Meta Events Manager com dados de usuário corretos
+
+## Página de Oferta com Foco em Conversão - CONCLUÍDO
+- [x] Criar página de oferta (Offer.tsx) com design persuasivo
+- [x] Implementar hero section com headline impactante
+- [x] Adicionar lista de 5 benefícios principais
+- [x] Exibir preço destacado (R$ 9,90)
+- [x] Implementar múltiplos CTAs ("Começar Minha Transformação")
+- [x] Adicionar seção de social proof com 3 diferenciais
+- [x] Incluir depoimento de cliente
+- [x] Criar FAQ com 4 perguntas frequentes
+- [x] Adicionar badges de confiança e segurança
+- [x] Integrar checkout Mercado Pago com Pix
+- [x] Testar fluxo completo: Resultado → Oferta → Pagamento
+
+## Correção do PIX - Modal com QR Code e Código para Copiar - CONCLUÍDO
+- [x] Corrigir problema onde modal de PIX fechava automaticamente
+- [x] Implementar exibição correta de QR Code
+- [x] Implementar exibição de código PIX para copiar e colar
+- [x] Adicionar botão "Copiar" para facilitar cópia do código
+- [x] Testar fluxo completo: Clique em PIX → QR Code e código aparecem → Pagamento funciona

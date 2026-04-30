@@ -20,6 +20,7 @@ import {
   InsertTransactionControl,
   visitors,
   InsertVisitor,
+  quizEvents,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -329,7 +330,8 @@ export async function getAdminUsers() {
     .leftJoin(payments, eq(leads.id, payments.leadId))
     .orderBy(desc(leads.updatedAt), desc(leads.createdAt));
 
-  return records;
+  const { enrichUsersWithQuizStatus } = await import("./admin-quiz-status");
+  return await enrichUsersWithQuizStatus(records);
 }
 
 export async function getAdminBuyers() {
