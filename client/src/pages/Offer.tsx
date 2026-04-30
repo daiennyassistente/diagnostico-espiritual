@@ -8,9 +8,13 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 
 export function OfferPage() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [showCheckout, setShowCheckout] = useState(false);
   const { data: user } = trpc.auth.me.useQuery();
+  
+  // Extrair leadId da URL
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const leadId = searchParams.get('leadId') || '';
 
   const handleCheckout = () => {
     if (!user?.email) {
@@ -18,6 +22,11 @@ export function OfferPage() {
       return;
     }
     setShowCheckout(true);
+  };
+  
+  const handlePaymentSuccess = () => {
+    // Redirecionar para página de sucesso
+    setLocation('/checkout-success');
   };
 
   return (
@@ -212,14 +221,12 @@ export function OfferPage() {
               </div>
               <MercadoPagoCheckout
                 email={user?.email || ""}
-                leadId=""
+                leadId={leadId}
                 quizId=""
                 resultId={0}
                 profileName="Devocional"
                 userPhone=""
-                onSuccess={() => {
-                  // Não fechar o modal aqui - deixar o MercadoPagoCheckout gerenciar a exibição do PIX
-                }}
+                onSuccess={handlePaymentSuccess}
               />
             </div>
           </Card>

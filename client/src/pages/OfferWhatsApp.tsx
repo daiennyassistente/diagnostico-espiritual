@@ -8,10 +8,14 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 
 export function OfferWhatsAppPage() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [showCheckout, setShowCheckout] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
   const { data: user } = trpc.auth.me.useQuery();
+  
+  // Extrair leadId da URL
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const leadId = searchParams.get('leadId') || '';
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -41,6 +45,11 @@ export function OfferWhatsAppPage() {
       return;
     }
     setShowCheckout(true);
+  };
+  
+  const handlePaymentSuccess = () => {
+    // Redirecionar para página de sucesso
+    setLocation('/checkout-success');
   };
 
   return (
@@ -188,14 +197,12 @@ export function OfferWhatsAppPage() {
               </div>
               <MercadoPagoCheckout
                 email={user?.email || ""}
-                leadId=""
+                leadId={leadId}
                 quizId=""
                 resultId={0}
                 profileName="Devocional WhatsApp"
                 userPhone=""
-                onSuccess={() => {
-                  // Não fechar o modal aqui - deixar o MercadoPagoCheckout gerenciar a exibição do PIX
-                }}
+                onSuccess={handlePaymentSuccess}
               />
             </div>
           </Card>
