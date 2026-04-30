@@ -1,6 +1,10 @@
 /**
  * Meta Pixel Tracking Utilities
  * Provides functions to track events in Meta Pixel with proper deduplication
+ * 
+ * NOTA: Os eventos QuizStarted, QuizCompleted, QuizAbandoned são enviados
+ * via Meta Conversions API (server-side) através do hook useMetaQuizEvents
+ * Este arquivo mantém apenas o evento Purchase que é disparado após pagamento
  */
 
 /**
@@ -12,13 +16,11 @@ export function trackMetaPixelEvent(
   eventId?: string
 ): void {
   if (typeof window === 'undefined') return;
-
   const fbq = (window as any).fbq;
   if (!fbq) {
     console.warn(`[Meta Pixel] fbq não disponível para rastrear ${eventName}`);
     return;
   }
-
   try {
     const options = eventId ? { eventID: eventId } : {};
     fbq('track', eventName, eventData || {}, options);
@@ -33,19 +35,8 @@ export function trackMetaPixelEvent(
 }
 
 /**
- * Track QuizStart event (quando usuário inicia o quiz automaticamente)
- */
-export function trackQuizStart(): void {
-  trackMetaPixelEvent('QuizStart', {
-    content_name: 'Diagnóstico Espiritual Quiz',
-    content_type: 'product',
-    currency: 'BRL',
-    value: 12.90,
-  });
-}
-
-/**
  * Track ViewContent event (quando usuário visualiza o quiz)
+ * NOTA: Este evento é opcional e pode ser removido se não for necessário
  */
 export function trackViewContent(): void {
   trackMetaPixelEvent('ViewContent', {
@@ -58,6 +49,7 @@ export function trackViewContent(): void {
 
 /**
  * Track Lead event (quando usuário submete lead)
+ * NOTA: Este evento é disparado após submissão do formulário de lead
  */
 export function trackLead(email?: string, phone?: string): void {
   trackMetaPixelEvent('Lead', {
@@ -91,7 +83,6 @@ export function trackPurchase(
   productName?: string
 ): void {
   const eventId = `purchase_${transactionId}`;
-
   trackMetaPixelEvent(
     'Purchase',
     {

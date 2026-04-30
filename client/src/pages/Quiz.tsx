@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { WhatsAppReferralButton } from '@/components/WhatsAppReferralButton';
-import { trackViewContent, trackLead, trackQuizStart } from '@/lib/metaPixelTracking';
+import { trackViewContent, trackLead } from '@/lib/metaPixelTracking';
 import { useMetaQuizEvents } from '@/hooks/useMetaQuizEvents';
 
 interface QuizStep {
@@ -224,13 +224,15 @@ export default function Quiz() {
     const newUserId = uuidv4();
     return newUserId;
   });
+  
+  const [submittedLeadId, setSubmittedLeadId] = useState<number>(0);
 
   // Integrar eventos de quiz com Meta CAPI
   useMetaQuizEvents({
     hasStarted,
     isQuizComplete: currentStep >= QUIZ_STEPS.length,
     leadData,
-    leadId: 0, // Será preenchido com o leadId real após submissão do formulário
+    leadId: submittedLeadId, // Será preenchido com o leadId real após submissão do formulário
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
   const [quizStartTracked, setQuizStartTracked] = useState(false);
@@ -264,14 +266,8 @@ export default function Quiz() {
     }
   }, [hasStarted, currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult]);
 
-  // Disparar evento QuizStart quando o quiz inicia
-  useEffect(() => {
-    if (!quizStartTracked && hasStarted && currentStep === 1) {
-      trackQuizStart();
-      setQuizStartTracked(true);
-      console.log('[Quiz] Evento QuizStart disparado');
-    }
-  }, [quizStartTracked, hasStarted, currentStep]);
+  // Nota: Evento QuizStarted é disparado via useMetaQuizEvents hook
+  // quando hasStarted muda para true
 
   // Disparar evento ViewContent quando o quiz é visualizado
   useEffect(() => {
@@ -474,7 +470,10 @@ export default function Quiz() {
 
       // Disparar evento Lead quando o lead é capturado
       trackLead(leadData.email, leadData.whatsapp.replace(/\D/g, ''));
-      console.log('[Quiz] Evento Lead disparado');
+      console.log('[Meta Pixel] Evento Lead disparado');
+      
+      // Nota: Evento QuizCompleted será disparado via useMetaQuizEvents
+      // quando currentStep >= QUIZ_STEPS.length (isQuizComplete = true)
 
       const leadResult = await submitLeadMutation.mutateAsync({
         userId: userId,
@@ -484,6 +483,9 @@ export default function Quiz() {
       });
 
       if (leadResult.success && leadResult.leadId) {
+        // Atualizar leadId para o hook de eventos Meta
+        setSubmittedLeadId(leadResult.leadId);
+        
         const responsesData = {
           quizId: quizId,
           leadId: leadResult.leadId,
@@ -721,9 +723,9 @@ export default function Quiz() {
             <Button
               onClick={() => {
                 setShowInitialScreen(false);
+                setHasStarted(true);
                 setCurrentStep(1);
-                trackQuizStart();
-                setQuizStartTracked(true);
+                console.log('[Quiz] Botão "Começar diagnóstico" clicado - QuizStarted será disparado via useMetaQuizEvents');
               }}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-6 font-bold"
             >
@@ -866,7 +868,7 @@ export default function Quiz() {
               onClick={() => {
                 setHasStarted(true);
                 setCurrentStep(1);
-                trackQuizStart();
+                console.log('[Quiz] Botão "Começar diagnóstico" clicado - QuizStarted será disparado via useMetaQuizEvents');
               }}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-lg text-lg font-semibold"
             >

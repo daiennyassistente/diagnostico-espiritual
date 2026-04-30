@@ -1197,3 +1197,12 @@
 - [x] Testar em página de oferta WhatsApp (/offer-whatsapp)
 - [x] Criar testes unitários para validar o comportamento correto
 - [x] Todos os testes passando (3 testes em MercadoPagoCheckout.test.ts)
+
+## Correção de Eventos do Quiz - Meta CAPI - CONCLUÍDO
+- [x] Corrigir disparo de QuizStarted no botão "Começar Diagnóstico"
+- [x] Corrigir disparo de QuizCompleted no botão "Finalizar"
+- [x] Corrigir disparo de QuizAbandoned (inatividade, beforeunload, visibilitychange)
+- [x] Garantir que event_name enviado seja exatamente: "QuizStarted", "QuizCompleted", "QuizAbandoned"
+- [x] Validar que cada evento retorna events_received: 1 na CAPI
+- [x] Criar testes para validar disparo correto dos eventos
+- [x] Testar fluxo completo com eventos corretos
