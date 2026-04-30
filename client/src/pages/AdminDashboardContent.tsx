@@ -35,6 +35,53 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 
 type AdminSection = "dashboard" | "usuarios" | "compradores";
+type AdminUserStatusKey = "all" | "quiz_started" | "quiz_abandoned" | "quiz_completed" | "pending" | "bought";
+
+export function getAdminUserStatusMeta(item: any): {
+  key: Exclude<AdminUserStatusKey, "all">;
+  label: string;
+  badgeClass: string;
+} {
+  const quizStatus = typeof item.quizStatus === "string" ? item.quizStatus : "";
+
+  if (item.status === "comprou") {
+    return {
+      key: "bought",
+      label: "✓ Comprou",
+      badgeClass: "bg-emerald-100 text-emerald-800",
+    };
+  }
+
+  if (item.status === "pendente") {
+    return {
+      key: "pending",
+      label: "⏳ Pendente",
+      badgeClass: "bg-amber-100 text-amber-800",
+    };
+  }
+
+  if (quizStatus === "Quiz Abandonado") {
+    return {
+      key: "quiz_abandoned",
+      label: "Quiz Abandonado",
+      badgeClass: "bg-rose-100 text-rose-800",
+    };
+  }
+
+  if (quizStatus === "Quiz Concluído") {
+    return {
+      key: "quiz_completed",
+      label: "Quiz Completo",
+      badgeClass: "bg-emerald-100 text-emerald-800",
+    };
+  }
+
+  return {
+    key: "quiz_started",
+    label: "Início Quiz",
+    badgeClass: "bg-blue-100 text-blue-800",
+  };
+}
 
 const MENU_ITEMS: DashboardLayoutMenuItem[] = [
   {
@@ -189,6 +236,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   const [buyerSearchQuery, setBuyerSearchQuery] = useState("");
+  const [userStatusFilter, setUserStatusFilter] = useState<AdminUserStatusKey>("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const { user } = useAuth();
@@ -264,6 +312,10 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
         );
       });
     }
+
+    if (userStatusFilter !== 'all') {
+      filtered = filtered.filter((user) => getAdminUserStatusMeta(user).key === userStatusFilter);
+    }
     
     if (startDate || endDate) {
       const start = startDate ? new Date(startDate) : null;
@@ -282,7 +334,7 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
     }
     
     return filtered;
-  }, [users, searchQuery, startDate, endDate]);
+  }, [users, searchQuery, userStatusFilter, startDate, endDate]);
 
   const renderContent = () => {
     if (snapshotQuery.isLoading) {
@@ -325,6 +377,21 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
               className="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">Status</label>
+              <select
+                value={userStatusFilter}
+                onChange={(e) => setUserStatusFilter(e.target.value as AdminUserStatusKey)}
+                className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              >
+                <option value="all">Todos os status</option>
+                <option value="quiz_started">Início Quiz</option>
+                <option value="quiz_abandoned">Quiz Abandonado</option>
+                <option value="quiz_completed">Quiz Completo</option>
+                <option value="pending">Pendente</option>
+                <option value="bought">Comprou</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-muted-foreground">Data de Início</label>
               <input
                 type="date"
@@ -342,15 +409,16 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                 className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
-            {(startDate || endDate) && (
+            {(userStatusFilter !== "all" || startDate || endDate) && (
               <button
                 onClick={() => {
+                  setUserStatusFilter("all");
                   setStartDate("");
                   setEndDate("");
                 }}
                 className="px-4 py-2 rounded-lg border border-border/60 bg-white/90 text-foreground hover:bg-muted transition-colors"
               >
-                Limpar datas
+                Limpar filtros
               </button>
             )}
           </div>
@@ -404,29 +472,15 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                       const emailStr = typeof item.email === 'string' ? item.email : String(item.email || '');
                       const whatsappStr = typeof item.whatsapp === 'string' ? item.whatsapp : String(item.whatsapp || '');
                       const roleStr = typeof item.role === 'string' ? item.role : String(item.role || '');
-                      const quizStatus = typeof item.quizStatus === 'string' ? item.quizStatus : '';
-                      const statusLabel = item.status === 'comprou'
-                        ? '✓ Comprou'
-                        : item.status === 'pendente'
-                          ? '⏳ Pendente'
-                          : quizStatus || '📝 Quiz';
-                      const statusClass = item.status === 'comprou'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : item.status === 'pendente'
-                          ? 'bg-amber-100 text-amber-800'
-                          : quizStatus === 'Quiz Concluído'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : quizStatus === 'Quiz Abandonado'
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-blue-100 text-blue-800';
+                      const statusMeta = getAdminUserStatusMeta(item);
                       return (
                         <tr key={item.id} className="border-t border-border/50 align-top">
                           <td className="px-5 py-4 text-foreground">{nameStr || "Sem nome"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{emailStr || "-"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}>
-                              {statusLabel}
+                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusMeta.badgeClass}`}>
+                              {statusMeta.label}
                             </span>
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">{formatDateTime(item.updatedAt)}</td>

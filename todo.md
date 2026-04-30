@@ -1236,4 +1236,10 @@
 - [x] Diagnosticar por que os eventos do quiz não estão aparecendo no painel de controle
 - [x] Corrigir o disparo e o envio dos eventos do quiz sem alterar outras funcionalidades
 - [x] Validar o envio para Meta e painel com testes e verificação do ambiente
-- [ ] Salvar checkpoint após a correção urgente
+- [x] Salvar checkpoint após a correção urgente
+
+## Filtro por status na aba de usuários do admin
+- [x] Revisar todos os status existentes no sistema: início quiz, quiz abandonado, quiz completo, pendente e comprou
+- [x] Adicionar filtro por status na aba de usuários da página de admin
+- [x] Garantir que o filtro funcione com todos os status exibidos no sistema
+- [x] Validar no ambiente e confirmar se já pode testar os eventos da Meta
