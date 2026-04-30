@@ -70,7 +70,7 @@ export function MercadoPagoCheckout({
           onSuccess?.(transactionId);
           // Obter o valor da compra do localStorage
           const purchaseAmount = localStorage.getItem('purchaseAmount') || '9.90';
-          window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(purchaseAmount)}`;
+          window.location.href = `/checkout-success?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(purchaseAmount)}`;
         }
       } catch (error) {
         console.error("Erro ao consultar status do pagamento PIX:", error);
