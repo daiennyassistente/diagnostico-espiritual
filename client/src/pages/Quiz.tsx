@@ -226,11 +226,14 @@ export default function Quiz() {
   });
   
   const [submittedLeadId, setSubmittedLeadId] = useState<number>(0);
+  const [hasClickedFinish, setHasClickedFinish] = useState(() =>
+    readSessionJSON<boolean>('quizHasClickedFinish', false)
+  );
 
   // Integrar eventos de quiz com Meta CAPI
   useMetaQuizEvents({
-    hasStarted,
-    isQuizComplete: showLeadForm || isProcessing || isNavigatingToResult,
+    hasStarted: hasStarted && !isNavigatingToResult,
+    isQuizComplete: hasClickedFinish,
     leadData,
     leadId: submittedLeadId,
   });
@@ -254,7 +257,8 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizShowLeadForm', JSON.stringify(showLeadForm));
     window.sessionStorage.setItem('quizLeadDraft', JSON.stringify(leadData));
     window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
-  }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
+    window.sessionStorage.setItem('quizHasClickedFinish', JSON.stringify(hasClickedFinish));
+  }, [currentStep, responses, showLeadForm, leadData, hasStarted, hasClickedFinish]);
 
   // Nota: Evento QuizStarted é disparado via useMetaQuizEvents apenas
   // quando o usuário realmente inicia o quiz por clique ou interação.
@@ -295,14 +299,6 @@ export default function Quiz() {
     window.sessionStorage.removeItem('quizProcessingStartedAt');
     window.sessionStorage.removeItem('quizProcessingStep');
   }, [isProcessing, processingStep]);
-
-  useEffect(() => {
-    if (hasStarted) return;
-
-    if (currentStep > 0 || Object.keys(responses).length > 0 || showLeadForm || isProcessing || isNavigatingToResult) {
-      setHasStarted(true);
-    }
-  }, [currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult, hasStarted]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -373,6 +369,7 @@ export default function Quiz() {
     if (currentStep < QUIZ_STEPS.length) {
       setCurrentStep((previousStep) => previousStep + 1);
     } else {
+      setHasClickedFinish(true);
       setShowLeadForm(true);
     }
   };
@@ -713,6 +710,7 @@ export default function Quiz() {
             <Button
               onClick={() => {
                 setShowInitialScreen(false);
+                setHasClickedFinish(false);
                 setHasStarted(true);
                 setCurrentStep(1);
                 // [Otimização] console.log removido
@@ -856,6 +854,7 @@ export default function Quiz() {
             {/* Botão principal */}
             <Button
               onClick={() => {
+                setHasClickedFinish(false);
                 setHasStarted(true);
                 setCurrentStep(1);
                 // [Otimização] console.log removido
@@ -888,6 +887,7 @@ export default function Quiz() {
           </p>
           <Button
             onClick={() => {
+              setHasClickedFinish(false);
               setHasStarted(true);
               setCurrentStep(1);
             }}

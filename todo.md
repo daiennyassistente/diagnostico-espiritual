@@ -1243,3 +1243,9 @@
 - [x] Adicionar filtro por status na aba de usuários da página de admin
 - [x] Garantir que o filtro funcione com todos os status exibidos no sistema
 - [x] Validar no ambiente e confirmar se já pode testar os eventos da Meta
+
+## Refino das regras de status do quiz no admin
+- [x] Garantir que "Início Quiz" represente apenas quem clicou em "Começar diagnóstico"
+- [x] Garantir que "Quiz Abandonado" represente apenas quem saiu sem terminar o quiz
+- [x] Garantir que "Quiz Completo" represente quem apertou no botão "Finalizar"
+- [x] Validar os gatilhos e o mapeamento final dos três status
