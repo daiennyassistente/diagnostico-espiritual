@@ -23,8 +23,42 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '948457397777180');
+    // Enable advanced matching for better event quality
+    fbq('init', '948457397777180', {
+      em: undefined, // Will be set dynamically from user data
+      ph: undefined  // Will be set dynamically from user data
+    });
     fbq('track', 'PageView');
+    
+    // Initialize fbclid tracking (capture from URL and persist in _fbc cookie)
+    (function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var fbclid = params.get('fbclid');
+        var existingFbc = null;
+        
+        // Check for existing _fbc cookie
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.indexOf('_fbc=') === 0) {
+            existingFbc = decodeURIComponent(cookie.substring(5));
+            break;
+          }
+        }
+        
+        // Set _fbc cookie if fbclid found and no existing cookie
+        if (fbclid && !existingFbc) {
+          var timestamp = Math.floor(Date.now() / 1000);
+          var fbcValue = 'fb.1.' + timestamp + '.' + fbclid;
+          var expirationDate = new Date();
+          expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+          document.cookie = '_fbc=' + encodeURIComponent(fbcValue) + '; path=/; expires=' + expirationDate.toUTCString() + '; SameSite=Lax';
+        }
+      } catch (e) {
+        // Silently fail - fbclid tracking is optional
+      }
+    })();
     
     // Quiz tracking state flags
     window.quizStarted = false;

@@ -8,6 +8,24 @@
  */
 
 /**
+ * Get _fbc cookie value for event matching
+ */
+function getFbcCookie(): string | null {
+  try {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === '_fbc' && value) {
+        return decodeURIComponent(value);
+      }
+    }
+  } catch (e) {
+    // Silently fail
+  }
+  return null;
+}
+
+/**
  * Track a Meta Pixel event
  */
 export function trackMetaPixelEvent(
@@ -49,16 +67,31 @@ export function trackViewContent(): void {
 
 /**
  * Track Lead event (quando usuário submete lead)
- * NOTA: Este evento é disparado após submissão do formulário de lead
+ * Inclui advanced matching (email, phone) e fbclid para melhor qualidade de correspondência
  */
 export function trackLead(email?: string, phone?: string): void {
-  trackMetaPixelEvent('Lead', {
+  const eventData: Record<string, any> = {
     content_name: 'Diagnóstico Espiritual',
     currency: 'BRL',
     value: 12.90,
-    ...(email && { email }),
-    ...(phone && { phone_number: phone }),
-  });
+  };
+
+  // Add advanced matching data (will be hashed by fbq)
+  if (email) {
+    eventData.em = email.toLowerCase().trim();
+  }
+  if (phone) {
+    // Normalize phone: remove non-digits
+    eventData.ph = phone.replace(/\D/g, '');
+  }
+
+  // Add fbclid from cookie for better event matching
+  const fbc = getFbcCookie();
+  if (fbc) {
+    eventData.fbc = fbc;
+  }
+
+  trackMetaPixelEvent('Lead', eventData);
 }
 
 /**

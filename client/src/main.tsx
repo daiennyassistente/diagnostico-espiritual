@@ -6,7 +6,11 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
+import { initializeFbclidTracking } from "./lib/fbclid";
 import "./index.css";
+
+// Initialize fbclid tracking early
+initializeFbclidTracking();
 
 const queryClient = new QueryClient();
 
