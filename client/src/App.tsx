@@ -14,6 +14,7 @@ import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminLogin } from "./pages/AdminLogin";
 import SharePage from "./pages/SharePage";
 import { OfferPage } from "./pages/Offer";
+import { OfferWhatsAppPage } from "./pages/OfferWhatsApp";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -27,6 +28,7 @@ function Router() {
       <Route path={"/sucesso"} component={CheckoutSuccess} />
       <Route path={"/share"} component={SharePage} />
       <Route path={"/offer"} component={OfferPage} />
+      <Route path={"/offer-whatsapp"} component={OfferWhatsAppPage} />
 
       <Route path={"/admin-login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminDashboard} />
