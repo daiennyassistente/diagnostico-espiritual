@@ -491,7 +491,7 @@ export default function Result() {
             size="lg"
             className="w-full text-lg font-bold"
             style={{ backgroundColor: "#FFC700", color: "#17395F" }}
-            onClick={() => setLocation("/offer")}
+            onClick={() => setLocation(`/offer?leadId=${leadId}`)}
             disabled={false}
           >
             {isCheckingOut ? (
