@@ -218,8 +218,7 @@ export function OfferPage() {
                 profileName="Devocional"
                 userPhone=""
                 onSuccess={() => {
-                  toast.success("Pagamento processado com sucesso!");
-                  setShowCheckout(false);
+                  // Não fechar o modal aqui - deixar o MercadoPagoCheckout gerenciar a exibição do PIX
                 }}
               />
             </div>

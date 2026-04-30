@@ -1010,12 +1010,36 @@ Se esse mesmo texto pudesse servir para outra pessoa com respostas diferentes, e
             const data = await response.json();
             console.log("[Mercado Pago PIX] DEBUG - Resposta sucesso:", JSON.stringify(data, null, 2));
             
-            const pixCode = data.point_of_interaction?.transaction_data?.qr_code;
-            const pixImage = data.point_of_interaction?.transaction_data?.qr_code_base64;
-
-            console.log("[Mercado Pago PIX] DEBUG - PIX Code gerado:", !!pixCode);
-            console.log("[Mercado Pago PIX] DEBUG - PIX Image gerado:", !!pixImage);
+            // Extrair PIX code e QR code da resposta
+            let pixCode = "";
+            let pixImage = "";
+            
+            // Tentar diferentes caminhos possíveis na resposta
+            if (data.point_of_interaction?.transaction_data?.qr_code) {
+              pixCode = data.point_of_interaction.transaction_data.qr_code;
+            }
+            if (data.point_of_interaction?.transaction_data?.qr_code_base64) {
+              pixImage = data.point_of_interaction.transaction_data.qr_code_base64;
+            }
+            
+            // Se não encontrou, tentar estrutura alternativa
+            if (!pixCode && data.transaction_data?.qr_code) {
+              pixCode = data.transaction_data.qr_code;
+            }
+            if (!pixImage && data.transaction_data?.qr_code_base64) {
+              pixImage = data.transaction_data.qr_code_base64;
+            }
+            
+            // Log detalhado da estrutura da resposta
+            console.log("[Mercado Pago PIX] DEBUG - Estrutura completa:", JSON.stringify(data, null, 2));
+            console.log("[Mercado Pago PIX] DEBUG - PIX Code extraído:", pixCode);
+            console.log("[Mercado Pago PIX] DEBUG - PIX Image extraído:", !!pixImage);
             console.log("[Mercado Pago PIX] DEBUG - transactionId retornando:", transactionId);
+            
+            if (!pixCode || !pixImage) {
+              console.warn("[Mercado Pago PIX] AVISO - PIX code ou image não encontrados na resposta");
+              console.warn("[Mercado Pago PIX] Resposta completa:", JSON.stringify(data, null, 2));
+            }
 
             // Create payment record
             try {

@@ -113,6 +113,7 @@ export function MercadoPagoCheckout({
   const handlePixPayment = async () => {
     setIsLoading(true);
     try {
+      console.log("[MercadoPagoCheckout] Iniciando pagamento PIX");
       const result = await createPaymentMutation.mutateAsync({
         email,
         leadId,
@@ -123,22 +124,31 @@ export function MercadoPagoCheckout({
         paymentMethod: "pix",
       });
 
+      console.log("[MercadoPagoCheckout] Resposta recebida:", result);
+
       if (result.success && result.pixCode && result.pixQrCode) {
+        console.log("[MercadoPagoCheckout] PIX gerado com sucesso, atualizando estado");
         setPixCode(result.pixCode);
         setPixQrCode(result.pixQrCode);
         setTransactionId(result.transactionId || "");
         console.log("[MercadoPagoCheckout] DEBUG - transactionId capturado:", result.transactionId);
         console.log("[MercadoPagoCheckout] DEBUG - resultId enviado:", resultId);
         console.log("[MercadoPagoCheckout] DEBUG - Iniciando polling para transactionId:", result.transactionId);
-        setShowPixInfo(true);
+        
+        // Usar setTimeout para garantir que o estado seja atualizado antes de renderizar
+        setTimeout(() => {
+          setShowPixInfo(true);
+          console.log("[MercadoPagoCheckout] showPixInfo definido como true");
+        }, 100);
+        
         onSuccess?.(result.transactionId);
         toast.success("QR Code PIX gerado com sucesso!");
       } else {
+        console.error("[MercadoPagoCheckout] Erro - PIX code ou QR code não retornados", result);
         toast.error(result.error || "Erro ao gerar QR Code PIX");
-        console.error("Erro ao gerar PIX:", result);
       }
     } catch (error) {
-      console.error("Erro ao gerar PIX:", error);
+      console.error("[MercadoPagoCheckout] Erro ao gerar PIX:", error);
       toast.error("Erro ao gerar PIX. Tente novamente.");
     } finally {
       setIsLoading(false);
