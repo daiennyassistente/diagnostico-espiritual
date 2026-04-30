@@ -9,6 +9,7 @@ interface UseMetaQuizEventsProps {
     whatsapp: string;
     email: string;
   };
+  leadId?: number;
 }
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutos
@@ -17,6 +18,7 @@ export function useMetaQuizEvents({
   hasStarted,
   isQuizComplete,
   leadData,
+  leadId = 0,
 }: UseMetaQuizEventsProps) {
   const sendMetaEventMutation = trpc.quiz.sendMetaEvent.useMutation();
   const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -68,7 +70,7 @@ export function useMetaQuizEvents({
         clearTimeout(inactivityTimeoutRef.current);
       }
     };
-  }, [hasStarted, leadData.email, leadData.whatsapp, sendMetaEventMutation]);
+  }, [hasStarted, leadData.email, leadData.whatsapp, leadId, sendMetaEventMutation]);
 
   // Disparar evento QuizCompleted quando o quiz é completado
   useEffect(() => {
@@ -110,10 +112,16 @@ export function useMetaQuizEvents({
           sourceUrl: window.location.href,
         };
 
-        navigator.sendBeacon(
-          '/api/trpc/quiz.sendMetaEvent',
-          JSON.stringify(eventData)
-        );
+        // Usar mutate ao invés de sendBeacon, pois sendBeacon não suporta tRPC
+        sendMetaEventMutation.mutate({
+          eventName: 'QuizAbandoned' as const,
+          leadId: leadId || 0,
+          email: leadData.email,
+          phone: leadData.whatsapp,
+          firstName: leadData.name,
+          reason: 'page_unload',
+          sourceUrl: window.location.href,
+        });
       }
     };
 
@@ -141,5 +149,5 @@ export function useMetaQuizEvents({
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [hasStarted, leadData.email, leadData.whatsapp, sendMetaEventMutation]);
+  }, [hasStarted, leadData.email, leadData.whatsapp, leadId, sendMetaEventMutation]);
 }

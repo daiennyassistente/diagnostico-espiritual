@@ -230,6 +230,7 @@ export default function Quiz() {
     hasStarted,
     isQuizComplete: currentStep >= QUIZ_STEPS.length,
     leadData,
+    leadId: 0, // Será preenchido com o leadId real após submissão do formulário
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
   const [quizStartTracked, setQuizStartTracked] = useState(false);
