@@ -466,9 +466,9 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                                 textColor="text-green-700"
                                 hoverColor="hover:bg-green-200"
                                 onClick={() => {
-                                  const offerLink = `${window.location.origin}/offer?leadId=${item.id}`;
+                                  const offerLink = `${window.location.origin}/offer-whatsapp?leadId=${item.id}`;
                                   navigator.clipboard.writeText(offerLink);
-                                  toast.success('Link de oferta copiado para a área de transferência!');
+                                  toast.success('Link de oferta WhatsApp copiado para a área de transferência!');
                                 }}
                                 isLoading={false}
                               />
