@@ -234,23 +234,23 @@ export default function CheckoutSuccess() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-24 h-24 bg-accent/20 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-16 h-16 text-accent" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-accent/20 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-12 h-12 md:w-16 md:h-16 text-accent" />
               </div>
             </div>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-2">
             Pagamento Confirmado! 🎉
           </h1>
-          <p className="text-lg text-accent font-semibold mb-4">
+          <p className="text-base md:text-lg text-accent font-semibold mb-4">
             Seu devocional personalizado está pronto
           </p>
         </div>
 
         {/* Mensagem de sucesso */}
-        <div className="mb-8 p-6 bg-secondary rounded-lg border border-muted">
-          <p className="text-foreground text-lg leading-relaxed mb-4">
+        <div className="mb-8 p-4 md:p-6 bg-secondary rounded-lg border border-muted">
+          <p className="text-foreground text-base md:text-lg leading-relaxed mb-4">
             Obrigado por sua compra! Seu devocional personalizado de 7 dias foi criado especialmente para sua jornada espiritual.
           </p>
           <p className="text-foreground text-sm italic border-l-4 border-accent pl-4">
@@ -259,64 +259,63 @@ export default function CheckoutSuccess() {
         </div>
 
         {/* Detalhes do devocional */}
-        <div className="mb-8 p-6 bg-accent/5 rounded-lg border border-accent/20">
-          <h2 className="text-lg font-semibold text-foreground mb-4">
+        <div className="mb-8 p-4 md:p-6 bg-accent/5 rounded-lg border border-accent/20">
+          <h2 className="text-base md:text-lg font-semibold text-foreground mb-4">
             📖 Seu Devocional Inclui:
           </h2>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <span className="text-accent text-xl mt-1">✓</span>
-              <div>
-                <p className="font-semibold text-foreground">7 Dias de Reflexões Personalizadas</p>
-                <p className="text-sm text-foreground/80">Baseado no seu perfil espiritual e desafios</p>
+              <span className="text-accent text-xl mt-1 flex-shrink-0">✓</span>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground text-sm md:text-base">7 Dias de Reflexões Personalizadas</p>
+                <p className="text-xs md:text-sm text-foreground/80">Baseado no seu perfil espiritual e desafios</p>
               </div>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-accent text-xl mt-1">✓</span>
-              <div>
-                <p className="font-semibold text-foreground">Versículos Bíblicos Diários</p>
-                <p className="text-sm text-foreground/80">Selecionados especificamente para sua situação</p>
+              <span className="text-accent text-xl mt-1 flex-shrink-0">✓</span>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground text-sm md:text-base">Versículos Bíblicos Diários</p>
+                <p className="text-xs md:text-sm text-foreground/80">Selecionados especificamente para sua situação</p>
               </div>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-accent text-xl mt-1">✓</span>
-              <div>
-                <p className="font-semibold text-foreground">Orações e Aplicações Práticas</p>
-                <p className="text-sm text-foreground/80">Para você colocar em prática imediatamente</p>
+              <span className="text-accent text-xl mt-1 flex-shrink-0">✓</span>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground text-sm md:text-base">Orações e Aplicações Práticas</p>
+                <p className="text-xs md:text-sm text-foreground/80">Para você colocar em prática imediatamente</p>
               </div>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-accent text-xl mt-1">✓</span>
-              <div>
-                <p className="font-semibold text-foreground">Acesso Vitalício</p>
-                <p className="text-sm text-foreground/80">Releia sempre que precisar de encorajamento</p>
+              <span className="text-accent text-xl mt-1 flex-shrink-0">✓</span>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground text-sm md:text-base">Acesso Vitalício</p>
+                <p className="text-xs md:text-sm text-foreground/80">Releia sempre que precisar de encorajamento</p>
               </div>
             </li>
           </ul>
         </div>
 
-
-        {/* Botões de ação */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {/* Botões de ação - Responsivos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
           <Button
             onClick={handleDownloadDevocional}
             disabled={isGeneratingPDF || pdfGenerated}
-            className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-6 text-lg"
+            className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-4 md:py-6 text-sm md:text-base"
           >
             {isGeneratingPDF ? (
               <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Gerando PDF...
+                <Loader2 className="w-4 h-4 md:w-5 md:h-5 mr-2 animate-spin" />
+                <span className="truncate">Gerando PDF...</span>
               </>
             ) : pdfGenerated ? (
               <>
-                <CheckCircle className="w-5 h-5 mr-2" />
-                PDF Baixado
+                <CheckCircle className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                <span className="truncate">PDF Baixado</span>
               </>
             ) : (
               <>
-                <Download className="w-5 h-5 mr-2" />
-                Baixar Devocional
+                <Download className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                <span className="truncate">Baixar Devocional</span>
               </>
             )}
           </Button>
@@ -325,17 +324,17 @@ export default function CheckoutSuccess() {
             <Button
               onClick={handleResendViaWhatsApp}
               disabled={resendViaWhatsAppMutation.isPending}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-6 text-lg"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 md:py-6 text-sm md:text-base"
             >
               {resendViaWhatsAppMutation.isPending ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Enviando...
+                  <Loader2 className="w-4 h-4 md:w-5 md:h-5 mr-2 animate-spin" />
+                  <span className="truncate">Enviando...</span>
                 </>
               ) : (
                 <>
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Reenviar via WhatsApp
+                  <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                  <span className="truncate">Reenviar via WhatsApp</span>
                 </>
               )}
             </Button>
@@ -343,32 +342,35 @@ export default function CheckoutSuccess() {
         </div>
 
         {!whatsappNumber && (
-          <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <p className="text-sm text-amber-800">
+          <div className="mb-6 md:mb-8 p-3 md:p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-xs md:text-sm text-amber-800">
               💡 Para reenviar o PDF via WhatsApp, atualize seu número na próxima compra.
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {/* Botões secundários */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
           <Button
             onClick={() => window.open('https://wa.me/5585984463738?text=Ol%C3%A1%21%20Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20meu%20devocional%20personalizado.', '_blank')}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-6 text-lg"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 md:py-6 text-sm md:text-base"
           >
-            <MessageCircle className="w-5 h-5 mr-2" />
-            Falar com Suporte via WhatsApp
+            <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+            <span className="truncate">Suporte via WhatsApp</span>
           </Button>
           <Button
             onClick={handleBackToHome}
             className="w-full"
             variant="outline"
+            size="lg"
           >
             <Home className="w-4 h-4 mr-2" />
-            Voltar para Home
+            <span className="truncate">Voltar para Home</span>
           </Button>
         </div>
 
-        <div className="text-center p-4 bg-secondary/50 rounded-lg">
+        {/* Informações de suporte */}
+        <div className="text-center p-3 md:p-4 bg-secondary/50 rounded-lg">
           <p className="text-xs text-foreground/70 mb-2">
             ✓ Suporte disponível por 7 dias após a compra
           </p>
@@ -388,11 +390,11 @@ export default function CheckoutSuccess() {
         </div>
 
         {/* Mensagem de bênção */}
-        <div className="mt-8 text-center">
-          <p className="text-foreground italic text-sm">
+        <div className="mt-6 md:mt-8 text-center">
+          <p className="text-foreground italic text-xs md:text-sm">
             "Que o Senhor te abençoe e te guarde durante estes 7 dias de transformação espiritual."
           </p>
-          <p className="text-accent font-semibold mt-2">Números 6:24</p>
+          <p className="text-accent font-semibold mt-2 text-xs md:text-sm">Números 6:24</p>
         </div>
       </div>
     </div>
