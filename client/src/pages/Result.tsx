@@ -489,7 +489,6 @@ export default function Result() {
           </p>
           <Button
             size="lg"
-            className="w-full text-sm md:text-lg font-bold"
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
             onClick={() => setLocation(`/offer?leadId=${leadId}`)}
             disabled={false}
