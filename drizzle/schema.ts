@@ -189,7 +189,7 @@ export type InsertVisitor = typeof visitors.$inferInsert;
 export const quizEvents = mysqlTable("quiz_events", {
   id: int("id").autoincrement().primaryKey(),
   leadId: int("leadId").notNull(), // Referência ao lead
-  eventName: mysqlEnum("eventName", ["QuizStarted", "QuizCompleted", "QuizAbandoned"]).notNull(),
+  eventName: mysqlEnum("eventName", ["QuizStarted", "QuizCompleted", "QuizAbandoned", "Lead"]).notNull(),
   eventId: varchar("eventId", { length: 255 }).notNull().unique(), // ID único do evento para deduplicação
   userEmail: varchar("userEmail", { length: 320 }), // Email do usuário
   userPhone: varchar("userPhone", { length: 20 }), // Telefone do usuário

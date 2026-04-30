@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
  */
 export async function saveQuizEvent(
   leadId: number,
-  eventName: "QuizStarted" | "QuizCompleted" | "QuizAbandoned",
+  eventName: "QuizStarted" | "QuizCompleted" | "QuizAbandoned" | "Lead",
   eventId: string,
   userEmail?: string,
   userPhone?: string,

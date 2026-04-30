@@ -211,6 +211,13 @@
       "when": 1777555287684,
       "tag": "0029_jittery_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1777582320747,
+      "tag": "0030_late_killraven",
+      "breakpoints": true
     }
   ]
 }

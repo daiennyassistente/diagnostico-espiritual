@@ -1,0 +1,1 @@
+ALTER TABLE `quiz_events` MODIFY COLUMN `eventName` enum('QuizStarted','QuizCompleted','QuizAbandoned','Lead') NOT NULL;

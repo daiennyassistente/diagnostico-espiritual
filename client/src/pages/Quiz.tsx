@@ -255,6 +255,7 @@ export default function Quiz() {
 
   const submitLeadMutation = trpc.quiz.submitLead.useMutation();
   const submitResponsesMutation = trpc.quiz.submitResponses.useMutation();
+  const sendMetaEventMutation = trpc.quiz.sendMetaEvent.useMutation();
 
   const isQuizComplete = currentStep >= QUIZ_STEPS.length;
 
@@ -489,6 +490,16 @@ export default function Quiz() {
       if (leadResult.success && leadResult.leadId) {
         // Atualizar leadId para o hook de eventos Meta
         setSubmittedLeadId(leadResult.leadId);
+        
+        // Disparar evento Lead para Meta CAPI
+        sendMetaEventMutation.mutate({
+          eventName: 'Lead',
+          leadId: leadResult.leadId,
+          email: leadData.email,
+          phone: leadData.whatsapp.replace(/\D/g, ''),
+          firstName: leadData.name,
+          sourceUrl: window.location.href,
+        });
         
         const responsesData = {
           quizId: quizId,

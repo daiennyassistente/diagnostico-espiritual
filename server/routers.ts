@@ -655,7 +655,7 @@ Equipe Diagnóstico Espiritual
     sendMetaEvent: publicProcedure
       .input(
         z.object({
-          eventName: z.enum(["QuizStarted", "QuizCompleted", "QuizAbandoned"]),
+          eventName: z.enum(["QuizStarted", "QuizCompleted", "QuizAbandoned", "Lead"]),
           leadId: z.number(),
           email: z.string().optional(),
           phone: z.string().optional(),

@@ -15,7 +15,7 @@ function getMetaPixelId(): string {
 }
 
 interface QuizConversionEvent {
-  event_name: "QuizStarted" | "QuizCompleted" | "QuizAbandoned";
+  event_name: "QuizStarted" | "QuizCompleted" | "QuizAbandoned" | "Lead";
   event_time: number;
   event_id: string;
   event_source_url: string;
@@ -45,7 +45,7 @@ function hashData(data: string): string {
  * Send Quiz event to Meta Conversions API and save to database
  */
 export async function sendQuizMetaEvent(
-  eventName: "QuizStarted" | "QuizCompleted" | "QuizAbandoned",
+  eventName: "QuizStarted" | "QuizCompleted" | "QuizAbandoned" | "Lead",
   leadId: number,
   email?: string,
   phone?: string,
