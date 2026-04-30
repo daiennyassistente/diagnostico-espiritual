@@ -461,14 +461,27 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                               />
                               <ActionButton
                                 icon="🎁"
-                                title="Copiar Link de Oferta"
+                                title="Copiar Link de Oferta (Principal)"
+                                bgColor="bg-blue-100"
+                                textColor="text-blue-700"
+                                hoverColor="hover:bg-blue-200"
+                                onClick={() => {
+                                  const offerLink = `${window.location.origin}/offer?leadId=${item.id}`;
+                                  navigator.clipboard.writeText(offerLink);
+                                  toast.success('Link de oferta principal copiado!');
+                                }}
+                                isLoading={false}
+                              />
+                              <ActionButton
+                                icon="💬"
+                                title="Copiar Link de Oferta (WhatsApp)"
                                 bgColor="bg-green-100"
                                 textColor="text-green-700"
                                 hoverColor="hover:bg-green-200"
                                 onClick={() => {
                                   const offerLink = `${window.location.origin}/offer-whatsapp?leadId=${item.id}`;
                                   navigator.clipboard.writeText(offerLink);
-                                  toast.success('Link de oferta WhatsApp copiado para a área de transferência!');
+                                  toast.success('Link de oferta WhatsApp copiado!');
                                 }}
                                 isLoading={false}
                               />
