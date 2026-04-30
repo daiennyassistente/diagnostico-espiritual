@@ -110,7 +110,7 @@ const firePixelPurchaseEvent = (amount: number, productName: string) => {
       content_name: productName,
       content_type: 'product'
     });
-    console.log('[Meta Pixel] Evento Purchase disparado:', { value: amount, currency: 'BRL', product: productName });
+    // [Otimização] console.log removido
   }
 };
 
@@ -149,7 +149,7 @@ export default function Result() {
       // para permitir a geração do diagnóstico caso ele ainda não exista no banco.
       // Em links compartilhados, limpamos apenas o nome local para evitar mistura visual.
       if (urlLeadId && !shouldPreserveLocalQuizState(Boolean(urlLeadId), isFreshQuizRedirect)) {
-        console.log('[Result] acesso externo ao resultado, limpando apenas nome local');
+         // [Otimização] console.log removido
         window.localStorage.removeItem("userName");
         window.sessionStorage.removeItem("userName");
       }
@@ -395,7 +395,7 @@ export default function Result() {
 
     // Disparar evento InitiateCheckout quando checkout é iniciado
     trackInitiateCheckout(9.90);
-    console.log('[Result] Evento InitiateCheckout disparado');
+    // [Otimização] console.log removido
 
     setIsCheckingOut(true);
 

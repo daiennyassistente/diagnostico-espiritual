@@ -230,12 +230,11 @@ export default function Quiz() {
   // Integrar eventos de quiz com Meta CAPI
   useMetaQuizEvents({
     hasStarted,
-    isQuizComplete: currentStep >= QUIZ_STEPS.length,
+    isQuizComplete: showLeadForm || isProcessing || isNavigatingToResult,
     leadData,
-    leadId: submittedLeadId, // Será preenchido com o leadId real após submissão do formulário
+    leadId: submittedLeadId,
   });
   const [viewContentTracked, setViewContentTracked] = useState(false);
-  const [quizStartTracked, setQuizStartTracked] = useState(false);
   const [showInitialScreen, setShowInitialScreen] = useState(() => {
     const storedShowInitial = readSessionJSON<boolean>('quizShowInitialScreen', true);
     return storedShowInitial;
@@ -257,24 +256,15 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
   }, [currentStep, responses, showLeadForm, leadData, hasStarted]);
 
-  // Autostart do quiz: mostrar tela inicial primeiro
-  useEffect(() => {
-    if (!hasStarted && currentStep === 0 && Object.keys(responses).length === 0 && !showLeadForm && !isProcessing && !isNavigatingToResult) {
-      // Apenas marcar como iniciado, mas não avançar para a primeira pergunta
-      setHasStarted(true);
-      console.log('[Quiz] Quiz iniciado automaticamente');
-    }
-  }, [hasStarted, currentStep, responses, showLeadForm, isProcessing, isNavigatingToResult]);
-
-  // Nota: Evento QuizStarted é disparado via useMetaQuizEvents hook
-  // quando hasStarted muda para true
+  // Nota: Evento QuizStarted é disparado via useMetaQuizEvents apenas
+  // quando o usuário realmente inicia o quiz por clique ou interação.
 
   // Disparar evento ViewContent quando o quiz é visualizado
   useEffect(() => {
     if (!viewContentTracked && hasStarted && currentStep === 1) {
       trackViewContent();
       setViewContentTracked(true);
-      console.log('[Quiz] Evento ViewContent disparado');
+      // [Otimização] console.log removido
     }
   }, [viewContentTracked, hasStarted, currentStep]);
 
@@ -470,7 +460,7 @@ export default function Quiz() {
 
       // Disparar evento Lead quando o lead é capturado
       trackLead(leadData.email, leadData.whatsapp.replace(/\D/g, ''));
-      console.log('[Meta Pixel] Evento Lead disparado');
+      // [Otimização] console.log removido
       
       // Nota: Evento QuizCompleted será disparado via useMetaQuizEvents
       // quando currentStep >= QUIZ_STEPS.length (isQuizComplete = true)
@@ -725,7 +715,7 @@ export default function Quiz() {
                 setShowInitialScreen(false);
                 setHasStarted(true);
                 setCurrentStep(1);
-                console.log('[Quiz] Botão "Começar diagnóstico" clicado - QuizStarted será disparado via useMetaQuizEvents');
+                // [Otimização] console.log removido
               }}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-6 font-bold"
             >
@@ -868,7 +858,7 @@ export default function Quiz() {
               onClick={() => {
                 setHasStarted(true);
                 setCurrentStep(1);
-                console.log('[Quiz] Botão "Começar diagnóstico" clicado - QuizStarted será disparado via useMetaQuizEvents');
+                // [Otimização] console.log removido
               }}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-lg text-sm md:text-lg font-semibold"
             >

@@ -8,6 +8,7 @@ describe('Meta Quiz Events - sendQuizMetaEvent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.META_CONVERSIONS_API_TOKEN = 'test_token';
+    process.env.META_PIXEL_ID = 'test_pixel_id';
     process.env.VITE_ANALYTICS_WEBSITE_ID = 'test_pixel_id';
   });
 
@@ -191,7 +192,7 @@ describe('Meta Quiz Events - sendQuizMetaEvent', () => {
   });
 
   it('deve falhar se Pixel ID não está configurado', async () => {
-    process.env.VITE_ANALYTICS_WEBSITE_ID = '';
+    process.env.META_PIXEL_ID = '';
 
     const result = await sendQuizMetaEvent(
       'QuizStarted',

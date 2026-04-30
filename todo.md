@@ -1219,3 +1219,21 @@
 - [x] Aplicar text-sm md:text-base em todos os botões
 - [x] Testar em 375px, 390px, 414px
 - [x] Salvar checkpoint com correções
+
+
+## Otimização de Performance - EM PROGRESSO
+- [ ] Analisar estrutura do projeto e identificar oportunidades de otimização
+- [ ] Otimizar imagens (WebP, lazy loading, width/height para CLS)
+- [ ] Otimizar JavaScript (code splitting, lazy load, remover console.logs)
+- [ ] Otimizar CSS (remover duplicatas, CSS crítico)
+- [ ] Otimizar fontes (preload, font-display)
+- [ ] Otimizar requisições e cache
+- [ ] Analisar e otimizar bundle
+- [ ] Testar com Lighthouse e gerar relatório
+
+## Correção urgente de eventos do quiz
+- [x] Diagnosticar por que os eventos do quiz não estão sendo enviados para a Meta
+- [x] Diagnosticar por que os eventos do quiz não estão aparecendo no painel de controle
+- [x] Corrigir o disparo e o envio dos eventos do quiz sem alterar outras funcionalidades
+- [x] Validar o envio para Meta e painel com testes e verificação do ambiente
+- [ ] Salvar checkpoint após a correção urgente

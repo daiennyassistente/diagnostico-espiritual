@@ -34,7 +34,7 @@ export function useMetaQuizEvents({
       
       sendMetaEventMutation.mutate({
         eventName: 'QuizStarted',
-        leadId: 0,
+        leadId: leadId || 0,
         email: leadData.email,
         phone: leadData.whatsapp,
         firstName: leadData.name,
@@ -54,7 +54,7 @@ export function useMetaQuizEvents({
           
           sendMetaEventMutation.mutate({
             eventName: 'QuizAbandoned',
-            leadId: 0,
+            leadId: leadId || 0,
             email: leadData.email,
             phone: leadData.whatsapp,
             firstName: leadData.name,
@@ -74,25 +74,26 @@ export function useMetaQuizEvents({
 
   // Disparar evento QuizCompleted quando o quiz é completado
   useEffect(() => {
-    if (isQuizComplete && !quizCompletedRef.current) {
-      quizCompletedRef.current = true;
-      console.log('[Meta CAPI] Disparando evento QuizCompleted');
-      
-      // Limpar timeout de inatividade
-      if (inactivityTimeoutRef.current) {
-        clearTimeout(inactivityTimeoutRef.current);
-      }
-
-      sendMetaEventMutation.mutate({
-        eventName: 'QuizCompleted',
-        leadId: 0,
-        email: leadData.email,
-        phone: leadData.whatsapp,
-        firstName: leadData.name,
-        sourceUrl: window.location.href,
-      });
+    if (!isQuizComplete || quizCompletedRef.current || leadId <= 0) {
+      return;
     }
-  }, [isQuizComplete, leadData.email, leadData.whatsapp, sendMetaEventMutation]);
+
+    quizCompletedRef.current = true;
+    console.log('[Meta CAPI] Disparando evento QuizCompleted');
+
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
+
+    sendMetaEventMutation.mutate({
+      eventName: 'QuizCompleted',
+      leadId,
+      email: leadData.email,
+      phone: leadData.whatsapp,
+      firstName: leadData.name,
+      sourceUrl: window.location.href,
+    });
+  }, [isQuizComplete, leadId, leadData.email, leadData.whatsapp, leadData.name, sendMetaEventMutation]);
 
   // Disparar evento QuizAbandoned quando a página é fechada ou o usuário sai
   useEffect(() => {
@@ -102,17 +103,6 @@ export function useMetaQuizEvents({
         console.log('[Meta CAPI] Disparando evento QuizAbandoned (beforeunload)');
         
         // Usar sendBeacon para garantir que o evento seja enviado mesmo com a página fechando
-        const eventData = {
-          eventName: 'QuizAbandoned',
-          leadId: 0,
-          email: leadData.email,
-          phone: leadData.whatsapp,
-          firstName: leadData.name,
-          reason: 'page_unload',
-          sourceUrl: window.location.href,
-        };
-
-        // Usar mutate ao invés de sendBeacon, pois sendBeacon não suporta tRPC
         sendMetaEventMutation.mutate({
           eventName: 'QuizAbandoned' as const,
           leadId: leadId || 0,
@@ -132,7 +122,7 @@ export function useMetaQuizEvents({
 
         sendMetaEventMutation.mutate({
           eventName: 'QuizAbandoned',
-          leadId: 0,
+          leadId: leadId || 0,
           email: leadData.email,
           phone: leadData.whatsapp,
           firstName: leadData.name,

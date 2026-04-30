@@ -7,6 +7,13 @@
 import crypto from "crypto";
 import { saveQuizEvent, getLatestQuizStatus } from "./quiz-events-db";
 
+function getMetaPixelId(): string {
+  if (typeof process.env.META_PIXEL_ID === "string") {
+    return process.env.META_PIXEL_ID.trim();
+  }
+  return "948457397777180";
+}
+
 interface QuizConversionEvent {
   event_name: "QuizStarted" | "QuizCompleted" | "QuizAbandoned";
   event_time: number;
@@ -56,8 +63,7 @@ export async function sendQuizMetaEvent(
       return { success: false, error: "Access token not configured" };
     }
 
-    // Get Pixel ID from environment
-    const pixelId = process.env.VITE_ANALYTICS_WEBSITE_ID;
+    const pixelId = getMetaPixelId();
     if (!pixelId) {
       console.error("[Meta Quiz Events] Pixel ID not configured");
       return { success: false, error: "Pixel ID not configured" };
@@ -158,7 +164,7 @@ export async function getQuizStatusForLead(leadId: number): Promise<string | nul
  */
 export function validateMetaQuizEventsConfig(): boolean {
   const hasToken = !!process.env.META_CONVERSIONS_API_TOKEN;
-  const hasPixelId = !!process.env.VITE_ANALYTICS_WEBSITE_ID;
+  const hasPixelId = !!getMetaPixelId();
 
   if (!hasToken) {
     console.warn("[Meta Quiz Events] Access token not configured");

@@ -404,20 +404,29 @@ export default function AdminDashboardContent({ onLogout }: { onLogout?: () => v
                       const emailStr = typeof item.email === 'string' ? item.email : String(item.email || '');
                       const whatsappStr = typeof item.whatsapp === 'string' ? item.whatsapp : String(item.whatsapp || '');
                       const roleStr = typeof item.role === 'string' ? item.role : String(item.role || '');
+                      const quizStatus = typeof item.quizStatus === 'string' ? item.quizStatus : '';
+                      const statusLabel = item.status === 'comprou'
+                        ? '✓ Comprou'
+                        : item.status === 'pendente'
+                          ? '⏳ Pendente'
+                          : quizStatus || '📝 Quiz';
+                      const statusClass = item.status === 'comprou'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : item.status === 'pendente'
+                          ? 'bg-amber-100 text-amber-800'
+                          : quizStatus === 'Quiz Concluído'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : quizStatus === 'Quiz Abandonado'
+                              ? 'bg-rose-100 text-rose-800'
+                              : 'bg-blue-100 text-blue-800';
                       return (
                         <tr key={item.id} className="border-t border-border/50 align-top">
                           <td className="px-5 py-4 text-foreground">{nameStr || "Sem nome"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{emailStr || "-"}</td>
                           <td className="px-5 py-4 text-muted-foreground">{whatsappStr || "-"}</td>
                           <td className="px-5 py-4">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                              item.status === 'comprou' ? 'bg-emerald-100 text-emerald-800' :
-                              item.status === 'pendente' ? 'bg-amber-100 text-amber-800' :
-                              'bg-blue-100 text-blue-800'
-                            }`}>
-                              {item.status === 'comprou' ? '✓ Comprou' :
-                               item.status === 'pendente' ? '⏳ Pendente' :
-                               '📝 Quiz'}
+                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}>
+                              {statusLabel}
                             </span>
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">{formatDateTime(item.updatedAt)}</td>
