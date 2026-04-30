@@ -64,8 +64,10 @@ export function MercadoPagoCheckout({
         console.log("[MercadoPagoCheckout] Polling - Status retornado:", data.status);
         console.log("[MercadoPagoCheckout] Polling - Dados completos:", data);
         if (data.status === "approved") {
-          console.log("[MercadoPagoCheckout] Polling - Pagamento aprovado! Redirecionando para /sucesso");
+          console.log("[MercadoPagoCheckout] Polling - Pagamento aprovado! Chamando onSuccess e redirecionando");
           window.clearInterval(intervalId);
+          // Chamar onSuccess agora que o pagamento foi confirmado
+          onSuccess?.(transactionId);
           // Obter o valor da compra do localStorage
           const purchaseAmount = localStorage.getItem('purchaseAmount') || '9.90';
           window.location.href = `/sucesso?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(purchaseAmount)}`;
@@ -141,7 +143,8 @@ export function MercadoPagoCheckout({
           console.log("[MercadoPagoCheckout] showPixInfo definido como true");
         }, 100);
         
-        onSuccess?.(result.transactionId);
+        // NÃO chamar onSuccess aqui - esperar o pagamento ser confirmado pelo polling
+        // onSuccess será chamado apenas após o pagamento ser aprovado
         toast.success("QR Code PIX gerado com sucesso!");
       } else {
         console.error("[MercadoPagoCheckout] Erro - PIX code ou QR code não retornados", result);

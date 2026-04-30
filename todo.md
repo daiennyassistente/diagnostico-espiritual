@@ -1187,3 +1187,13 @@
 - [x] Implementar exibição de código PIX para copiar e colar
 - [x] Adicionar botão "Copiar" para facilitar cópia do código
 - [x] Testar fluxo completo: Clique em PIX → QR Code e código aparecem → Pagamento funciona
+
+## Correção do Bug de Redirecionamento Prematuro no PIX - CONCLUÍDO
+- [x] Identificar que onSuccess estava sendo chamado imediatamente após gerar QR Code
+- [x] Remover chamada prematura de onSuccess em handlePixPayment
+- [x] Mover chamada de onSuccess para após pagamento ser aprovado pelo polling
+- [x] Garantir que QR Code e código PIX permanecem visíveis até pagamento ser confirmado
+- [x] Testar em página de oferta regular (/offer)
+- [x] Testar em página de oferta WhatsApp (/offer-whatsapp)
+- [x] Criar testes unitários para validar o comportamento correto
+- [x] Todos os testes passando (3 testes em MercadoPagoCheckout.test.ts)
