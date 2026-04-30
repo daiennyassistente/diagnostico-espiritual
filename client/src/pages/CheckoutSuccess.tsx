@@ -300,7 +300,7 @@ export default function CheckoutSuccess() {
           <Button
             onClick={handleDownloadDevocional}
             disabled={isGeneratingPDF || pdfGenerated}
-            className="w-full bg-accent hover:bg-accent/80 text-accent-foreground font-bold py-4 md:py-6 text-sm md:text-base"
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
           >
             {isGeneratingPDF ? (
               <>

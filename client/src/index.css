@@ -45,61 +45,44 @@
 }
 
 :root {
-  /* Paleta Diagnóstico Espiritual */
-  --primary: #1E4E8C;
-  --primary-foreground: #FDFBF4;
-  --background: #F7F2E8;
-  --foreground: #27405F;
-  --card: #FFFDF8;
-  --card-foreground: #27405F;
-  --popover: #FFFDF8;
-  --popover-foreground: #27405F;
-  --secondary: #EED9A1;
-  --secondary-foreground: #4C3A15;
-  --muted: #E8DCC7;
-  --muted-foreground: #6E6250;
-  --accent: #C9A54C;
-  --accent-foreground: #1D2F45;
-  --destructive: #DC2626;
+  /* Identidade Dark Spiritual */
+  --primary: #FFD700; /* Dourado para CTAs */
+  --primary-foreground: #000000;
+  --background: #0A0A0A; /* Preto Absoluto */
+  --foreground: #FFFFFF; /* Texto Branco */
+  --card: #141414; /* Cinza muito escuro para cards */
+  --card-foreground: #FFFFFF;
+  --popover: #141414;
+  --popover-foreground: #FFFFFF;
+  --secondary: #1E1E1E;
+  --secondary-foreground: #FFFFFF;
+  --muted: #262626;
+  --muted-foreground: #A3A3A3;
+  --accent: #FFD700;
+  --accent-foreground: #000000;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #DCCBAE;
-  --input: #FFF9EF;
-  --ring: #1E4E8C;
+  --border: #262626;
+  --input: #1A1A1A;
+  --ring: #FFD700;
   --radius: 0.875rem;
-  --sidebar: #FFFDF8;
-  --sidebar-foreground: #27405F;
-  --sidebar-accent: #1E4E8C;
-  --sidebar-accent-foreground: #FDFBF4;
-  --sidebar-border: #DCCBAE;
-  --sidebar-ring: #1E4E8C;
+  --sidebar: #141414;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-accent: #FFD700;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #262626;
+  --sidebar-ring: #FFD700;
 }
 
 .dark {
-  --primary: #1E4E8C;
-  --primary-foreground: #FDFBF4;
-  --background: #F7F2E8;
-  --foreground: #27405F;
-  --card: #FFFDF8;
-  --card-foreground: #27405F;
-  --popover: #FFFDF8;
-  --popover-foreground: #27405F;
-  --secondary: #EED9A1;
-  --secondary-foreground: #4C3A15;
-  --muted: #E8DCC7;
-  --muted-foreground: #6E6250;
-  --accent: #C9A54C;
-  --accent-foreground: #1D2F45;
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
-  --border: #DCCBAE;
-  --input: #FFF9EF;
-  --ring: #1E4E8C;
-  --sidebar: #FFFDF8;
-  --sidebar-foreground: #27405F;
-  --sidebar-accent: #1E4E8C;
-  --sidebar-accent-foreground: #FDFBF4;
-  --sidebar-border: #DCCBAE;
-  --sidebar-ring: #1E4E8C;
+  /* Mantém os mesmos valores já que o design agora é nativamente Dark */
+  --primary: #FFD700;
+  --primary-foreground: #000000;
+  --background: #0A0A0A;
+  --foreground: #FFFFFF;
+  --card: #141414;
+  --card-foreground: #FFFFFF;
+  --border: #262626;
 }
 
 @layer base {
@@ -151,11 +134,6 @@
     padding-right: 1rem;
   }
 
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
   @media (min-width: 640px) {
     .container {
       padding-left: 1.5rem;
@@ -171,65 +149,42 @@
     }
   }
   
-  /* Quiz Card Styling */
+  /* Quiz Card Styling - Dark Minimalist */
   .quiz-card {
-    @apply rounded-2xl shadow-lg p-6 md:p-8 max-w-2xl mx-auto relative;
-    background: linear-gradient(135deg, rgba(255, 253, 248, 0.98) 0%, rgba(247, 242, 232, 0.98) 100%);
-    border: 1px solid rgba(201, 165, 76, 0.28);
-    box-shadow: 0 24px 60px rgba(30, 78, 140, 0.12);
+    @apply rounded-2xl p-6 md:p-8 max-w-2xl mx-auto relative;
+    background: #141414;
+    border: 1px solid #262626;
+    box-shadow: none; /* Removendo sombras excessivas conforme solicitado */
   }
   
-  .quiz-card::before {
-    content: '';
-    position: relative;
-    z-index: 10;
-  }
-  
-  .quiz-card::after {
-    content: '';
-    position: relative;
-    z-index: 10;
-  }
-  
-  /* Quiz Button Styling */
+  /* Quiz Button Styling - Dark Theme */
   .quiz-button {
     width: 100% !important;
     padding: 1rem !important;
     padding-right: 3rem !important;
     border-radius: 0.875rem !important;
-    border: 2px solid #DCCBAE !important;
-    background-color: #FFFDF8 !important;
-    color: #27405F !important;
+    border: 1px solid #262626 !important;
+    background-color: #1A1A1A !important;
+    color: #FFFFFF !important;
     font-weight: 500 !important;
     font-size: 1rem !important;
     text-align: center !important;
     position: relative !important;
     overflow: hidden !important;
-    transition: all 500ms ease !important;
+    transition: all 300ms ease !important;
     cursor: pointer !important;
   }
   
   .quiz-button:hover:not(.selected) {
-    background-color: #F7F1E4 !important;
-    border-color: #C9A54C !important;
-    box-shadow: 0 8px 22px rgba(30, 78, 140, 0.12) !important;
+    background-color: #262626 !important;
+    border-color: #404040 !important;
   }
   
   .quiz-button.selected {
-    background: linear-gradient(135deg, #1E4E8C 0%, #2F6FB4 100%) !important;
-    color: #FDFBF4 !important;
-    border-color: #1E4E8C !important;
-    border-width: 2px !important;
-    border-style: solid !important;
-    box-shadow: 0 12px 28px rgba(30, 78, 140, 0.26) !important;
+    background: #FFD700 !important; /* Dourado ao selecionar */
+    color: #000000 !important;
+    border-color: #FFD700 !important;
     font-weight: bold !important;
-    transform: scale(1.03) !important;
-  }
-  
-  .quiz-button.selected:hover {
-    background: linear-gradient(135deg, #163B6C 0%, #255C97 100%) !important;
-    border-color: #163B6C !important;
-    box-shadow: 0 14px 32px rgba(22, 59, 108, 0.3) !important;
   }
   
   .quiz-button.selected::after {
@@ -240,38 +195,28 @@
     transform: translateY(-50%);
     font-size: 20px;
     font-weight: bold;
-    color: #FFFFFF;
+    color: #000000;
     animation: checkmark 0.3s ease-out;
   }
   
   @keyframes checkmark {
-    0% {
-      opacity: 0;
-      transform: translateY(-50%) scale(0);
-    }
-    50% {
-      opacity: 1;
-      transform: translateY(-50%) scale(1.2);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(-50%) scale(1);
-    }
+    0% { opacity: 0; transform: translateY(-50%) scale(0); }
+    100% { opacity: 1; transform: translateY(-50%) scale(1); }
   }
   
   /* Progress Bar */
   .progress-bar {
-    @apply w-full h-2 bg-muted rounded-full overflow-hidden mb-6;
+    @apply w-full h-1.5 bg-muted rounded-full overflow-hidden mb-6;
   }
   
   .progress-fill {
-    @apply h-full bg-primary transition-all duration-300;
+    @apply h-full bg-accent transition-all duration-300;
   }
   
-  /* Page Background with Decorative Elements */
+  /* Page Background - Dark Spiritual */
   .spiritual-background {
     position: relative;
-    background: linear-gradient(135deg, #F6EFE3 0%, #FBF6ED 55%, #F1E7D8 100%);
+    background: #0A0A0A;
     overflow: hidden;
   }
   
@@ -283,9 +228,9 @@
     width: 100%;
     height: 100%;
     font-size: 120px;
-    opacity: 0.08;
+    opacity: 0.03; /* Reduzindo opacidade para visual mais limpo */
     font-weight: bold;
-    color: #1E4E8C;
+    color: #FFFFFF;
     pointer-events: none;
     z-index: 0;
     line-height: 2.2;
@@ -294,9 +239,5 @@
     white-space: pre-wrap;
     padding: 40px;
     text-align: justify;
-  }
-  
-  .spiritual-background::after {
-    content: '';
   }
 }
