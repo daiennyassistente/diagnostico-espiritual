@@ -1213,3 +1213,9 @@
 - [x] Corrigir botões para mobile (375px, 390px, 414px)
 - [x] Testar responsividade em múltiplas resoluções
 - [x] Gerar preview mobile e desktop
+
+## Correção de Botões Mobile - CONCLUÍDO
+- [x] Corrigir tamanho de fonte dos botões em todas as páginas para mobile
+- [x] Aplicar text-sm md:text-base em todos os botões
+- [x] Testar em 375px, 390px, 414px
+- [x] Salvar checkpoint com correções

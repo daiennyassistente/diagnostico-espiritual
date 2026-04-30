@@ -360,7 +360,7 @@ export default function CheckoutSuccess() {
           </Button>
           <Button
             onClick={handleBackToHome}
-            className="w-full"
+            className="w-full text-sm md:text-base"
             variant="outline"
             size="lg"
           >

@@ -100,7 +100,7 @@ export function OfferPage() {
 
                 <Button
                   size="lg"
-                  className="w-full text-lg font-bold mb-4 py-6"
+                  className="w-full text-sm md:text-lg font-bold mb-4 py-6"
                   style={{ backgroundColor: "#FFC700", color: "#17395F" }}
                   onClick={handleCheckout}
                 >

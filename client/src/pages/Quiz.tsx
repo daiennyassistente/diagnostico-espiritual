@@ -870,7 +870,7 @@ export default function Quiz() {
                 setCurrentStep(1);
                 console.log('[Quiz] Botão "Começar diagnóstico" clicado - QuizStarted será disparado via useMetaQuizEvents');
               }}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-lg text-lg font-semibold"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-lg text-sm md:text-lg font-semibold"
             >
               🔍 Começar diagnóstico
             </Button>

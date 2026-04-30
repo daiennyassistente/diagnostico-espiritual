@@ -489,7 +489,7 @@ export default function Result() {
           </p>
           <Button
             size="lg"
-            className="w-full text-lg font-bold"
+            className="w-full text-sm md:text-lg font-bold"
             style={{ backgroundColor: "#FFC700", color: "#17395F" }}
             onClick={() => setLocation(`/offer?leadId=${leadId}`)}
             disabled={false}
@@ -509,12 +509,12 @@ export default function Result() {
         </section>
 
         <section className="mb-10 flex gap-4 justify-center flex-wrap">
-          <Button variant="outline" onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
+          <Button variant="outline" onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="text-sm md:text-base">
             <Download className="w-4 h-4 mr-2" />
             {isGeneratingPDF ? "Gerando..." : "Baixar PDF"}
           </Button>
 
-          <Button variant="outline" onClick={handleRetake}>
+          <Button variant="outline" onClick={handleRetake} className="text-sm md:text-base">
             <RotateCcw className="w-4 h-4 mr-2" />
             Refazer
           </Button>

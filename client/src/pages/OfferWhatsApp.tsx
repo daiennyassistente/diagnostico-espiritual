@@ -122,7 +122,7 @@ export function OfferWhatsAppPage() {
             {/* CTA Button */}
             <Button
               size="lg"
-              className="w-full text-lg font-bold py-6 mb-4"
+              className="w-full text-sm md:text-lg font-bold py-6 mb-4"
               style={{ backgroundColor: "#FFC700", color: "#17395F" }}
               onClick={handleCheckout}
               disabled={isExpired}
