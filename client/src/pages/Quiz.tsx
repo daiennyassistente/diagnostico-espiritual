@@ -705,7 +705,7 @@ export default function Quiz() {
               <p className="text-sm font-semibold text-primary">Diagnóstico Gratuito</p>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-primary">
-              Existe algo invisível travando sua vida...
+              Algo está afastando você de Deus?
             </h1>
             <p className="text-lg text-primary/80 font-semibold">
               baseado na Bíblia
@@ -713,12 +713,12 @@ export default function Quiz() {
 
             {/* Subtítulo */}
             <p className="text-lg text-foreground/80">
-              Descubra em menos de 2 minutos se há um bloqueio espiritual impedindo sua paz e direção 🙏
+              <span className="font-semibold">Baseado na Bíblia.</span> Identifique em apenas <span className="font-semibold">60 segundos</span> o bloqueio espiritual que está impedindo sua paz e sua caminhada com o Pai. 🙏
             </p>
 
             {/* Texto de apoio */}
             <p className="text-sm text-foreground/60">
-              ✨ Mais de 1.000 pessoas já fizeram esse diagnóstico
+              ✨ Mais de 1.000 pessoas já iniciaram sua restauração espiritual hoje.
             </p>
 
             {/* Bullets */}
@@ -748,7 +748,7 @@ export default function Quiz() {
               }}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-6 font-bold"
             >
-              🔍 Começar diagnóstico
+              🙏 QUERO DESCOBRIR AGORA
             </Button>
           </div>
         </div>
