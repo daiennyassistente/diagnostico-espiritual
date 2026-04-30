@@ -674,11 +674,14 @@ export default function Quiz() {
           <div className="space-y-6 text-center">
             {/* Título */}
             <div className="inline-block bg-primary/10 border border-primary/30 rounded-full px-4 py-2 mb-4">
-              <p className="text-sm font-semibold text-primary">✨ Diagnóstico Gratuito</p>
+              <p className="text-sm font-semibold text-primary">Diagnóstico Gratuito</p>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-primary">
               Existe algo invisível travando sua vida...
             </h1>
+            <p className="text-lg text-primary/80 font-semibold">
+              baseado na Bíblia
+            </p>
 
             {/* Subtítulo */}
             <p className="text-lg text-foreground/80">
