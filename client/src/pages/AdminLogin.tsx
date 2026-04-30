@@ -42,19 +42,19 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen spiritual-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-secondary/30 backdrop-blur-md shadow-none border-border">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg">
         <div className="p-8">
-          <h1 className="text-2xl font-bold text-center mb-2 text-foreground shadow-none font-bold">
+          <h1 className="text-2xl font-bold text-center mb-2 text-amber-900">
             Área Administrativa
           </h1>
-          <p className="text-center text-muted-foreground shadow-none mb-6">
+          <p className="text-center text-gray-600 mb-6">
             Faça login para acessar o painel
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground shadow-none font-bold mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Usuário
               </label>
               <Input
@@ -68,7 +68,7 @@ export function AdminLogin() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground shadow-none font-bold mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Senha
               </label>
               <Input
@@ -90,7 +90,7 @@ export function AdminLogin() {
             <Button
               type="submit"
               disabled={isLoading || !username || !password}
-              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
+              className="w-full bg-amber-900 hover:bg-amber-800"
             >
               {loginMutation.isPending ? "Entrando..." : "Entrar"}
             </Button>

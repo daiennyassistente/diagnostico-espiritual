@@ -212,12 +212,12 @@ function DashboardLayoutContent({
   return (
     <div className="spiritual-background flex min-h-screen w-full">
       <div className="relative" ref={sidebarRef}>
-        <Sidebar collapsible="icon" className="border-r border-border shadow-none bg-background/95 backdrop-blur-md border-border shadow-none" disableTransition={isResizing}>
-          <SidebarHeader className="border-b border-border shadow-none px-3 py-4">
+        <Sidebar collapsible="icon" className="border-r border-sidebar-border/80 bg-sidebar/95 backdrop-blur" disableTransition={isResizing}>
+          <SidebarHeader className="border-b border-sidebar-border/70 px-3 py-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={toggleSidebar}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-secondary/30 backdrop-blur-md shadow-none border-border transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-white/80 transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Alternar navegação"
               >
                 <PanelLeft className="h-4 w-4" />
@@ -234,7 +234,7 @@ function DashboardLayoutContent({
           </SidebarHeader>
 
           <SidebarContent className="px-2 py-4">
-            <div className="mb-4 rounded-2xl border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border p-3 shadow-sm group-data-[collapsible=icon]:hidden">
+            <div className="mb-4 rounded-2xl border border-border/60 bg-white/70 p-3 shadow-sm group-data-[collapsible=icon]:hidden">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Diagnóstico Espiritual
               </p>
@@ -268,10 +268,10 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="border-t border-border shadow-none p-3">
+          <SidebarFooter className="border-t border-sidebar-border/70 p-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex w-full items-center gap-3 rounded-2xl border border-border/60 bg-secondary/30 backdrop-blur-md shadow-none border-border px-2 py-2 text-left transition-colors hover:bg-accent/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring group-data-[collapsible=icon]:justify-center">
+                <button className="flex w-full items-center gap-3 rounded-2xl border border-border/60 bg-white/75 px-2 py-2 text-left transition-colors hover:bg-accent/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring group-data-[collapsible=icon]:justify-center">
                   <Avatar className="h-10 w-10 border border-border/60">
                     <AvatarFallback className="bg-secondary text-secondary-foreground">
                       {(user?.name?.charAt(0) || user?.email?.charAt(0) || "A").toUpperCase()}
@@ -307,7 +307,7 @@ function DashboardLayoutContent({
         {isMobile ? (
           <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/70 bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:backdrop-blur">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9 rounded-xl border border-border/70 bg-secondary/30 backdrop-blur-md shadow-none border-border" />
+              <SidebarTrigger className="h-9 w-9 rounded-xl border border-border/70 bg-white/80" />
               <div>
                 <p className="text-sm font-semibold text-foreground">{selectedItem?.label ?? title}</p>
                 <p className="text-xs text-muted-foreground">{selectedItem?.helperText ?? subtitle}</p>
