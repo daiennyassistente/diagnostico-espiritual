@@ -91,7 +91,11 @@ const readSessionJSON = <T,>(key: string, fallback: T): T => {
   if (typeof window === 'undefined') return fallback;
   try {
     const storedValue = window.sessionStorage.getItem(key);
-    return storedValue ? (JSON.parse(storedValue) as T) : fallback;
+    if (!storedValue) return fallback;
+    // Handle boolean values stored as strings
+    if (storedValue === 'true') return true as T;
+    if (storedValue === 'false') return false as T;
+    return JSON.parse(storedValue) as T;
   } catch { return fallback; }
 };
 
@@ -114,6 +118,8 @@ export default function Quiz() {
   const [hasStarted, setHasStarted] = useState(() => readSessionJSON<boolean>('quizHasStarted', false));
   const [hasClickedFinish, setHasClickedFinish] = useState(() => readSessionJSON<boolean>('quizHasClickedFinish', false));
   const [showInitialScreen, setShowInitialScreen] = useState(() => readSessionJSON<boolean>('quizShowInitialScreen', true));
+  const [userId, setUserId] = useState(() => window.sessionStorage.getItem('quizUserId') || '');
+  const [quizLeadId, setQuizLeadId] = useState(() => readSessionNumber('quizLeadId', 0));
   const createLeadMutation = trpc.quiz.submitLead.useMutation();
   const submitResponsesMutation = trpc.quiz.submitResponses.useMutation();
 
@@ -121,7 +127,7 @@ export default function Quiz() {
     hasStarted: hasStarted,
     isQuizComplete: hasClickedFinish,
     leadData,
-    leadId: 0,
+    leadId: quizLeadId,
   });
 
   useEffect(() => {
@@ -133,7 +139,19 @@ export default function Quiz() {
     window.sessionStorage.setItem('quizHasStarted', JSON.stringify(hasStarted));
     window.sessionStorage.setItem('quizHasClickedFinish', JSON.stringify(hasClickedFinish));
     window.sessionStorage.setItem('quizShowInitialScreen', JSON.stringify(showInitialScreen));
-  }, [currentStep, responses, showLeadForm, leadData, hasStarted, hasClickedFinish, showInitialScreen]);
+    window.sessionStorage.setItem('quizLeadId', String(quizLeadId));
+    window.sessionStorage.setItem('quizUserId', userId);
+  }, [currentStep, responses, showLeadForm, leadData, hasStarted, hasClickedFinish, showInitialScreen, quizLeadId]);
+
+  // Gerar UUID único quando o quiz é iniciado
+  useEffect(() => {
+    if (hasStarted && !userId) {
+      const newUserId = uuidv4();
+      setUserId(newUserId);
+      window.sessionStorage.setItem('quizUserId', newUserId);
+      console.log('[Quiz] UUID gerado ao iniciar quiz:', newUserId);
+    }
+  }, [hasStarted, userId]);
 
   const handleNext = () => {
     if (currentStep < QUIZ_STEPS.length) {
@@ -172,7 +190,7 @@ export default function Quiz() {
       return;
     }
 
-    const quizId = window.sessionStorage.getItem('quizId') || uuidv4();
+    const quizId = userId || uuidv4();
     window.sessionStorage.setItem('quizId', quizId);
     window.sessionStorage.setItem('userName', name);
     window.localStorage.setItem('userName', name);
@@ -184,17 +202,19 @@ export default function Quiz() {
     setProcessingStep(0);
 
     try {
+      // Criar ou atualizar lead com os dados do formulário
       const leadResult = await createLeadMutation.mutateAsync({
         userId: quizId,
         name,
         whatsapp,
         email,
       });
-
       const newLeadId = leadResult.leadId;
-      window.localStorage.setItem('quizLeadId', String(newLeadId));
-      window.localStorage.setItem('leadData', JSON.stringify({ name, whatsapp, email, leadId: newLeadId }));
-      setProcessingStep(1);
+
+    window.localStorage.setItem('quizLeadId', String(newLeadId));
+    window.localStorage.setItem('leadData', JSON.stringify({ name, whatsapp, email, leadId: newLeadId }));
+    setQuizLeadId(newLeadId);
+    setProcessingStep(1);
 
       await submitResponsesMutation.mutateAsync({
         quizId,
@@ -308,7 +328,20 @@ export default function Quiz() {
             </div>
 
             <Button
-              onClick={() => { setShowInitialScreen(false); setHasStarted(true); setCurrentStep(1); }}
+              onClick={() => {
+                setShowInitialScreen(false);
+                setHasStarted(true);
+                setCurrentStep(1);
+                // Disparar evento ViewContent quando o quiz começa
+                if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
+                  (window as any).fbq('track', 'ViewContent', {
+                    content_name: 'Quiz Diagnóstico Espiritual',
+                    content_type: 'product',
+                    value: 0,
+                    currency: 'BRL'
+                  });
+                }
+              }}
               className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-base md:text-lg py-6 md:py-8 font-black uppercase tracking-wider shadow-[0_0_20px_rgba(255,215,0,0.3)]"
             >
               🙏 QUERO DESCOBRIR AGORA

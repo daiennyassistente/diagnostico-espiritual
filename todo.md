@@ -1259,3 +1259,8 @@
 - [x] Corrigir exclusivamente a falha de criação de lead ao finalizar o quiz, causada pelo insert na tabela leads durante a conclusão do formulário
 - [x] Corrigir exclusivamente o fluxo do botão "começar minha transformação" para abrir o QR Code e o código Pix sem cair na mensagem de acesso não localizado ou redirecionar para refazer o quiz
 - [ ] Corrigir exclusivamente a página de oferta do WhatsApp para abrir o QR Code e o código Pix sem mostrar a mensagem de acesso não localizado ou mandar refazer o quiz
+- [x] Verificar exclusivamente se o e-mail está sendo enviado após pagamento nas duas páginas de oferta
+- [x] Verificar exclusivamente se a página de sucesso está carregando após pagamento nas duas páginas de oferta
+- [x] Verificar exclusivamente se o resultado está sendo gerado de forma personalizada conforme as respostas do quiz
+- [x] Verificar exclusivamente se o devocional está sendo gerado de forma personalizada conforme as respostas do quiz
+- [ ] Verificar exclusivamente se os eventos do Meta Pixel estão sendo enviados corretamente, sem alterar nenhuma parte do sistema

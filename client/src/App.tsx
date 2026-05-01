@@ -2,41 +2,48 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
+import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
-import Resultado from "./pages/Resultado";
-import Result from "./pages/Result";
-import CheckoutSuccess from "./pages/CheckoutSuccess";
-import Admin from "./pages/Admin";
-import { AdminDashboard } from "./pages/AdminDashboard";
-import { AdminLogin } from "./pages/AdminLogin";
-import SharePage from "./pages/SharePage";
-import { OfferPage } from "./pages/Offer";
-import { OfferWhatsAppPage } from "./pages/OfferWhatsApp";
+
+// Lazy load non-critical pages
+const Resultado = lazy(() => import("./pages/Resultado"));
+const Result = lazy(() => import("./pages/Result"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const Admin = lazy(() => import("./pages/Admin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const AdminLogin = lazy(() => import("./pages/AdminLogin").then(m => ({ default: m.AdminLogin })));
+const SharePage = lazy(() => import("./pages/SharePage"));
+const OfferPage = lazy(() => import("./pages/Offer").then(m => ({ default: m.OfferPage })));
+const OfferWhatsAppPage = lazy(() => import("./pages/OfferWhatsApp").then(m => ({ default: m.OfferWhatsAppPage })));
+
+const LoadingFallback = () => null;
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/quiz"} component={Quiz} />
-      <Route path={"/resultado"} component={Resultado} />
-      <Route path={"/result"} component={Result} />
-      <Route path={"/checkout-success"} component={CheckoutSuccess} />
-      <Route path={"/sucesso"} component={CheckoutSuccess} />
-      <Route path={"/share"} component={SharePage} />
-      <Route path={"/offer"} component={OfferPage} />
-      <Route path={"/offer-whatsapp"} component={OfferWhatsAppPage} />
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/quiz"} component={Quiz} />
+        <Route path={"/resultado"} component={Resultado} />
+        <Route path={"/result"} component={Result} />
+        <Route path={"/checkout-success"} component={CheckoutSuccess} />
+        <Route path={"/sucesso"} component={CheckoutSuccess} />
+        <Route path={"/share"} component={SharePage} />
+        <Route path={"/offer"} component={OfferPage} />
+        <Route path={"/offer-whatsapp"} component={OfferWhatsAppPage} />
 
-      <Route path={"/admin-login"} component={AdminLogin} />
-      <Route path={"/admin"} component={AdminDashboard} />
-      <Route path={"/admin-legacy"} component={Admin} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+        <Route path={"/admin-login"} component={AdminLogin} />
+        <Route path={"/admin"} component={AdminDashboard} />
+        <Route path={"/admin-legacy"} component={Admin} />
+        <Route path={"/404"} component={NotFound} />
+        {/* Final fallback route */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

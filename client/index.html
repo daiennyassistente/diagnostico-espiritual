@@ -7,15 +7,15 @@
     <meta name="description" content="Descubra seu perfil espiritual com nosso quiz interativo. Diagnóstico personalizado em minutos." />
     <meta name="theme-color" content="#FFFFFF" />
     <title>Diagnóstico Espiritual - Quiz Interativo</title>
-    
-    <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://connect.facebook.net" />
-    <link rel="preconnect" href="https://sdk.mercadopago.com" />
-    <link rel="dns-prefetch" href="https://connect.facebook.net" />
-    <link rel="dns-prefetch" href="https://sdk.mercadopago.com" />
-    
-    <!-- Meta Pixel Code (async) -->
-    <script async>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx" defer></script>
+    <!-- Meta Pixel (deferred, non-critical) -->
+    <script defer>
+    window.quizStarted = false;
+    window.quizCompleted = false;
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};n.push=n;n.loaded=!0;n.version='2.0';
@@ -23,55 +23,24 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    // Enable advanced matching for better event quality
-    fbq('init', '948457397777180', {
-      em: undefined, // Will be set dynamically from user data
-      ph: undefined  // Will be set dynamically from user data
-    });
+    fbq('init', '948457397777180');
     fbq('track', 'PageView');
-    
-    // Initialize fbclid tracking (capture from URL and persist in _fbc cookie)
     (function() {
       try {
         var params = new URLSearchParams(window.location.search);
         var fbclid = params.get('fbclid');
-        var existingFbc = null;
-        
-        // Check for existing _fbc cookie
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-          var cookie = cookies[i].trim();
-          if (cookie.indexOf('_fbc=') === 0) {
-            existingFbc = decodeURIComponent(cookie.substring(5));
-            break;
-          }
-        }
-        
-        // Set _fbc cookie if fbclid found and no existing cookie
-        if (fbclid && !existingFbc) {
+        if (fbclid) {
           var timestamp = Math.floor(Date.now() / 1000);
           var fbcValue = 'fb.1.' + timestamp + '.' + fbclid;
           var expirationDate = new Date();
           expirationDate.setFullYear(expirationDate.getFullYear() + 1);
           document.cookie = '_fbc=' + encodeURIComponent(fbcValue) + '; path=/; expires=' + expirationDate.toUTCString() + '; SameSite=Lax';
         }
-      } catch (e) {
-        // Silently fail - fbclid tracking is optional
-      }
+      } catch (e) {}
     })();
-    
-    // Quiz tracking state flags
-    window.quizStarted = false;
-    window.quizCompleted = false;
     </script>
-    <!-- End Meta Pixel Code -->
-  </head>
-
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx" defer></script>
-    <!-- Mercado Pago SDK (async, non-critical) -->
-    <script async src="https://sdk.mercadopago.com/js/v2"></script>
+    <!-- Mercado Pago SDK (deferred, non-critical) -->
+    <script defer src="https://sdk.mercadopago.com/js/v2"></script>
     <!-- Analytics (deferred) -->
     <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>

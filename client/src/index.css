@@ -92,11 +92,11 @@
   
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Inter', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Lora', serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     font-weight: 600;
   }
   
@@ -221,23 +221,7 @@
   }
   
   .spiritual-background::before {
-    content: '✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖 ✝ 📖';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    font-size: 120px;
-    opacity: 0.03; /* Reduzindo opacidade para visual mais limpo */
-    font-weight: bold;
-    color: #FFFFFF;
-    pointer-events: none;
-    z-index: 0;
-    line-height: 2.2;
-    word-wrap: break-word;
-    overflow: hidden;
-    white-space: pre-wrap;
-    padding: 40px;
-    text-align: justify;
+    content: '';
+    display: none;
   }
 }

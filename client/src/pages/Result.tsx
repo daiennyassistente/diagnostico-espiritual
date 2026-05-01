@@ -192,6 +192,18 @@ export default function Result() {
     },
   );
 
+  // Disparar evento ViewContent quando o resultado é carregado
+  useEffect(() => {
+    if (trpcResult?.diagnostic && typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
+      (window as any).fbq('track', 'ViewContent', {
+        content_name: trpcResult.diagnostic.profileName || 'Diagnóstico Espiritual',
+        content_type: 'product',
+        value: 0,
+        currency: 'BRL'
+      });
+    }
+  }, [trpcResult?.diagnostic]);
+
   // Disparar evento Purchase do Pixel quando o checkout for concluído
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
