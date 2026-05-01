@@ -13,11 +13,12 @@ export function OfferWhatsAppPage() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
 
-  // Extrair leadId da URL real do navegador
+  // Extrair leadId da URL real do navegador, com fallback para o estado salvo localmente
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const leadId = searchParams.get('leadId') || '';
-  const numericLeadId = Number(leadId);
+  const rawLeadId = searchParams.get('leadId') || '';
   const storedLeadData = parseStoredLeadData(typeof window !== "undefined" ? window.localStorage.getItem("leadData") : null);
+  const resolvedLeadId = rawLeadId || (storedLeadData?.leadId ? String(storedLeadData.leadId) : '');
+  const numericLeadId = Number(resolvedLeadId);
   const { data: resultData } = trpc.quiz.getResult.useQuery(
     { leadId: numericLeadId },
     { enabled: Number.isFinite(numericLeadId) && numericLeadId > 0 },
@@ -25,7 +26,7 @@ export function OfferWhatsAppPage() {
 
   const checkoutEmail = resultData?.lead?.email || storedLeadData?.email || "";
   const checkoutPhone = resultData?.lead?.whatsapp || storedLeadData?.whatsapp || "";
-  const checkoutQuizId = resultData?.quizResponse?.quizId || `offer-whatsapp-${leadId}`;
+  const checkoutQuizId = resultData?.quizResponse?.quizId || `offer-whatsapp-${resolvedLeadId}`;
   const checkoutResultId = Number(resultData?.diagnostic?.id ?? 0);
   const checkoutProfileName = resultData?.diagnostic?.profileName || "Devocional WhatsApp";
 
@@ -215,7 +216,7 @@ export function OfferWhatsAppPage() {
               </div>
               <MercadoPagoCheckout
                 email={checkoutEmail}
-                leadId={leadId}
+                leadId={resolvedLeadId}
                 quizId={checkoutQuizId}
                 resultId={checkoutResultId}
                 profileName={checkoutProfileName}
