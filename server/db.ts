@@ -116,16 +116,34 @@ export async function createLead(lead: InsertLead) {
     throw new Error("Database not available");
   }
 
-  try {
-    const result = await db.insert(leads).values(lead);
+  const normalizedLead: InsertLead = {
+    ...lead,
+    userId: lead.userId ?? crypto.randomUUID(),
+  };
 
-    // Drizzle-orm retorna um objeto com insertId
+  try {
+    const result = await db.insert(leads).values(normalizedLead).onDuplicateKeyUpdate({
+      set: {
+        name: normalizedLead.name ?? null,
+        whatsapp: normalizedLead.whatsapp,
+        email: normalizedLead.email,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Drizzle-orm retorna um objeto com insertId quando há novo registro
     const insertId = (result as any).insertId || (result as any)[0]?.insertId;
     if (insertId) {
       return { id: Number(insertId) };
     }
 
-    // Se não conseguir o insertId, tenta buscar o lead mais recente
+    // Em caso de upsert por userId, buscar explicitamente o registro existente/atualizado
+    const existingLead = await db.select().from(leads).where(eq(leads.userId, normalizedLead.userId!)).limit(1);
+    if (existingLead && existingLead.length > 0) {
+      return { id: existingLead[0].id };
+    }
+
+    // Fallback defensivo
     const latestLead = await db.select().from(leads).orderBy(desc(leads.id)).limit(1);
     if (latestLead && latestLead.length > 0) {
       return { id: latestLead[0].id };
@@ -144,8 +162,13 @@ export async function createQuizResponse(response: InsertQuizResponse) {
     throw new Error("Database not available");
   }
 
+  const normalizedResponse: InsertQuizResponse = {
+    ...response,
+    quizId: response.quizId ?? crypto.randomUUID(),
+  };
+
   try {
-    const result = await db.insert(quizResponses).values(response);
+    const result = await db.insert(quizResponses).values(normalizedResponse);
 
     // Drizzle-orm retorna um objeto com insertId
     const insertId = (result as any).insertId || (result as any)[0]?.insertId;
