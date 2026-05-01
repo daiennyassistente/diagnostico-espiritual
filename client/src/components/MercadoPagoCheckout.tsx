@@ -12,6 +12,7 @@ interface MercadoPagoCheckoutProps {
   resultId: number;
   profileName: string;
   userPhone: string;
+  amount?: number;
   onSuccess?: (transactionId?: string) => void;
 }
 
@@ -28,10 +29,11 @@ export function MercadoPagoCheckout({
   resultId,
   profileName,
   userPhone,
+  amount = 9.9,
   onSuccess,
 }: MercadoPagoCheckoutProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "pix">("card");
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "pix">("pix");
   const [pixCode, setPixCode] = useState<string>("");
   const [pixQrCode, setPixQrCode] = useState<string>("");
   const [transactionId, setTransactionId] = useState<string>("");
@@ -69,7 +71,7 @@ export function MercadoPagoCheckout({
           // Chamar onSuccess agora que o pagamento foi confirmado
           onSuccess?.(transactionId);
           // Obter o valor da compra do localStorage
-          const purchaseAmount = localStorage.getItem('purchaseAmount') || '9.90';
+          const purchaseAmount = localStorage.getItem('purchaseAmount') || amount.toFixed(2);
           window.location.href = `/checkout-success?transaction_id=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(purchaseAmount)}`;
         }
       } catch (error) {
@@ -88,6 +90,11 @@ export function MercadoPagoCheckout({
     setIsLoading(true);
     try {
       // Create payment with card
+      window.localStorage.setItem('purchaseAmount', amount.toFixed(2));
+      if (userPhone) {
+        window.localStorage.setItem('userWhatsapp', userPhone);
+      }
+
       const result = await createPaymentMutation.mutateAsync({
         email,
         leadId,
@@ -96,9 +103,14 @@ export function MercadoPagoCheckout({
         profileName,
         userPhone,
         paymentMethod: "card",
+        amount,
       });
 
-      if (result.success) {
+      if (result.success && result.checkoutUrl) {
+        toast.success("Redirecionando para o pagamento...");
+        window.location.href = result.checkoutUrl;
+        return;
+      } else if (result.success) {
         toast.success("Pagamento processado com sucesso!");
         onSuccess?.();
       } else {
@@ -116,6 +128,11 @@ export function MercadoPagoCheckout({
     setIsLoading(true);
     try {
       console.log("[MercadoPagoCheckout] Iniciando pagamento PIX");
+      window.localStorage.setItem('purchaseAmount', amount.toFixed(2));
+      if (userPhone) {
+        window.localStorage.setItem('userWhatsapp', userPhone);
+      }
+
       const result = await createPaymentMutation.mutateAsync({
         email,
         leadId,
@@ -124,6 +141,7 @@ export function MercadoPagoCheckout({
         profileName,
         userPhone,
         paymentMethod: "pix",
+        amount,
       });
 
       console.log("[MercadoPagoCheckout] Resposta recebida:", result);

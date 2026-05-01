@@ -148,7 +148,9 @@ describe("mercadopago-webhook idempotência", () => {
       "maria@example.com",
       12.9,
       "txn-abc",
-      "Perfil Personalizado"
+      "Perfil Personalizado",
+      undefined,
+      "Maria"
     );
     expect(res.status).toHaveBeenCalledWith(200);
   });

@@ -6,19 +6,39 @@ import { useState } from "react";
 import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { parseStoredLeadData } from "@/lib/leadStorage";
 
 export function OfferPage() {
   const [location, setLocation] = useLocation();
   const [showCheckout, setShowCheckout] = useState(false);
-  const { data: user } = trpc.auth.me.useQuery();
-  
+
   // Extrair leadId da URL
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
   const leadId = searchParams.get('leadId') || '';
+  const numericLeadId = Number(leadId);
+  const storedLeadData = parseStoredLeadData(typeof window !== "undefined" ? window.localStorage.getItem("leadData") : null);
+  const { data: resultData } = trpc.quiz.getResult.useQuery(
+    { leadId: numericLeadId },
+    { enabled: Number.isFinite(numericLeadId) && numericLeadId > 0 },
+  );
+
+  const checkoutEmail = resultData?.lead?.email || storedLeadData?.email || "";
+  const checkoutPhone = resultData?.lead?.whatsapp || storedLeadData?.whatsapp || "";
+  const checkoutQuizId = resultData?.quizResponse?.quizId || `offer-${leadId}`;
+  const checkoutResultId = Number(resultData?.diagnostic?.id ?? 0);
+  const checkoutProfileName = resultData?.diagnostic?.profileName || "Devocional";
 
   const handleCheckout = () => {
-    if (!user?.email) {
+    if (!numericLeadId) {
+      toast.error("Não conseguimos identificar seu acesso. Refaça o quiz.");
+      return;
+    }
+    if (!checkoutEmail) {
       toast.error("Não conseguimos identificar seu e-mail. Refaça o quiz.");
+      return;
+    }
+    if (!checkoutResultId) {
+      toast.error("Seu resultado ainda não está pronto para pagamento. Volte ao resultado e tente novamente.");
       return;
     }
     setShowCheckout(true);
@@ -100,8 +120,7 @@ export function OfferPage() {
 
                 <Button
                   size="lg"
-                  className="w-full text-sm md:text-lg font-bold mb-4 py-6"
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-6 md:py-8 text-sm md:text-lg uppercase tracking-wider mb-4 whitespace-normal leading-tight"
                   onClick={handleCheckout}
                 >
                   <Zap className="w-5 h-5 mr-2" />
@@ -184,8 +203,7 @@ export function OfferPage() {
           </p>
           <Button
             size="lg"
-            className="text-lg font-bold py-6 px-8"
-            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-8 uppercase tracking-wider"
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-black py-6 md:py-8 px-6 md:px-8 text-base md:text-lg uppercase tracking-wider whitespace-normal leading-tight"
             onClick={handleCheckout}
           >
             <Zap className="w-5 h-5 mr-2" />
@@ -207,8 +225,8 @@ export function OfferPage() {
 
       {/* Checkout Modal */}
       {showCheckout && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Pagamento</h2>
@@ -220,12 +238,13 @@ export function OfferPage() {
                 </button>
               </div>
               <MercadoPagoCheckout
-                email={user?.email || ""}
+                email={checkoutEmail}
                 leadId={leadId}
-                quizId=""
-                resultId={0}
-                profileName="Devocional"
-                userPhone=""
+                quizId={checkoutQuizId}
+                resultId={checkoutResultId}
+                profileName={checkoutProfileName}
+                userPhone={checkoutPhone}
+                amount={9.9}
                 onSuccess={handlePaymentSuccess}
               />
             </div>

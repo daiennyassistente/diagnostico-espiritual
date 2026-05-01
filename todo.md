@@ -1250,3 +1250,9 @@
 - [x] Garantir que "Quiz Completo" represente quem apertou no botão "Finalizar"
 - [x] Validar os gatilhos e o mapeamento final dos três status
 - [x] Investigar e corrigir exclusivamente o problema atual que impede a geração/carregamento do resultado do quiz
+- [x] Auditar todo o fluxo do sistema do início ao fim, validando quiz, captura de lead, geração de resultado, oferta, checkout e pós-pagamento
+- [x] Corrigir exclusivamente os erros técnicos das páginas de oferta que impedem o fluxo até o checkout
+- [x] Verificar e corrigir exclusivamente o fluxo de pagamento Pix até a aprovação
+- [x] Verificar e corrigir exclusivamente a entrega automática do devocional após pagamento aprovado
+- [x] Verificar e corrigir exclusivamente o carregamento da página de sucesso após aprovação do pagamento
+- [x] Ajustar exclusivamente a visualização mobile das páginas afetadas no fluxo de oferta e sucesso
