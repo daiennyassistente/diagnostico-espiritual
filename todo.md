@@ -1257,3 +1257,4 @@
 - [x] Verificar e corrigir exclusivamente o carregamento da página de sucesso após aprovação do pagamento
 - [x] Ajustar exclusivamente a visualização mobile das páginas afetadas no fluxo de oferta e sucesso
 - [x] Corrigir exclusivamente a falha de criação de lead ao finalizar o quiz, causada pelo insert na tabela leads durante a conclusão do formulário
+- [x] Corrigir exclusivamente o fluxo do botão "começar minha transformação" para abrir o QR Code e o código Pix sem cair na mensagem de acesso não localizado ou redirecionar para refazer o quiz

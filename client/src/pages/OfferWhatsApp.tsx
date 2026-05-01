@@ -13,8 +13,8 @@ export function OfferWhatsAppPage() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutos em segundos
 
-  // Extrair leadId da URL
-  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  // Extrair leadId da URL real do navegador
+  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const leadId = searchParams.get('leadId') || '';
   const numericLeadId = Number(leadId);
   const storedLeadData = parseStoredLeadData(typeof window !== "undefined" ? window.localStorage.getItem("leadData") : null);

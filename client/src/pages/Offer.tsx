@@ -12,8 +12,8 @@ export function OfferPage() {
   const [location, setLocation] = useLocation();
   const [showCheckout, setShowCheckout] = useState(false);
 
-  // Extrair leadId da URL
-  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  // Extrair leadId da URL real do navegador
+  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const leadId = searchParams.get('leadId') || '';
   const numericLeadId = Number(leadId);
   const storedLeadData = parseStoredLeadData(typeof window !== "undefined" ? window.localStorage.getItem("leadData") : null);

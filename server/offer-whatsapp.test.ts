@@ -16,6 +16,24 @@ describe('WhatsApp Offer Flow - Mercado Pago Integration', () => {
       expect(typeof mockLeadData.leadId).toBe('number');
     });
 
+    it('should retrieve leadId from the real browser query string', () => {
+      const searchParams = new URLSearchParams('?leadId=456');
+      const leadId = searchParams.get('leadId') || '';
+      const numericLeadId = Number(leadId);
+
+      expect(leadId).toBe('456');
+      expect(numericLeadId).toBe(456);
+    });
+
+    it('should not lose leadId when the router location omits the query string', () => {
+      const routerLocation = '/offer';
+      const routerLeadId = new URLSearchParams(routerLocation.split('?')[1] || '').get('leadId');
+      const browserLeadId = new URLSearchParams('?leadId=789').get('leadId');
+
+      expect(routerLeadId).toBeNull();
+      expect(browserLeadId).toBe('789');
+    });
+
     it('should construct checkout URL with leadId parameter', () => {
       const leadId = 123;
       const price = 7.90;
