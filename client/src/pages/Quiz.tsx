@@ -153,6 +153,21 @@ export default function Quiz() {
     }
   }, [hasStarted, userId]);
 
+  // Disparar ViewContent apenas uma vez quando o quiz é iniciado
+  useEffect(() => {
+    if (hasStarted && currentStep === 1) {
+      if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
+        (window as any).fbq('track', 'ViewContent', {
+          content_name: 'Quiz Diagnóstico Espiritual',
+          content_type: 'product',
+          value: 0,
+          currency: 'BRL'
+        });
+        console.log('[Meta] ViewContent disparado ao iniciar quiz');
+      }
+    }
+  }, [hasStarted, currentStep]);
+
   const handleNext = () => {
     if (currentStep < QUIZ_STEPS.length) {
       setCurrentStep(currentStep + 1);
@@ -233,7 +248,15 @@ export default function Quiz() {
       });
 
       setProcessingStep(2);
-      trackViewContent();
+      // Disparar evento Lead quando o lead é enviado
+      if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
+        (window as any).fbq('track', 'Lead', {
+          content_name: 'Quiz Diagnóstico Espiritual - Lead',
+          value: 0,
+          currency: 'BRL'
+        });
+        console.log('[Meta] Lead disparado ao enviar dados do lead');
+      }
 
       if (processingTimerRef.current) {
         window.clearTimeout(processingTimerRef.current);
@@ -317,36 +340,60 @@ export default function Quiz() {
             </div>
             <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-tight">Algo está afastando você de Deus?</h1>
             <p className="text-base md:text-lg text-foreground/80 font-bold">baseado na Bíblia</p>
-            <p className="text-sm md:text-lg text-foreground/80">
-              Identifique em <span className="font-semibold">60 segundos</span> o bloqueio espiritual que está impedindo sua paz. 🙏
-            </p>
+            <p className="text-sm md:text-base text-foreground/70">Identifique em 1 min o que vem te enfraquecendo</p>
             
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 my-4 text-xs md:text-sm text-foreground">
-              <div className="flex items-center gap-1"><span>🔒</span><span>Rápido</span></div>
-              <div className="flex items-center gap-1"><span>🔒</span><span>Confidencial</span></div>
-              <div className="flex items-center gap-1"><span>⚡</span><span>Imediato</span></div>
+            <div className="space-y-3 mt-8">
+              <button
+                onClick={async () => {
+                  setResponses({ ...responses, [-1]: 'Sim' });
+                  setShowInitialScreen(false);
+                  setCurrentStep(1);
+                  
+                  // Criar um lead vazio para rastreamento
+                  try {
+                    const leadResult = await createLeadMutation.mutateAsync({
+                      userId: userId,
+                      name: '',
+                      whatsapp: '',
+                      email: '',
+                    });
+                    setQuizLeadId(leadResult.leadId);
+                    setHasStarted(true);
+                  } catch (error) {
+                    console.error('Erro ao criar lead:', error);
+                    setHasStarted(true);
+                  }
+                }}
+                className="quiz-button w-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                Sim
+              </button>
+              <button
+                onClick={async () => {
+                  setResponses({ ...responses, [-1]: 'Não' });
+                  setShowInitialScreen(false);
+                  setCurrentStep(1);
+                  
+                  // Criar um lead vazio para rastreamento
+                  try {
+                    const leadResult = await createLeadMutation.mutateAsync({
+                      userId: userId,
+                      name: '',
+                      whatsapp: '',
+                      email: '',
+                    });
+                    setQuizLeadId(leadResult.leadId);
+                    setHasStarted(true);
+                  } catch (error) {
+                    console.error('Erro ao criar lead:', error);
+                    setHasStarted(true);
+                  }
+                }}
+                className="quiz-button w-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                Não
+              </button>
             </div>
-
-            <Button
-              onClick={() => {
-                setShowInitialScreen(false);
-                setHasStarted(true);
-                setCurrentStep(1);
-                // Disparar evento ViewContent quando o quiz começa
-                if (typeof window !== 'undefined' && typeof (window as any).fbq !== 'undefined') {
-                  (window as any).fbq('track', 'ViewContent', {
-                    content_name: 'Quiz Diagnóstico Espiritual',
-                    content_type: 'product',
-                    value: 0,
-                    currency: 'BRL'
-                  });
-                }
-              }}
-              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-base md:text-lg py-6 md:py-8 font-black uppercase tracking-wider shadow-[0_0_20px_rgba(255,215,0,0.3)]"
-            >
-              🙏 QUERO DESCOBRIR AGORA
-            </Button>
-            <p className="text-[10px] md:text-sm text-muted-foreground">✨ +1.000 pessoas já iniciaram hoje.</p>
           </div>
         </div>
       </div>
